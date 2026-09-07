@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "SnapBrief AI",
+    "slug": "snapbrief-ai",
+    "version": "1.0.0",
+    "scheme": "snapbrief",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "plugins": ["expo-router"],
+    "ios": { "supportsTablet": true },
+    "android": { "edgeToEdgeEnabled": true }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "snapbrief-ai",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "mobile": "npm --prefix apps/mobile start",
+    "api": "python services/api/run.py",
+    "api:dev": "cd services/api && python -m uvicorn app.main:app --reload --port 8000"
+  }
+}
