@@ -1,276 +1,387 @@
 import React, { useRef, useState } from 'react';
 import {
-  Animated,
   Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const COLORS = {
-  background: '#071113',
-  surface: '#0D1A1D',
-  surfaceLight: '#112326',
-  primary: '#27D7D0',
-  primarySoft: '#8AF4EF',
-  primaryDark: '#159E9A',
-  white: '#F4FFFF',
-  text: '#D9E9E8',
-  muted: '#87A3A3',
-  border: '#1B393C',
+  background: '#061113',
+  surface: '#0B181B',
+  surfaceElevated: '#102326',
+  surfaceMuted: '#132B2E',
+
+  primary: '#2DE1D6',
+  primaryLight: '#92FFF7',
+  primaryDark: '#12AAA4',
+
+  white: '#F3FFFE',
+  text: '#D7E8E7',
+  muted: '#8AA6A5',
+  subtle: '#5D7778',
+
+  border: '#1B383A',
+  borderStrong: '#285254',
 };
 
-const SLIDES = [
+type Slide = {
+  eyebrow: string;
+  title: string;
+  description: string;
+};
+
+const SLIDES: Slide[] = [
   {
     eyebrow: 'WELCOME TO SNAPBRIEF',
     title: 'Turn messy thoughts\ninto clear briefs.',
     description:
-      'Capture your ideas, notes, and conversations in seconds. SnapBrief uses AI to turn them into something you can actually use.',
+      'Drop in your rough notes, ideas, or meeting details. SnapBrief uses AI to turn them into something clear, useful, and ready to act on.',
   },
   {
-    eyebrow: 'LET AI ORGANIZE IT',
-    title: 'From raw notes\nto clear action.',
+    eyebrow: 'LET AI DO THE SORTING',
+    title: 'Less formatting.\nMore clarity.',
     description:
-      'SnapBrief finds the important details, summarizes the context, and turns scattered notes into focused next steps.',
+      'SnapBrief picks out the important details, summarizes the context, and turns scattered information into focused next steps.',
   },
   {
     eyebrow: 'READY WHEN YOU ARE',
     title: 'Capture it.\nStructure it.\nMove forward.',
     description:
-      'Get concise summaries, action items, priorities, and useful tags without spending time formatting everything yourself.',
+      'Get a clean summary, action items, priority, due dates, and tags in seconds — without manually organizing everything.',
   },
 ];
 
 function BrandMark() {
   return (
-    <View style={styles.brandMark}>
+    <View style={styles.brandMarkShadow}>
       <LinearGradient
-        colors={[COLORS.primarySoft, COLORS.primary, COLORS.primaryDark]}
+        colors={[
+          COLORS.primaryLight,
+          COLORS.primary,
+          COLORS.primaryDark,
+        ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.brandGradient}
+        style={styles.brandMark}
       >
-        <Ionicons name="flash" size={24} color={COLORS.background} />
+        <Ionicons
+          name="flash"
+          size={21}
+          color={COLORS.background}
+        />
       </LinearGradient>
     </View>
   );
 }
 
-function FeatureVisual({ index }: { index: number }) {
-  if (index === 0) {
-    return (
-      <View style={styles.visualFrame}>
-        <View style={styles.glowOne} />
-        <View style={styles.glowTwo} />
+function Glow({
+  size,
+  top,
+  left,
+  opacity,
+}: {
+  size: number;
+  top: number;
+  left: number;
+  opacity: number;
+}) {
+  return (
+    <View
+      style={[
+        styles.glow,
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          top,
+          left,
+          opacity,
+        },
+      ]}
+    />
+  );
+}
 
-        <View style={styles.noteCard}>
-          <View style={styles.noteTop}>
-            <View style={styles.tinyDot} />
-            <Text style={styles.noteLabel}>RAW NOTES</Text>
-          </View>
+function FirstVisual() {
+  return (
+    <View style={styles.visualArea}>
+      <Glow size={190} top={56} left={58} opacity={0.07} />
+      <Glow size={100} top={180} left={208} opacity={0.05} />
 
-          <Text style={styles.noteText}>
-            client meeting friday 3pm{'\n'}
-            redesign homepage{'\n'}
-            budget maybe 120k{'\n'}
-            discuss payment
-          </Text>
-
-          <View style={styles.lineShort} />
-          <View style={styles.lineLong} />
+      <View style={styles.rawCard}>
+        <View style={styles.cardHeader}>
+          <View style={styles.statusDot} />
+          <Text style={styles.microLabel}>RAW NOTES</Text>
         </View>
 
-        <View style={styles.centerIcon}>
-          <Ionicons name="sparkles" size={21} color={COLORS.background} />
-        </View>
+        <Text style={styles.rawText}>
+          client meeting friday 3pm{'\n'}
+          redesign homepage{'\n'}
+          budget around 120k{'\n'}
+          discuss payment terms
+        </Text>
 
-        <View style={styles.briefCard}>
-          <View style={styles.briefTop}>
-            <View style={styles.briefIcon}>
-              <Ionicons
-                name="checkmark"
-                size={13}
-                color={COLORS.background}
-              />
-            </View>
-
-            <Text style={styles.briefLabel}>AI BRIEF</Text>
-          </View>
-
-          <Text style={styles.briefTitle}>Website Redesign</Text>
-
-          <View style={styles.briefRow}>
-            <Ionicons
-              name="calendar-outline"
-              size={13}
-              color={COLORS.primary}
-            />
-            <Text style={styles.briefRowText}>Friday · 3:00 PM</Text>
-          </View>
-
-          <View style={styles.briefRow}>
-            <Ionicons
-              name="flash-outline"
-              size={13}
-              color={COLORS.primary}
-            />
-            <Text style={styles.briefRowText}>High priority</Text>
-          </View>
-        </View>
+        <View style={styles.fakeLineShort} />
+        <View style={styles.fakeLineLong} />
       </View>
-    );
-  }
 
-  if (index === 1) {
-    return (
-      <View style={styles.visualFrame}>
-        <View style={styles.glowOne} />
-        <View style={styles.glowTwo} />
+      <View style={styles.magicButton}>
+        <Ionicons
+          name="sparkles"
+          size={20}
+          color={COLORS.background}
+        />
+      </View>
 
-        <View style={[styles.flowCard, styles.flowBack]}>
-          <Text style={styles.flowSmall}>RAW</Text>
-          <Text style={styles.flowLarge}>Notes</Text>
-
-          <View style={styles.flowLines}>
-            <View style={styles.flowLineOne} />
-            <View style={styles.flowLineTwo} />
-            <View style={styles.flowLineThree} />
+      <View style={styles.resultCard}>
+        <View style={styles.cardHeader}>
+          <View style={styles.resultIcon}>
+            <Ionicons
+              name="checkmark"
+              size={12}
+              color={COLORS.background}
+            />
           </View>
+
+          <Text style={styles.resultLabel}>AI BRIEF</Text>
         </View>
 
-        <View style={styles.flowArrow}>
+        <Text style={styles.resultTitle}>Website Redesign</Text>
+
+        <View style={styles.infoRow}>
           <Ionicons
-            name="arrow-forward"
-            size={17}
+            name="calendar-outline"
+            size={14}
             color={COLORS.primary}
           />
+          <Text style={styles.infoText}>Friday · 3:00 PM</Text>
         </View>
 
-        <View style={[styles.flowCard, styles.flowFront]}>
-          <View style={styles.flowHeader}>
-            <View style={styles.checkCircle}>
-              <Ionicons
-                name="checkmark"
-                size={11}
-                color={COLORS.background}
-              />
-            </View>
-
-            <Text style={styles.flowSmall}>AI</Text>
-          </View>
-
-          <Text style={styles.flowLarge}>Clarity</Text>
-
-          <View style={styles.miniPill}>
-            <Text style={styles.miniPillText}>Summary</Text>
-          </View>
-
-          <View style={styles.miniPill}>
-            <Text style={styles.miniPillText}>Actions</Text>
-          </View>
-
-          <View style={styles.miniPill}>
-            <Text style={styles.miniPillText}>Priority</Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.visualFrame}>
-      <View style={styles.glowOne} />
-      <View style={styles.glowTwo} />
-
-      <View style={styles.finalCard}>
-        <View style={styles.finalHeader}>
-          <View>
-            <Text style={styles.finalEyebrow}>YOUR BRIEF</Text>
-            <Text style={styles.finalTitle}>Ready to act</Text>
-          </View>
-
-          <View style={styles.finalBadge}>
-            <Ionicons
-              name="sparkles"
-              size={13}
-              color={COLORS.background}
-            />
-          </View>
-        </View>
-
-        <View style={styles.statRow}>
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>04</Text>
-            <Text style={styles.statLabel}>Points</Text>
-          </View>
-
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>03</Text>
-            <Text style={styles.statLabel}>Actions</Text>
-          </View>
-
-          <View style={styles.statBox}>
-            <Text style={styles.statNumber}>01</Text>
-            <Text style={styles.statLabel}>Priority</Text>
-          </View>
-        </View>
-
-        <View style={styles.actionItem}>
-          <View style={styles.actionIcon}>
-            <Ionicons
-              name="arrow-forward"
-              size={12}
-              color={COLORS.background}
-            />
-          </View>
-
-          <Text style={styles.actionText}>Send revised proposal</Text>
-        </View>
-
-        <View style={styles.actionItem}>
-          <View style={styles.actionIcon}>
-            <Ionicons
-              name="arrow-forward"
-              size={12}
-              color={COLORS.background}
-            />
-          </View>
-
-          <Text style={styles.actionText}>Confirm payment terms</Text>
+        <View style={styles.infoRow}>
+          <Ionicons
+            name="flag-outline"
+            size={14}
+            color={COLORS.primary}
+          />
+          <Text style={styles.infoText}>High priority</Text>
         </View>
       </View>
     </View>
   );
 }
 
+function SecondVisual() {
+  return (
+    <View style={styles.visualArea}>
+      <Glow size={190} top={60} left={62} opacity={0.06} />
+      <Glow size={120} top={165} left={202} opacity={0.05} />
+
+      <View
+        style={[
+          styles.transformCard,
+          styles.transformBack,
+        ]}
+      >
+        <Text style={styles.transformLabel}>RAW</Text>
+        <Text style={styles.transformTitle}>Notes</Text>
+
+        <View style={styles.stackLines}>
+          <View style={[styles.stackLine, { width: '86%' }]} />
+          <View style={[styles.stackLine, { width: '69%' }]} />
+          <View style={[styles.stackLine, { width: '78%' }]} />
+          <View style={[styles.stackLine, { width: '58%' }]} />
+        </View>
+      </View>
+
+      <View style={styles.arrowCircle}>
+        <Ionicons
+          name="arrow-forward"
+          size={17}
+          color={COLORS.primary}
+        />
+      </View>
+
+      <View
+        style={[
+          styles.transformCard,
+          styles.transformFront,
+        ]}
+      >
+        <View style={styles.aiHeader}>
+          <View style={styles.aiDot}>
+            <Ionicons
+              name="sparkles"
+              size={10}
+              color={COLORS.background}
+            />
+          </View>
+
+          <Text style={styles.transformLabel}>AI</Text>
+        </View>
+
+        <Text style={styles.transformTitle}>Clarity</Text>
+
+        <View style={styles.tag}>
+          <Ionicons
+            name="document-text-outline"
+            size={12}
+            color={COLORS.primary}
+          />
+          <Text style={styles.tagText}>Summary</Text>
+        </View>
+
+        <View style={styles.tag}>
+          <Ionicons
+            name="checkmark-circle-outline"
+            size={12}
+            color={COLORS.primary}
+          />
+          <Text style={styles.tagText}>Actions</Text>
+        </View>
+
+        <View style={styles.tag}>
+          <Ionicons
+            name="flag-outline"
+            size={12}
+            color={COLORS.primary}
+          />
+          <Text style={styles.tagText}>Priority</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function ThirdVisual() {
+  return (
+    <View style={styles.visualArea}>
+      <Glow size={200} top={52} left={53} opacity={0.07} />
+      <Glow size={115} top={182} left={205} opacity={0.05} />
+
+      <View style={styles.readyCard}>
+        <View style={styles.readyHeader}>
+          <View>
+            <Text style={styles.readyEyebrow}>YOUR BRIEF</Text>
+            <Text style={styles.readyTitle}>Ready to act</Text>
+          </View>
+
+          <View style={styles.readySpark}>
+            <Ionicons
+              name="sparkles"
+              size={14}
+              color={COLORS.background}
+            />
+          </View>
+        </View>
+
+        <View style={styles.stats}>
+          <View style={styles.stat}>
+            <Text style={styles.statNumber}>04</Text>
+            <Text style={styles.statLabel}>POINTS</Text>
+          </View>
+
+          <View style={styles.stat}>
+            <Text style={styles.statNumber}>03</Text>
+            <Text style={styles.statLabel}>ACTIONS</Text>
+          </View>
+
+          <View style={styles.stat}>
+            <Text style={styles.statNumber}>01</Text>
+            <Text style={styles.statLabel}>PRIORITY</Text>
+          </View>
+        </View>
+
+        <View style={styles.actionRow}>
+          <View style={styles.actionCircle}>
+            <Ionicons
+              name="arrow-forward"
+              size={11}
+              color={COLORS.background}
+            />
+          </View>
+          <Text style={styles.actionText}>
+            Send revised proposal
+          </Text>
+        </View>
+
+        <View style={styles.actionRow}>
+          <View style={styles.actionCircle}>
+            <Ionicons
+              name="arrow-forward"
+              size={11}
+              color={COLORS.background}
+            />
+          </View>
+          <Text style={styles.actionText}>
+            Confirm payment terms
+          </Text>
+        </View>
+
+        <View style={styles.priorityStrip}>
+          <View style={styles.priorityDot} />
+          <Text style={styles.priorityText}>
+            HIGH PRIORITY
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function SlideVisual({ index }: { index: number }) {
+  if (index === 0) {
+    return <FirstVisual />;
+  }
+
+  if (index === 1) {
+    return <SecondVisual />;
+  }
+
+  return <ThirdVisual />;
+}
+
 export default function OnboardingScreen() {
   const scrollRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [finishing, setFinishing] = useState(false);
 
-  const completeOnboarding = async () => {
-    await AsyncStorage.setItem(
-      'snapbrief_onboarding_complete',
-      'true'
-    );
+  const finishOnboarding = async () => {
+    if (finishing) {
+      return;
+    }
 
-    router.replace('/(tabs)');
+    setFinishing(true);
+
+    try {
+      await AsyncStorage.setItem(
+        'snapbrief_onboarding_complete',
+        'true'
+      );
+
+      requestAnimationFrame(() => {
+        router.replace('/(tabs)');
+      });
+    } catch {
+      setFinishing(false);
+    }
   };
 
-  const next = () => {
+  const handleNext = () => {
     if (currentIndex === SLIDES.length - 1) {
-      completeOnboarding();
+      finishOnboarding();
       return;
     }
 
@@ -280,31 +391,43 @@ export default function OnboardingScreen() {
       x: nextIndex * width,
       animated: true,
     });
-
-    setCurrentIndex(nextIndex);
   };
 
   const handleScrollEnd = (
     event: NativeSyntheticEvent<NativeScrollEvent>
   ) => {
-    const index = Math.round(
+    const nextIndex = Math.round(
       event.nativeEvent.contentOffset.x / width
     );
 
-    setCurrentIndex(index);
+    if (
+      nextIndex >= 0 &&
+      nextIndex < SLIDES.length &&
+      nextIndex !== currentIndex
+    ) {
+      setCurrentIndex(nextIndex);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={COLORS.background}
+      />
 
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView
+        style={styles.safeArea}
+        edges={['top', 'bottom']}
+      >
         <View style={styles.topBar}>
           <View style={styles.brand}>
             <BrandMark />
 
             <View>
-              <Text style={styles.brandName}>SnapBrief</Text>
+              <Text style={styles.brandName}>
+                SnapBrief
+              </Text>
               <Text style={styles.brandCaption}>
                 AI NOTES, MADE USEFUL
               </Text>
@@ -313,7 +436,8 @@ export default function OnboardingScreen() {
 
           {currentIndex < SLIDES.length - 1 && (
             <Pressable
-              onPress={completeOnboarding}
+              onPress={finishOnboarding}
+              disabled={finishing}
               hitSlop={12}
               style={styles.skipButton}
             >
@@ -322,19 +446,20 @@ export default function OnboardingScreen() {
           )}
         </View>
 
-        <Animated.ScrollView
+        <ScrollView
           ref={scrollRef}
           horizontal
           pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={handleScrollEnd}
-          scrollEventThrottle={16}
           bounces={false}
+          showsHorizontalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onMomentumScrollEnd={handleScrollEnd}
+          contentContainerStyle={styles.scrollContent}
         >
-          {SLIDES.map((item, index) => (
-            <View style={styles.slide} key={item.eyebrow}>
+          {SLIDES.map((slide, index) => (
+            <View style={styles.slide} key={slide.eyebrow}>
               <View style={styles.visualWrap}>
-                <FeatureVisual index={index} />
+                <SlideVisual index={index} />
               </View>
 
               <View style={styles.copy}>
@@ -342,22 +467,24 @@ export default function OnboardingScreen() {
                   <View style={styles.eyebrowLine} />
 
                   <Text style={styles.eyebrow}>
-                    {item.eyebrow}
+                    {slide.eyebrow}
                   </Text>
                 </View>
 
-                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.title}>
+                  {slide.title}
+                </Text>
 
                 <Text style={styles.description}>
-                  {item.description}
+                  {slide.description}
                 </Text>
               </View>
             </View>
           ))}
-        </Animated.ScrollView>
+        </ScrollView>
 
         <View style={styles.bottom}>
-          <View style={styles.indicators}>
+          <View style={styles.indicatorRow}>
             {SLIDES.map((_, index) => (
               <View
                 key={index}
@@ -371,34 +498,36 @@ export default function OnboardingScreen() {
           </View>
 
           <Pressable
-            onPress={next}
+            onPress={handleNext}
+            disabled={finishing}
             style={({ pressed }) => [
               styles.primaryButton,
-              pressed && styles.primaryButtonPressed,
+              pressed && styles.buttonPressed,
+              finishing && styles.buttonDisabled,
             ]}
           >
             <Text style={styles.primaryButtonText}>
-              {currentIndex === SLIDES.length - 1
-                ? 'Start creating'
-                : 'Continue'}
+              {finishing
+                ? 'Opening…'
+                : currentIndex === SLIDES.length - 1
+                  ? 'Start creating'
+                  : 'Continue'}
             </Text>
 
-            <View style={styles.buttonIcon}>
-              <Ionicons
-                name={
-                  currentIndex === SLIDES.length - 1
-                    ? 'arrow-forward'
-                    : 'chevron-forward'
-                }
-                size={17}
-                color={COLORS.background}
-              />
-            </View>
+            {!finishing && (
+              <View style={styles.buttonIcon}>
+                <Ionicons
+                  name="arrow-forward"
+                  size={17}
+                  color={COLORS.background}
+                />
+              </View>
+            )}
           </Pressable>
 
-          <Text style={styles.privacy}>
-            Your notes stay yours. AI is used only to structure what
-            you provide.
+          <Text style={styles.footerText}>
+            Your notes stay yours. SnapBrief only structures what
+            you choose to provide.
           </Text>
         </View>
       </SafeAreaView>
@@ -417,7 +546,7 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    height: 76,
+    height: 74,
     paddingHorizontal: 22,
     flexDirection: 'row',
     alignItems: 'center',
@@ -430,22 +559,22 @@ const styles = StyleSheet.create({
     gap: 11,
   },
 
-  brandMark: {
-    width: 42,
-    height: 42,
+  brandMarkShadow: {
+    width: 41,
+    height: 41,
     borderRadius: 14,
     overflow: 'hidden',
     shadowColor: COLORS.primary,
-    shadowOpacity: 0.25,
-    shadowRadius: 14,
+    shadowOpacity: 0.28,
+    shadowRadius: 16,
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 7,
     },
     elevation: 8,
   },
 
-  brandGradient: {
+  brandMark: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -455,14 +584,14 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '800',
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
 
   brandCaption: {
-    color: COLORS.muted,
+    color: COLORS.subtle,
     fontSize: 7.5,
     fontWeight: '800',
-    letterSpacing: 1.3,
+    letterSpacing: 1.25,
     marginTop: 2,
   },
 
@@ -477,62 +606,49 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
+  scrollContent: {
+    alignItems: 'stretch',
+  },
+
   slide: {
     width,
     paddingHorizontal: 22,
   },
 
   visualWrap: {
-    height: 345,
+    height: Math.min(height * 0.42, 355),
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  visualFrame: {
+  visualArea: {
     width: width - 44,
-    height: 320,
+    height: 330,
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  glowOne: {
+  glow: {
     position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 180,
     backgroundColor: COLORS.primary,
-    opacity: 0.07,
-    top: 50,
-    left: 70,
   },
 
-  glowTwo: {
+  rawCard: {
     position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 120,
-    backgroundColor: COLORS.primarySoft,
-    opacity: 0.05,
-    bottom: 30,
-    right: 80,
-  },
-
-  noteCard: {
-    position: 'absolute',
-    width: 236,
-    minHeight: 156,
-    top: 55,
-    left: 4,
-    backgroundColor: '#0D191B',
+    width: 234,
+    height: 158,
+    top: 48,
+    left: 3,
+    padding: 17,
+    borderRadius: 20,
+    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
-    borderRadius: 20,
-    padding: 17,
     transform: [{ rotate: '-5deg' }],
     shadowColor: '#000',
     shadowOpacity: 0.25,
-    shadowRadius: 18,
+    shadowRadius: 20,
     shadowOffset: {
       width: 0,
       height: 12,
@@ -540,100 +656,202 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
-  noteTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-    marginBottom: 14,
-  },
-
-  tinyDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 6,
-    backgroundColor: COLORS.primary,
-  },
-
-  noteLabel: {
-    color: COLORS.muted,
-    fontSize: 8.5,
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
-
-  noteText: {
-    color: '#AFC5C4',
-    fontSize: 12,
-    lineHeight: 20,
-  },
-
-  lineShort: {
-    width: '40%',
-    height: 4,
-    borderRadius: 5,
-    backgroundColor: '#203336',
-    marginTop: 13,
-  },
-
-  lineLong: {
-    width: '66%',
-    height: 4,
-    borderRadius: 5,
-    backgroundColor: '#203336',
-    marginTop: 6,
-  },
-
-  centerIcon: {
-    position: 'absolute',
-    width: 45,
-    height: 45,
-    borderRadius: 14,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    left: width / 2 - 23,
-    top: 126,
-    zIndex: 5,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.32,
-    shadowRadius: 18,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    elevation: 9,
-  },
-
-  briefCard: {
+  resultCard: {
     position: 'absolute',
     width: 224,
-    minHeight: 185,
-    right: 3,
-    bottom: 34,
-    backgroundColor: '#102123',
-    borderWidth: 1,
-    borderColor: '#285155',
+    minHeight: 184,
+    bottom: 30,
+    right: 2,
+    padding: 17,
     borderRadius: 21,
-    padding: 16,
+    backgroundColor: COLORS.surfaceElevated,
+    borderWidth: 1,
+    borderColor: COLORS.borderStrong,
     transform: [{ rotate: '5deg' }],
     shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 18,
+    shadowOpacity: 0.28,
+    shadowRadius: 20,
     shadowOffset: {
       width: 0,
-      height: 12,
+      height: 13,
     },
     elevation: 10,
   },
 
-  briefTop: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
-    marginBottom: 13,
+    marginBottom: 12,
   },
 
-  briefIcon: {
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.primary,
+  },
+
+  microLabel: {
+    color: COLORS.muted,
+    fontSize: 8.5,
+    fontWeight: '800',
+    letterSpacing: 1.15,
+  },
+
+  rawText: {
+    color: '#B2C8C7',
+    fontSize: 12,
+    lineHeight: 20,
+  },
+
+  fakeLineShort: {
+    width: '40%',
+    height: 4,
+    borderRadius: 4,
+    backgroundColor: '#203638',
+    marginTop: 12,
+  },
+
+  fakeLineLong: {
+    width: '69%',
+    height: 4,
+    borderRadius: 4,
+    backgroundColor: '#1B3032',
+    marginTop: 6,
+  },
+
+  magicButton: {
+    position: 'absolute',
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: 123,
+    left: width / 2 - 23,
+    zIndex: 5,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.35,
+    shadowRadius: 19,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    elevation: 10,
+  },
+
+  resultIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary,
+  },
+
+  resultLabel: {
+    color: COLORS.primaryLight,
+    fontSize: 8.5,
+    fontWeight: '800',
+    letterSpacing: 1.1,
+  },
+
+  resultTitle: {
+    color: COLORS.white,
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: -0.6,
+    marginBottom: 15,
+  },
+
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 11,
+  },
+
+  infoText: {
+    color: COLORS.text,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+
+  transformCard: {
+    position: 'absolute',
+    width: 224,
+    height: 205,
+    padding: 19,
+    borderRadius: 22,
+    borderWidth: 1,
+  },
+
+  transformBack: {
+    left: 5,
+    top: 52,
+    backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
+    transform: [{ rotate: '-6deg' }],
+  },
+
+  transformFront: {
+    right: 3,
+    bottom: 31,
+    backgroundColor: COLORS.surfaceElevated,
+    borderColor: COLORS.borderStrong,
+    transform: [{ rotate: '5deg' }],
+  },
+
+  transformLabel: {
+    color: COLORS.muted,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
+
+  transformTitle: {
+    color: COLORS.white,
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: -1,
+    marginTop: 10,
+  },
+
+  stackLines: {
+    marginTop: 21,
+    gap: 10,
+  },
+
+  stackLine: {
+    height: 6,
+    borderRadius: 4,
+    backgroundColor: '#243B3D',
+  },
+
+  arrowCircle: {
+    position: 'absolute',
+    width: 43,
+    height: 43,
+    borderRadius: 14,
+    left: width / 2 - 21.5,
+    top: 130,
+    zIndex: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.background,
+  },
+
+  aiHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+
+  aiDot: {
     width: 20,
     height: 20,
     borderRadius: 7,
@@ -642,210 +860,89 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  briefLabel: {
-    color: COLORS.primarySoft,
-    fontSize: 8.5,
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
-
-  briefTitle: {
-    color: COLORS.white,
-    fontSize: 18,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-    marginBottom: 14,
-  },
-
-  briefRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 10,
-  },
-
-  briefRowText: {
-    color: COLORS.text,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  flowCard: {
-    position: 'absolute',
-    width: 224,
-    height: 205,
-    borderRadius: 22,
-    borderWidth: 1,
-    padding: 19,
-  },
-
-  flowBack: {
-    left: 5,
-    top: 55,
-    backgroundColor: '#0C1719',
-    borderColor: COLORS.border,
-    transform: [{ rotate: '-6deg' }],
-  },
-
-  flowFront: {
-    right: 4,
-    bottom: 30,
-    backgroundColor: '#112426',
-    borderColor: '#2A5558',
-    transform: [{ rotate: '5deg' }],
-  },
-
-  flowSmall: {
-    color: COLORS.muted,
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-  },
-
-  flowLarge: {
-    color: COLORS.white,
-    fontSize: 28,
-    fontWeight: '800',
-    marginTop: 10,
-    letterSpacing: -1,
-  },
-
-  flowLines: {
-    marginTop: 22,
-    gap: 10,
-  },
-
-  flowLineOne: {
-    width: '82%',
-    height: 6,
-    borderRadius: 4,
-    backgroundColor: '#294246',
-  },
-
-  flowLineTwo: {
-    width: '64%',
-    height: 6,
-    borderRadius: 4,
-    backgroundColor: '#22383B',
-  },
-
-  flowLineThree: {
-    width: '74%',
-    height: 6,
-    borderRadius: 4,
-    backgroundColor: '#22383B',
-  },
-
-  flowArrow: {
-    position: 'absolute',
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: COLORS.background,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    left: width / 2 - 21,
-    top: 133,
-    zIndex: 10,
-  },
-
-  flowHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-
-  checkCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 20,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  miniPill: {
+  tag: {
     alignSelf: 'flex-start',
-    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: '#173236',
+    marginTop: 10,
+    borderRadius: 9,
+    backgroundColor: '#173437',
     borderWidth: 1,
-    borderColor: '#265055',
+    borderColor: '#275255',
   },
 
-  miniPillText: {
-    color: COLORS.primarySoft,
+  tagText: {
+    color: COLORS.primaryLight,
     fontSize: 9,
     fontWeight: '700',
   },
 
-  finalCard: {
-    width: 310,
-    minHeight: 255,
-    backgroundColor: '#102124',
-    borderWidth: 1,
-    borderColor: '#295256',
-    borderRadius: 24,
+  readyCard: {
+    width: 312,
+    minHeight: 265,
     padding: 21,
+    borderRadius: 24,
+    backgroundColor: COLORS.surfaceElevated,
+    borderWidth: 1,
+    borderColor: COLORS.borderStrong,
     shadowColor: '#000',
     shadowOpacity: 0.28,
     shadowRadius: 26,
     shadowOffset: {
       width: 0,
-      height: 17,
+      height: 16,
     },
     elevation: 10,
   },
 
-  finalHeader: {
+  readyHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 22,
+    marginBottom: 19,
   },
 
-  finalEyebrow: {
+  readyEyebrow: {
     color: COLORS.primary,
     fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 1.25,
+    fontWeight: '900',
+    letterSpacing: 1.3,
   },
 
-  finalTitle: {
+  readyTitle: {
     color: COLORS.white,
     fontSize: 25,
     fontWeight: '800',
-    marginTop: 4,
     letterSpacing: -0.7,
+    marginTop: 4,
   },
 
-  finalBadge: {
-    width: 33,
-    height: 33,
+  readySpark: {
+    width: 34,
+    height: 34,
     borderRadius: 11,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  statRow: {
+  stats: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 19,
+    marginBottom: 18,
   },
 
-  statBox: {
+  stat: {
     flex: 1,
-    backgroundColor: '#0C1A1C',
+    alignItems: 'center',
+    paddingVertical: 10,
     borderRadius: 14,
+    backgroundColor: '#0B191B',
     borderWidth: 1,
     borderColor: COLORS.border,
-    paddingVertical: 10,
-    alignItems: 'center',
   },
 
   statNumber: {
@@ -855,20 +952,21 @@ const styles = StyleSheet.create({
   },
 
   statLabel: {
-    color: COLORS.muted,
-    fontSize: 8.5,
-    fontWeight: '700',
+    color: COLORS.subtle,
+    fontSize: 7.5,
+    fontWeight: '800',
+    letterSpacing: 0.7,
     marginTop: 2,
   },
 
-  actionItem: {
+  actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 9,
     marginBottom: 10,
   },
 
-  actionIcon: {
+  actionCircle: {
     width: 20,
     height: 20,
     borderRadius: 7,
@@ -879,12 +977,36 @@ const styles = StyleSheet.create({
 
   actionText: {
     color: COLORS.text,
-    fontSize: 11,
+    fontSize: 11.5,
     fontWeight: '600',
   },
 
+  priorityStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 2,
+    paddingTop: 11,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+
+  priorityDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.primary,
+  },
+
+  priorityText: {
+    color: COLORS.primaryLight,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+
   copy: {
-    paddingTop: 2,
+    paddingTop: 5,
   },
 
   eyebrowRow: {
@@ -895,7 +1017,7 @@ const styles = StyleSheet.create({
   },
 
   eyebrowLine: {
-    width: 22,
+    width: 23,
     height: 2,
     borderRadius: 2,
     backgroundColor: COLORS.primary,
@@ -905,7 +1027,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 9,
     fontWeight: '900',
-    letterSpacing: 1.5,
+    letterSpacing: 1.45,
   },
 
   title: {
@@ -913,7 +1035,7 @@ const styles = StyleSheet.create({
     fontSize: 35,
     lineHeight: 39,
     fontWeight: '900',
-    letterSpacing: -1.2,
+    letterSpacing: -1.3,
   },
 
   description: {
@@ -921,27 +1043,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
     marginTop: 14,
-    maxWidth: 345,
+    maxWidth: 355,
   },
 
   bottom: {
     paddingHorizontal: 22,
-    paddingTop: 8,
-    paddingBottom: 20,
+    paddingTop: 9,
+    paddingBottom: 15,
   },
 
-  indicators: {
+  indicatorRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 16,
+    marginBottom: 15,
   },
 
   indicator: {
-    height: 5,
     width: 5,
+    height: 5,
     borderRadius: 5,
-    backgroundColor: '#294346',
+    backgroundColor: '#294345',
   },
 
   indicatorActive: {
@@ -953,41 +1075,43 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 17,
     backgroundColor: COLORS.primary,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
 
-  primaryButtonPressed: {
+  buttonPressed: {
     opacity: 0.82,
     transform: [{ scale: 0.985 }],
+  },
+
+  buttonDisabled: {
+    opacity: 0.65,
   },
 
   primaryButtonText: {
     color: COLORS.background,
     fontSize: 15,
     fontWeight: '900',
-    letterSpacing: -0.1,
   },
 
   buttonIcon: {
     position: 'absolute',
-    right: 7,
     top: 7,
+    right: 7,
     width: 44,
     height: 44,
     borderRadius: 13,
-    backgroundColor: 'rgba(7,17,19,0.10)',
+    backgroundColor: 'rgba(6,17,19,0.10)',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  privacy: {
-    color: '#537274',
+  footerText: {
+    color: '#527071',
     textAlign: 'center',
     fontSize: 9.5,
     lineHeight: 14,
-    marginTop: 11,
+    marginTop: 10,
   },
 });
