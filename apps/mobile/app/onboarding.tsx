@@ -447,7 +447,7 @@ export default function OnboardingScreen() {
   const visualHeight = isSmallPhone
     ? Math.min(height * 0.34, 265)
     : isLargeScreen
-      ? Math.min(height * 0.40, 390)
+      ? Math.min(height * 0.4, 390)
       : Math.min(height * 0.42, 340);
 
   const titleSize = isLargeScreen
@@ -502,8 +502,6 @@ export default function OnboardingScreen() {
       x: nextIndex * width,
       animated: true,
     });
-
-    setCurrentIndex(nextIndex);
   };
 
   const handleScrollEnd = (
@@ -587,7 +585,7 @@ export default function OnboardingScreen() {
             )}
           </View>
 
-          <View style={{ flex: 1 }}>
+          <View style={styles.contentArea}>
             <ScrollView
               ref={scrollRef}
               horizontal
@@ -603,8 +601,7 @@ export default function OnboardingScreen() {
                   style={[
                     styles.slide,
                     {
-                      width: width,
-                      paddingHorizontal: 0,
+                      width,
                     },
                   ]}
                   key={item.eyebrow}
@@ -665,7 +662,7 @@ export default function OnboardingScreen() {
             style={[
               styles.bottom,
               {
-                paddingBottom: isSmallPhone ? 10 : 15,
+                paddingBottom: isSmallPhone ? 8 : 14,
               },
             ]}
           >
@@ -688,7 +685,7 @@ export default function OnboardingScreen() {
               style={({ pressed }) => [
                 styles.primaryButton,
                 {
-                  height: isSmallPhone ? 53 : 58,
+                  height: isSmallPhone ? 52 : 58,
                 },
                 pressed && styles.buttonPressed,
                 finishing && styles.buttonDisabled,
@@ -697,7 +694,8 @@ export default function OnboardingScreen() {
               <Text
                 style={[
                   styles.primaryButtonText,
-                  isLargeScreen && styles.primaryButtonTextLarge,
+                  isLargeScreen &&
+                    styles.primaryButtonTextLarge,
                 ]}
               >
                 {finishing
@@ -714,9 +712,7 @@ export default function OnboardingScreen() {
                     {
                       width: isSmallPhone ? 39 : 44,
                       height: isSmallPhone ? 39 : 44,
-                      borderRadius: isSmallPhone ? 12 : 14,
-                      top: isSmallPhone ? 7 : 7,
-                      right: isSmallPhone ? 7 : 7,
+                      borderRadius: isSmallPhone ? 20 : 22,
                     },
                   ]}
                 >
@@ -818,6 +814,11 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 14,
     fontWeight: '600',
+  },
+
+  contentArea: {
+    flex: 1,
+    overflow: 'hidden',
   },
 
   slide: {
@@ -956,7 +957,7 @@ const styles = StyleSheet.create({
   },
 
   resultLabel: {
-    color: COLORS.primaryLight,
+    color: COLORS.primarySoft,
     fontSize: 8.5,
     fontWeight: '800',
     letterSpacing: 1.05,
@@ -1077,7 +1078,7 @@ const styles = StyleSheet.create({
   },
 
   tagText: {
-    color: COLORS.primaryLight,
+    color: COLORS.primarySoft,
     fontSize: 9,
     fontWeight: '700',
   },
@@ -1206,7 +1207,7 @@ const styles = StyleSheet.create({
   },
 
   priorityText: {
-    color: COLORS.primaryLight,
+    color: COLORS.primarySoft,
     fontSize: 8,
     fontWeight: '800',
     letterSpacing: 1,
@@ -1214,7 +1215,7 @@ const styles = StyleSheet.create({
 
   copy: {
     paddingTop: 4,
-    paddingHorizontal: 0,
+    paddingBottom: 4,
   },
 
   eyebrowRow: {
@@ -1313,9 +1314,11 @@ const styles = StyleSheet.create({
 
   buttonIcon: {
     position: 'absolute',
+    right: 7,
+    top: 7,
+    backgroundColor: 'rgba(6,17,19,0.10)',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(6,17,19,0.10)',
   },
 
   footerText: {
