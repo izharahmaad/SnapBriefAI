@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import {
-  Dimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -9,14 +8,13 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-
-const { width, height } = Dimensions.get('window');
 
 const COLORS = {
   background: '#061113',
@@ -25,16 +23,16 @@ const COLORS = {
   surfaceMuted: '#132B2E',
 
   primary: '#2DE1D6',
-  primaryLight: '#92FFF7',
+  primarySoft: '#92FFF7',
   primaryDark: '#12AAA4',
 
   white: '#F3FFFE',
   text: '#D7E8E7',
-  muted: '#8AA6A5',
+  muted: '#87A6A5',
   subtle: '#5D7778',
 
   border: '#1B383A',
-  borderStrong: '#285254',
+  borderStrong: '#2A5558',
 };
 
 type Slide = {
@@ -48,13 +46,13 @@ const SLIDES: Slide[] = [
     eyebrow: 'WELCOME TO SNAPBRIEF',
     title: 'Turn messy thoughts\ninto clear briefs.',
     description:
-      'Drop in your rough notes, ideas, or meeting details. SnapBrief uses AI to turn them into something clear, useful, and ready to act on.',
+      'Drop in rough notes, ideas, or meeting details. SnapBrief uses AI to turn them into something clear, useful, and ready to act on.',
   },
   {
     eyebrow: 'LET AI DO THE SORTING',
     title: 'Less formatting.\nMore clarity.',
     description:
-      'SnapBrief picks out the important details, summarizes the context, and turns scattered information into focused next steps.',
+      'SnapBrief finds the important details, summarizes the context, and turns scattered information into focused next steps.',
   },
   {
     eyebrow: 'READY WHEN YOU ARE',
@@ -64,22 +62,36 @@ const SLIDES: Slide[] = [
   },
 ];
 
-function BrandMark() {
+function BrandMark({ size = 42 }: { size?: number }) {
   return (
-    <View style={styles.brandMarkShadow}>
+    <View
+      style={[
+        styles.brandMarkShadow,
+        {
+          width: size,
+          height: size,
+          borderRadius: size * 0.34,
+        },
+      ]}
+    >
       <LinearGradient
         colors={[
-          COLORS.primaryLight,
+          COLORS.primarySoft,
           COLORS.primary,
           COLORS.primaryDark,
         ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.brandMark}
+        style={[
+          styles.brandMark,
+          {
+            borderRadius: size * 0.34,
+          },
+        ]}
       >
         <Ionicons
           name="flash"
-          size={21}
+          size={size * 0.52}
           color={COLORS.background}
         />
       </LinearGradient>
@@ -100,6 +112,7 @@ function Glow({
 }) {
   return (
     <View
+      pointerEvents="none"
       style={[
         styles.glow,
         {
@@ -115,13 +128,35 @@ function Glow({
   );
 }
 
-function FirstVisual() {
+function FirstVisual({ cardWidth }: { cardWidth: number }) {
+  const rawWidth = Math.min(cardWidth * 0.72, 245);
+  const resultWidth = Math.min(cardWidth * 0.68, 230);
+
   return (
     <View style={styles.visualArea}>
-      <Glow size={190} top={56} left={58} opacity={0.07} />
-      <Glow size={100} top={180} left={208} opacity={0.05} />
+      <Glow
+        size={Math.min(cardWidth * 0.65, 210)}
+        top={40}
+        left={cardWidth * 0.17}
+        opacity={0.065}
+      />
 
-      <View style={styles.rawCard}>
+      <Glow
+        size={95}
+        top={185}
+        left={cardWidth * 0.62}
+        opacity={0.045}
+      />
+
+      <View
+        style={[
+          styles.rawCard,
+          {
+            width: rawWidth,
+            left: Math.max(0, cardWidth * 0.01),
+          },
+        ]}
+      >
         <View style={styles.cardHeader}>
           <View style={styles.statusDot} />
           <Text style={styles.microLabel}>RAW NOTES</Text>
@@ -138,7 +173,14 @@ function FirstVisual() {
         <View style={styles.fakeLineLong} />
       </View>
 
-      <View style={styles.magicButton}>
+      <View
+        style={[
+          styles.magicButton,
+          {
+            left: cardWidth / 2 - 23,
+          },
+        ]}
+      >
         <Ionicons
           name="sparkles"
           size={20}
@@ -146,7 +188,15 @@ function FirstVisual() {
         />
       </View>
 
-      <View style={styles.resultCard}>
+      <View
+        style={[
+          styles.resultCard,
+          {
+            width: resultWidth,
+            right: Math.max(0, cardWidth * 0.01),
+          },
+        ]}
+      >
         <View style={styles.cardHeader}>
           <View style={styles.resultIcon}>
             <Ionicons
@@ -183,16 +233,25 @@ function FirstVisual() {
   );
 }
 
-function SecondVisual() {
+function SecondVisual({ cardWidth }: { cardWidth: number }) {
+  const flowWidth = Math.min(cardWidth * 0.69, 225);
+
   return (
     <View style={styles.visualArea}>
-      <Glow size={190} top={60} left={62} opacity={0.06} />
-      <Glow size={120} top={165} left={202} opacity={0.05} />
+      <Glow
+        size={Math.min(cardWidth * 0.65, 210)}
+        top={48}
+        left={cardWidth * 0.16}
+        opacity={0.06}
+      />
 
       <View
         style={[
           styles.transformCard,
           styles.transformBack,
+          {
+            width: flowWidth,
+          },
         ]}
       >
         <Text style={styles.transformLabel}>RAW</Text>
@@ -206,7 +265,14 @@ function SecondVisual() {
         </View>
       </View>
 
-      <View style={styles.arrowCircle}>
+      <View
+        style={[
+          styles.arrowCircle,
+          {
+            left: cardWidth / 2 - 21,
+          },
+        ]}
+      >
         <Ionicons
           name="arrow-forward"
           size={17}
@@ -218,6 +284,9 @@ function SecondVisual() {
         style={[
           styles.transformCard,
           styles.transformFront,
+          {
+            width: flowWidth,
+          },
         ]}
       >
         <View style={styles.aiHeader}>
@@ -265,15 +334,21 @@ function SecondVisual() {
   );
 }
 
-function ThirdVisual() {
+function ThirdVisual({ cardWidth }: { cardWidth: number }) {
+  const width = Math.min(cardWidth * 0.92, 335);
+
   return (
     <View style={styles.visualArea}>
-      <Glow size={200} top={52} left={53} opacity={0.07} />
-      <Glow size={115} top={182} left={205} opacity={0.05} />
+      <Glow
+        size={Math.min(cardWidth * 0.65, 210)}
+        top={42}
+        left={cardWidth * 0.17}
+        opacity={0.07}
+      />
 
-      <View style={styles.readyCard}>
+      <View style={[styles.readyCard, { width }]}>
         <View style={styles.readyHeader}>
-          <View>
+          <View style={styles.readyTitleBlock}>
             <Text style={styles.readyEyebrow}>YOUR BRIEF</Text>
             <Text style={styles.readyTitle}>Ready to act</Text>
           </View>
@@ -312,6 +387,7 @@ function ThirdVisual() {
               color={COLORS.background}
             />
           </View>
+
           <Text style={styles.actionText}>
             Send revised proposal
           </Text>
@@ -325,6 +401,7 @@ function ThirdVisual() {
               color={COLORS.background}
             />
           </View>
+
           <Text style={styles.actionText}>
             Confirm payment terms
           </Text>
@@ -341,20 +418,54 @@ function ThirdVisual() {
   );
 }
 
-function SlideVisual({ index }: { index: number }) {
+function SlideVisual({
+  index,
+  width,
+}: {
+  index: number;
+  width: number;
+}) {
   if (index === 0) {
-    return <FirstVisual />;
+    return <FirstVisual cardWidth={width} />;
   }
 
   if (index === 1) {
-    return <SecondVisual />;
+    return <SecondVisual cardWidth={width} />;
   }
 
-  return <ThirdVisual />;
+  return <ThirdVisual cardWidth={width} />;
 }
 
 export default function OnboardingScreen() {
+  const { width, height } = useWindowDimensions();
+
+  const isSmallPhone = height < 700;
+  const isLargeScreen = width >= 600;
+
+  const contentWidth = Math.min(width - 32, 520);
+
+  const visualHeight = isSmallPhone
+    ? Math.min(height * 0.34, 265)
+    : isLargeScreen
+      ? Math.min(height * 0.40, 390)
+      : Math.min(height * 0.42, 340);
+
+  const titleSize = isLargeScreen
+    ? 43
+    : isSmallPhone
+      ? 29
+      : 34;
+
+  const titleLineHeight = isLargeScreen
+    ? 48
+    : isSmallPhone
+      ? 34
+      : 39;
+
+  const descriptionSize = isLargeScreen ? 16 : 14;
+
   const scrollRef = useRef<ScrollView>(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [finishing, setFinishing] = useState(false);
 
@@ -379,7 +490,7 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleNext = () => {
+  const goNext = () => {
     if (currentIndex === SLIDES.length - 1) {
       finishOnboarding();
       return;
@@ -391,6 +502,8 @@ export default function OnboardingScreen() {
       x: nextIndex * width,
       animated: true,
     });
+
+    setCurrentIndex(nextIndex);
   };
 
   const handleScrollEnd = (
@@ -402,12 +515,13 @@ export default function OnboardingScreen() {
 
     if (
       nextIndex >= 0 &&
-      nextIndex < SLIDES.length &&
-      nextIndex !== currentIndex
+      nextIndex < SLIDES.length
     ) {
       setCurrentIndex(nextIndex);
     }
   };
+
+  const slide = SLIDES[currentIndex];
 
   return (
     <View style={styles.container}>
@@ -417,118 +531,214 @@ export default function OnboardingScreen() {
       />
 
       <SafeAreaView
-        style={styles.safeArea}
+        style={[
+          styles.safeArea,
+          {
+            paddingHorizontal: isLargeScreen ? 34 : 16,
+          },
+        ]}
         edges={['top', 'bottom']}
       >
-        <View style={styles.topBar}>
-          <View style={styles.brand}>
-            <BrandMark />
-
-            <View>
-              <Text style={styles.brandName}>
-                SnapBrief
-              </Text>
-              <Text style={styles.brandCaption}>
-                AI NOTES, MADE USEFUL
-              </Text>
-            </View>
-          </View>
-
-          {currentIndex < SLIDES.length - 1 && (
-            <Pressable
-              onPress={finishOnboarding}
-              disabled={finishing}
-              hitSlop={12}
-              style={styles.skipButton}
-            >
-              <Text style={styles.skipText}>Skip</Text>
-            </Pressable>
-          )}
-        </View>
-
-        <ScrollView
-          ref={scrollRef}
-          horizontal
-          pagingEnabled
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          scrollEventThrottle={16}
-          onMomentumScrollEnd={handleScrollEnd}
-          contentContainerStyle={styles.scrollContent}
+        <View
+          style={[
+            styles.screenContent,
+            {
+              width: contentWidth,
+              alignSelf: 'center',
+            },
+          ]}
         >
-          {SLIDES.map((slide, index) => (
-            <View style={styles.slide} key={slide.eyebrow}>
-              <View style={styles.visualWrap}>
-                <SlideVisual index={index} />
-              </View>
-
-              <View style={styles.copy}>
-                <View style={styles.eyebrowRow}>
-                  <View style={styles.eyebrowLine} />
-
-                  <Text style={styles.eyebrow}>
-                    {slide.eyebrow}
-                  </Text>
-                </View>
-
-                <Text style={styles.title}>
-                  {slide.title}
-                </Text>
-
-                <Text style={styles.description}>
-                  {slide.description}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </ScrollView>
-
-        <View style={styles.bottom}>
-          <View style={styles.indicatorRow}>
-            {SLIDES.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.indicator,
-                  index === currentIndex &&
-                    styles.indicatorActive,
-                ]}
-              />
-            ))}
-          </View>
-
-          <Pressable
-            onPress={handleNext}
-            disabled={finishing}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              pressed && styles.buttonPressed,
-              finishing && styles.buttonDisabled,
+          <View
+            style={[
+              styles.topBar,
+              {
+                height: isSmallPhone ? 64 : 72,
+              },
             ]}
           >
-            <Text style={styles.primaryButtonText}>
-              {finishing
-                ? 'Opening…'
-                : currentIndex === SLIDES.length - 1
-                  ? 'Start creating'
-                  : 'Continue'}
-            </Text>
+            <View style={styles.brand}>
+              <BrandMark size={isSmallPhone ? 38 : 42} />
 
-            {!finishing && (
-              <View style={styles.buttonIcon}>
-                <Ionicons
-                  name="arrow-forward"
-                  size={17}
-                  color={COLORS.background}
-                />
+              <View>
+                <Text
+                  style={[
+                    styles.brandName,
+                    isLargeScreen && styles.brandNameLarge,
+                  ]}
+                >
+                  SnapBrief
+                </Text>
+
+                <Text style={styles.brandCaption}>
+                  AI NOTES, MADE USEFUL
+                </Text>
               </View>
-            )}
-          </Pressable>
+            </View>
 
-          <Text style={styles.footerText}>
-            Your notes stay yours. SnapBrief only structures what
-            you choose to provide.
-          </Text>
+            {currentIndex < SLIDES.length - 1 && (
+              <Pressable
+                onPress={finishOnboarding}
+                disabled={finishing}
+                hitSlop={12}
+                style={styles.skipButton}
+              >
+                <Text style={styles.skipText}>Skip</Text>
+              </Pressable>
+            )}
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <ScrollView
+              ref={scrollRef}
+              horizontal
+              pagingEnabled
+              bounces={false}
+              showsHorizontalScrollIndicator={false}
+              scrollEventThrottle={16}
+              onMomentumScrollEnd={handleScrollEnd}
+              decelerationRate="fast"
+            >
+              {SLIDES.map((item, index) => (
+                <View
+                  style={[
+                    styles.slide,
+                    {
+                      width: width,
+                      paddingHorizontal: 0,
+                    },
+                  ]}
+                  key={item.eyebrow}
+                >
+                  <View
+                    style={[
+                      styles.visualWrap,
+                      {
+                        height: visualHeight,
+                      },
+                    ]}
+                  >
+                    <SlideVisual
+                      index={index}
+                      width={contentWidth}
+                    />
+                  </View>
+
+                  <View style={styles.copy}>
+                    <View style={styles.eyebrowRow}>
+                      <View style={styles.eyebrowLine} />
+
+                      <Text style={styles.eyebrow}>
+                        {item.eyebrow}
+                      </Text>
+                    </View>
+
+                    <Text
+                      style={[
+                        styles.title,
+                        {
+                          fontSize: titleSize,
+                          lineHeight: titleLineHeight,
+                        },
+                      ]}
+                    >
+                      {item.title}
+                    </Text>
+
+                    <Text
+                      style={[
+                        styles.description,
+                        {
+                          fontSize: descriptionSize,
+                          lineHeight: descriptionSize * 1.55,
+                        },
+                      ]}
+                    >
+                      {item.description}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View
+            style={[
+              styles.bottom,
+              {
+                paddingBottom: isSmallPhone ? 10 : 15,
+              },
+            ]}
+          >
+            <View style={styles.indicatorRow}>
+              {SLIDES.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.indicator,
+                    index === currentIndex &&
+                      styles.indicatorActive,
+                  ]}
+                />
+              ))}
+            </View>
+
+            <Pressable
+              onPress={goNext}
+              disabled={finishing}
+              style={({ pressed }) => [
+                styles.primaryButton,
+                {
+                  height: isSmallPhone ? 53 : 58,
+                },
+                pressed && styles.buttonPressed,
+                finishing && styles.buttonDisabled,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.primaryButtonText,
+                  isLargeScreen && styles.primaryButtonTextLarge,
+                ]}
+              >
+                {finishing
+                  ? 'Opening…'
+                  : currentIndex === SLIDES.length - 1
+                    ? 'Start creating'
+                    : 'Continue'}
+              </Text>
+
+              {!finishing && (
+                <View
+                  style={[
+                    styles.buttonIcon,
+                    {
+                      width: isSmallPhone ? 39 : 44,
+                      height: isSmallPhone ? 39 : 44,
+                      borderRadius: isSmallPhone ? 12 : 14,
+                      top: isSmallPhone ? 7 : 7,
+                      right: isSmallPhone ? 7 : 7,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name="arrow-forward"
+                    size={17}
+                    color={COLORS.background}
+                  />
+                </View>
+              )}
+            </Pressable>
+
+            <Text
+              style={[
+                styles.footerText,
+                isLargeScreen && styles.footerTextLarge,
+              ]}
+            >
+              Your notes stay yours. SnapBrief only structures
+              what you choose to provide.
+            </Text>
+          </View>
         </View>
       </SafeAreaView>
     </View>
@@ -545,9 +755,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  screenContent: {
+    flex: 1,
+  },
+
   topBar: {
-    height: 74,
-    paddingHorizontal: 22,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -556,17 +769,14 @@ const styles = StyleSheet.create({
   brand: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 11,
+    gap: 10,
   },
 
   brandMarkShadow: {
-    width: 41,
-    height: 41,
-    borderRadius: 14,
     overflow: 'hidden',
     shadowColor: COLORS.primary,
-    shadowOpacity: 0.28,
-    shadowRadius: 16,
+    shadowOpacity: 0.24,
+    shadowRadius: 15,
     shadowOffset: {
       width: 0,
       height: 7,
@@ -584,20 +794,24 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: '800',
-    letterSpacing: -0.4,
+    letterSpacing: -0.45,
+  },
+
+  brandNameLarge: {
+    fontSize: 18,
   },
 
   brandCaption: {
     color: COLORS.subtle,
     fontSize: 7.5,
     fontWeight: '800',
-    letterSpacing: 1.25,
+    letterSpacing: 1.15,
     marginTop: 2,
   },
 
   skipButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
 
   skipText: {
@@ -606,24 +820,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  scrollContent: {
-    alignItems: 'stretch',
-  },
-
   slide: {
-    width,
-    paddingHorizontal: 22,
+    justifyContent: 'flex-start',
   },
 
   visualWrap: {
-    height: Math.min(height * 0.42, 355),
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   visualArea: {
-    width: width - 44,
-    height: 330,
+    width: '100%',
+    height: '100%',
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
@@ -636,41 +845,37 @@ const styles = StyleSheet.create({
 
   rawCard: {
     position: 'absolute',
-    width: 234,
-    height: 158,
-    top: 48,
-    left: 3,
-    padding: 17,
-    borderRadius: 20,
+    minHeight: 153,
+    top: '11%',
+    padding: 16,
+    borderRadius: 21,
     backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
     transform: [{ rotate: '-5deg' }],
     shadowColor: '#000',
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.23,
     shadowRadius: 20,
     shadowOffset: {
       width: 0,
       height: 12,
     },
-    elevation: 8,
+    elevation: 7,
   },
 
   resultCard: {
     position: 'absolute',
-    width: 224,
-    minHeight: 184,
-    bottom: 30,
-    right: 2,
+    minHeight: 178,
+    bottom: '7%',
     padding: 17,
     borderRadius: 21,
     backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
     borderColor: COLORS.borderStrong,
-    transform: [{ rotate: '5deg' }],
+    transform: [{ rotate: '4.5deg' }],
     shadowColor: '#000',
     shadowOpacity: 0.28,
-    shadowRadius: 20,
+    shadowRadius: 21,
     shadowOffset: {
       width: 0,
       height: 13,
@@ -696,25 +901,25 @@ const styles = StyleSheet.create({
     color: COLORS.muted,
     fontSize: 8.5,
     fontWeight: '800',
-    letterSpacing: 1.15,
+    letterSpacing: 1.1,
   },
 
   rawText: {
-    color: '#B2C8C7',
-    fontSize: 12,
+    color: '#B4C9C8',
+    fontSize: 11.8,
     lineHeight: 20,
   },
 
   fakeLineShort: {
-    width: '40%',
+    width: '41%',
     height: 4,
     borderRadius: 4,
-    backgroundColor: '#203638',
+    backgroundColor: '#21383A',
     marginTop: 12,
   },
 
   fakeLineLong: {
-    width: '69%',
+    width: '68%',
     height: 4,
     borderRadius: 4,
     backgroundColor: '#1B3032',
@@ -725,16 +930,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 46,
     height: 46,
-    borderRadius: 15,
+    borderRadius: 16,
+    top: '37%',
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    top: 123,
-    left: width / 2 - 23,
     zIndex: 5,
     shadowColor: COLORS.primary,
-    shadowOpacity: 0.35,
-    shadowRadius: 19,
+    shadowOpacity: 0.34,
+    shadowRadius: 18,
     shadowOffset: {
       width: 0,
       height: 8,
@@ -755,7 +959,7 @@ const styles = StyleSheet.create({
     color: COLORS.primaryLight,
     fontSize: 8.5,
     fontWeight: '800',
-    letterSpacing: 1.1,
+    letterSpacing: 1.05,
   },
 
   resultTitle: {
@@ -763,80 +967,78 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     letterSpacing: -0.6,
-    marginBottom: 15,
+    marginBottom: 14,
   },
 
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 11,
+    marginBottom: 10,
   },
 
   infoText: {
     color: COLORS.text,
-    fontSize: 12,
+    fontSize: 11.8,
     fontWeight: '600',
   },
 
   transformCard: {
     position: 'absolute',
-    width: 224,
-    height: 205,
+    height: 200,
     padding: 19,
     borderRadius: 22,
     borderWidth: 1,
   },
 
   transformBack: {
-    left: 5,
-    top: 52,
+    left: 0,
+    top: '15%',
     backgroundColor: COLORS.surface,
     borderColor: COLORS.border,
-    transform: [{ rotate: '-6deg' }],
+    transform: [{ rotate: '-5.5deg' }],
   },
 
   transformFront: {
-    right: 3,
-    bottom: 31,
+    right: 0,
+    bottom: '9%',
     backgroundColor: COLORS.surfaceElevated,
     borderColor: COLORS.borderStrong,
-    transform: [{ rotate: '5deg' }],
+    transform: [{ rotate: '4.5deg' }],
   },
 
   transformLabel: {
     color: COLORS.muted,
     fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 1.2,
+    letterSpacing: 1.15,
   },
 
   transformTitle: {
     color: COLORS.white,
-    fontSize: 28,
+    fontSize: 27,
     fontWeight: '800',
     letterSpacing: -1,
-    marginTop: 10,
+    marginTop: 9,
   },
 
   stackLines: {
     marginTop: 21,
-    gap: 10,
+    gap: 9,
   },
 
   stackLine: {
     height: 6,
-    borderRadius: 4,
-    backgroundColor: '#243B3D',
+    borderRadius: 5,
+    backgroundColor: '#253C3E',
   },
 
   arrowCircle: {
     position: 'absolute',
     width: 43,
     height: 43,
-    borderRadius: 14,
-    left: width / 2 - 21.5,
-    top: 130,
+    borderRadius: 15,
+    top: '39%',
     zIndex: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -867,7 +1069,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    marginTop: 10,
+    marginTop: 9,
     borderRadius: 9,
     backgroundColor: '#173437',
     borderWidth: 1,
@@ -881,19 +1083,18 @@ const styles = StyleSheet.create({
   },
 
   readyCard: {
-    width: 312,
-    minHeight: 265,
+    minHeight: 258,
     padding: 21,
-    borderRadius: 24,
+    borderRadius: 25,
     backgroundColor: COLORS.surfaceElevated,
     borderWidth: 1,
     borderColor: COLORS.borderStrong,
     shadowColor: '#000',
-    shadowOpacity: 0.28,
-    shadowRadius: 26,
+    shadowOpacity: 0.27,
+    shadowRadius: 25,
     shadowOffset: {
       width: 0,
-      height: 16,
+      height: 15,
     },
     elevation: 10,
   },
@@ -905,11 +1106,16 @@ const styles = StyleSheet.create({
     marginBottom: 19,
   },
 
+  readyTitleBlock: {
+    flex: 1,
+    paddingRight: 12,
+  },
+
   readyEyebrow: {
     color: COLORS.primary,
     fontSize: 8,
     fontWeight: '900',
-    letterSpacing: 1.3,
+    letterSpacing: 1.25,
   },
 
   readyTitle: {
@@ -955,7 +1161,7 @@ const styles = StyleSheet.create({
     color: COLORS.subtle,
     fontSize: 7.5,
     fontWeight: '800',
-    letterSpacing: 0.7,
+    letterSpacing: 0.65,
     marginTop: 2,
   },
 
@@ -976,6 +1182,7 @@ const styles = StyleSheet.create({
   },
 
   actionText: {
+    flex: 1,
     color: COLORS.text,
     fontSize: 11.5,
     fontWeight: '600',
@@ -1006,18 +1213,19 @@ const styles = StyleSheet.create({
   },
 
   copy: {
-    paddingTop: 5,
+    paddingTop: 4,
+    paddingHorizontal: 0,
   },
 
   eyebrowRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 11,
   },
 
   eyebrowLine: {
-    width: 23,
+    width: 22,
     height: 2,
     borderRadius: 2,
     backgroundColor: COLORS.primary,
@@ -1027,36 +1235,30 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 9,
     fontWeight: '900',
-    letterSpacing: 1.45,
+    letterSpacing: 1.4,
   },
 
   title: {
     color: COLORS.white,
-    fontSize: 35,
-    lineHeight: 39,
     fontWeight: '900',
-    letterSpacing: -1.3,
+    letterSpacing: -1.25,
   },
 
   description: {
     color: COLORS.muted,
-    fontSize: 14,
-    lineHeight: 21,
-    marginTop: 14,
-    maxWidth: 355,
+    marginTop: 13,
+    maxWidth: 470,
   },
 
   bottom: {
-    paddingHorizontal: 22,
-    paddingTop: 9,
-    paddingBottom: 15,
+    paddingTop: 10,
   },
 
   indicatorRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 15,
+    marginBottom: 14,
   },
 
   indicator: {
@@ -1067,22 +1269,31 @@ const styles = StyleSheet.create({
   },
 
   indicatorActive: {
-    width: 25,
+    width: 26,
     backgroundColor: COLORS.primary,
   },
 
   primaryButton: {
-    height: 58,
-    borderRadius: 17,
+    width: '100%',
+    borderRadius: 999,
     backgroundColor: COLORS.primary,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    shadowColor: COLORS.primary,
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    elevation: 5,
   },
 
   buttonPressed: {
     opacity: 0.82,
-    transform: [{ scale: 0.985 }],
+    transform: [{ scale: 0.988 }],
   },
 
   buttonDisabled: {
@@ -1093,18 +1304,18 @@ const styles = StyleSheet.create({
     color: COLORS.background,
     fontSize: 15,
     fontWeight: '900',
+    letterSpacing: -0.1,
+  },
+
+  primaryButtonTextLarge: {
+    fontSize: 16,
   },
 
   buttonIcon: {
     position: 'absolute',
-    top: 7,
-    right: 7,
-    width: 44,
-    height: 44,
-    borderRadius: 13,
-    backgroundColor: 'rgba(6,17,19,0.10)',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(6,17,19,0.10)',
   },
 
   footerText: {
@@ -1112,6 +1323,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 9.5,
     lineHeight: 14,
-    marginTop: 10,
+    marginTop: 9,
+    paddingHorizontal: 10,
+  },
+
+  footerTextLarge: {
+    fontSize: 10.5,
   },
 });
