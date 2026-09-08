@@ -27,6 +27,7 @@
     "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
+    "@types/node": "^26.5.0",
     "@types/react": "~19.1.10",
     "babel-preset-expo": "~54.0.10",
     "typescript": "~5.9.2"

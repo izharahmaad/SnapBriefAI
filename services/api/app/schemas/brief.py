@@ -1,15 +1,17 @@
-from typing import Literal
+from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
-class GenerateBriefRequest(BaseModel):
-    content: str = Field(min_length=3, max_length=3000)
-    tone: Literal['professional', 'casual', 'concise'] = 'professional'
+
+class BriefRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=10000)
+
 
 class BriefResponse(BaseModel):
     title: str
     summary: str
-    key_points: list[str]
-    actions: list[str]
-    tags: list[str]
-    priority: Literal['low', 'medium', 'high']
-    due_date: str | None = None
+    key_points: List[str] = Field(default_factory=list)
+    actions: List[str] = Field(default_factory=list)
+    tags: List[str] = Field(default_factory=list)
+    priority: str
+    due_date: Optional[str] = None
