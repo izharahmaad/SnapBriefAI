@@ -1,15 +1,29 @@
 export const colors = {
-  bg: '#0A0C0D',
-  surface: '#111315',
-  surface2: '#171A1C',
-  border: '#24282B',
-  text: '#F4F5F2',
-  muted: '#8B9296',
-  dim: '#5E6569',
-  accent: '#D8FF5A',
-  accentSoft: '#B5D74D',
-  danger: '#FF7D7D',
-  white: '#FFFFFF',
+  // Base
+  bg: '#061113',
+
+  // Surfaces
+  surface: '#0B181B',
+  surface2: '#102326',
+
+  // Borders
+  border: '#1B383A',
+
+  // Text
+  text: '#D7E8E7',
+  muted: '#87A6A5',
+  dim: '#5D7778',
+
+  // SnapBrief aqua brand
+  accent: '#2DE1D6',
+  accentSoft: '#92FFF7',
+  accentDeep: '#12AAA4',
+
+  // Status
+  danger: '#FF7C87',
+
+  // White
+  white: '#F3FFFE',
 };
 
 export const spacing = {
@@ -25,5 +39,6 @@ export const radius = {
   sm: 10,
   md: 15,
   lg: 20,
+  xl: 24,
   pill: 999,
 };
