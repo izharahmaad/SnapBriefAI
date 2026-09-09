@@ -1,17 +1,63 @@
-import { Text, View, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
 import { colors } from '@/theme';
 
-export function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
+type SectionTitleProps = {
+  eyebrow: string;
+  title: string;
+};
+
+export function SectionTitle({
+  eyebrow,
+  title,
+}: SectionTitleProps) {
   return (
     <View style={styles.wrap}>
-      <Text style={styles.eyebrow}>{eyebrow}</Text>
-      <Text style={styles.title}>{title}</Text>
+      <View style={styles.eyebrowRow}>
+        <View style={styles.accentLine} />
+
+        <Text style={styles.eyebrow}>
+          {eyebrow}
+        </Text>
+      </View>
+
+      <Text style={styles.title}>
+        {title}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: 3 },
-  eyebrow: { color: colors.accent, fontSize: 10, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: 1.5 },
-  title: { color: colors.text, fontSize: 23, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.5 },
+  wrap: {
+    gap: 5,
+  },
+
+  eyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  accentLine: {
+    width: 14,
+    height: 2,
+    borderRadius: 99,
+    backgroundColor: colors.accent,
+    marginRight: 7,
+  },
+
+  eyebrow: {
+    color: colors.accentSoft,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+  },
+
+  title: {
+    color: colors.white,
+    fontSize: 22,
+    lineHeight: 27,
+    fontWeight: '800',
+    letterSpacing: -0.55,
+  },
 });
