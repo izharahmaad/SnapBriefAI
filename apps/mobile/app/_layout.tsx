@@ -1,63 +1,30 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
-  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-
-    const checkOnboarding = async () => {
+    const prepare = async () => {
       try {
-        const completed = await AsyncStorage.getItem(
-          'snapbrief_onboarding_complete'
-        );
-
-        if (!mounted) return;
-
-        setShowOnboarding(!completed);
-      } catch {
-        if (!mounted) return;
-
-        // Safer fallback: show onboarding if storage cannot be read.
-        setShowOnboarding(true);
+        await AsyncStorage.getItem('snapbrief_onboarding_complete');
       } finally {
-        if (mounted) {
-          setCheckingOnboarding(false);
-        }
+        setChecking(false);
       }
     };
 
-    checkOnboarding();
-
-    return () => {
-      mounted = false;
-    };
+    prepare();
   }, []);
 
-  useEffect(() => {
-    if (checkingOnboarding) return;
-
-    // Give Expo Router one render cycle to mount the Stack.
-    const timer = setTimeout(() => {
-      if (showOnboarding) {
-        router.replace('/onboarding');
-      }
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, [checkingOnboarding, showOnboarding]);
-
-  if (checkingOnboarding) {
+  if (checking) {
     return (
       <View
         style={{
           flex: 1,
-          backgroundColor: '#071113',
+          backgroundColor: '#061113',
         }}
       />
     );
@@ -68,13 +35,21 @@ export default function RootLayout() {
       <StatusBar style="light" />
 
       <Stack
+        initialRouteName="splash"
         screenOptions={{
           headerShown: false,
           contentStyle: {
-            backgroundColor: '#071113',
+            backgroundColor: '#061113',
           },
         }}
       >
+        <Stack.Screen
+          name="splash"
+          options={{
+            gestureEnabled: false,
+          }}
+        />
+
         <Stack.Screen
           name="onboarding"
           options={{
