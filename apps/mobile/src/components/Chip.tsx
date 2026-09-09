@@ -1,15 +1,51 @@
-import { Text, View, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, View } from 'react-native';
+
 import { colors, radius } from '@/theme';
 
 export function Chip({ text }: { text: string }) {
   return (
     <View style={styles.chip}>
-      <Text style={styles.text}>#{text}</Text>
+      <Ionicons
+        name="pricetag-outline"
+        size={11}
+        color={colors.accent}
+      />
+
+      <Text
+        style={styles.text}
+        numberOfLines={1}
+      >
+        #{text}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  chip: { borderRadius: radius.pill, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface2, paddingHorizontal: 10, paddingVertical: 6 },
-  text: { color: colors.muted, fontSize: 11, fontFamily: 'SpaceGrotesk_600SemiBold' },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+
+    minHeight: 31,
+
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+
+    borderRadius: radius.pill,
+
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+  },
+
+  text: {
+    color: colors.aquaSoft,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.15,
+    marginLeft: 5,
+    maxWidth: 150,
+  },
 });
