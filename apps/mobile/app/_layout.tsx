@@ -1,35 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    const prepare = async () => {
-      try {
-        await AsyncStorage.getItem('snapbrief_onboarding_complete');
-      } finally {
-        setChecking(false);
-      }
-    };
-
-    prepare();
-  }, []);
-
-  if (checking) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: '#061113',
-        }}
-      />
-    );
-  }
-
   return (
     <>
       <StatusBar style="light" />
@@ -41,12 +13,14 @@ export default function RootLayout() {
           contentStyle: {
             backgroundColor: '#061113',
           },
+          animation: 'fade',
         }}
       >
         <Stack.Screen
           name="splash"
           options={{
             gestureEnabled: false,
+            animation: 'none',
           }}
         />
 
