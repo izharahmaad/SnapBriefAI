@@ -6,8 +6,20 @@
     "scheme": "snapbrief",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+
+    "splash": {
+      "backgroundColor": "#061113",
+      "resizeMode": "contain"
+    },
+
     "plugins": ["expo-router"],
-    "ios": { "supportsTablet": true },
-    "android": { "edgeToEdgeEnabled": true }
+
+    "ios": {
+      "supportsTablet": true
+    },
+
+    "android": {
+      "edgeToEdgeEnabled": true
+    }
   }
 }
