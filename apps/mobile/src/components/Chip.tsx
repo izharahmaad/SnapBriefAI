@@ -37,11 +37,11 @@ const styles = StyleSheet.create({
 
     backgroundColor: 'rgba(45, 225, 214, 0.06)',
     borderWidth: 1,
-    borderColor: colors.borderStrong,
+    borderColor: colors.border,
   },
 
   text: {
-    color: colors.aquaSoft,
+    color: colors.accentSoft,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 0.15,
