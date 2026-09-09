@@ -17,28 +17,8 @@ import { SectionTitle } from '@/components/SectionTitle';
 import { examples } from '@/constants/examples';
 import { generateBrief } from '@/lib/api';
 import { saveBrief } from '@/lib/storage';
+import { colors, radius, spacing } from '@/theme';
 import { Brief } from '@/types/brief';
-
-const COLORS = {
-  bg: '#061113',
-  panel: '#0B181B',
-  panelRaised: '#102326',
-  panelSoft: '#0D2023',
-
-  aqua: '#2DE1D6',
-  aquaSoft: '#92FFF7',
-  aquaDeep: '#12AAA4',
-
-  white: '#F3FFFE',
-  text: '#D7E8E7',
-  muted: '#87A6A5',
-  dim: '#5D7778',
-
-  border: '#1B383A',
-  borderStrong: '#2A5558',
-
-  danger: '#FF7C87',
-};
 
 const QUICK_STARTS = [
   {
@@ -67,25 +47,34 @@ const QUICK_STARTS = [
   },
 ];
 
+const CHARACTER_LIMIT = 3000;
+
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
 
   const isCompact = width < 380;
-  const horizontalPadding = isCompact ? 16 : width > 600 ? 28 : 20;
+  const isWide = width >= 600;
+
+  const horizontalPadding = isCompact
+    ? 16
+    : isWide
+      ? 28
+      : 20;
 
   const [text, setText] = useState(examples[0] ?? '');
   const [brief, setBrief] = useState<Brief | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const characterLimit = 3000;
-
   const progress = useMemo(() => {
-    if (!text.length) return 0;
-    return Math.min(text.length / characterLimit, 1);
+    if (!text.length) {
+      return 0;
+    }
+
+    return Math.min(text.length / CHARACTER_LIMIT, 1);
   }, [text.length]);
 
-  const remainingCharacters = characterLimit - text.length;
+  const remainingCharacters = CHARACTER_LIMIT - text.length;
 
   async function createBrief() {
     const trimmed = text.trim();
@@ -164,8 +153,8 @@ export default function HomeScreen() {
             <View style={styles.brandMark}>
               <Ionicons
                 name="sparkles"
-                size={15}
-                color={COLORS.bg}
+                size={14}
+                color={colors.bg}
               />
             </View>
 
@@ -191,17 +180,17 @@ export default function HomeScreen() {
       <View style={styles.hero}>
         <View style={styles.heroGlow} />
 
-        <View style={styles.heroTopRow}>
-          <View style={styles.heroBadge}>
-            <View style={styles.liveDot} />
-            <Text style={styles.heroBadgeText}>AI BRIEF BUILDER</Text>
+        <View style={styles.heroHeader}>
+          <View style={styles.statusBadge}>
+            <View style={styles.statusDot} />
+            <Text style={styles.statusText}>AI BRIEF BUILDER</Text>
           </View>
 
           <View style={styles.heroIcon}>
             <Ionicons
               name="flash-outline"
-              size={18}
-              color={COLORS.aqua}
+              size={17}
+              color={colors.accent}
             />
           </View>
         </View>
@@ -213,67 +202,78 @@ export default function HomeScreen() {
           ]}
         >
           Messy input.{'\n'}
-          <Text style={styles.heroTitleAccent}>Sharp output.</Text>
+          <Text style={styles.heroAccent}>Sharp output.</Text>
         </Text>
 
-        <Text style={styles.heroCopy}>
-          Turn rough notes, messages, ideas, or meeting summaries
+        <Text style={styles.heroDescription}>
+          Turn rough notes, messages, ideas, and meeting summaries
           into a clear brief you can actually use.
         </Text>
 
-        <View style={styles.heroMetaRow}>
+        <View style={styles.heroFooter}>
           <View style={styles.metaItem}>
             <Ionicons
               name="time-outline"
-              size={15}
-              color={COLORS.dim}
+              size={14}
+              color={colors.dim}
             />
-            <Text style={styles.metaText}>Usually takes a few seconds</Text>
+            <Text style={styles.metaText}>
+              Usually takes a few seconds
+            </Text>
           </View>
 
           <View style={styles.metaItem}>
             <Ionicons
               name="shield-checkmark-outline"
-              size={15}
-              color={COLORS.dim}
+              size={14}
+              color={colors.dim}
             />
-            <Text style={styles.metaText}>Review before sharing</Text>
+            <Text style={styles.metaText}>
+              Review before sharing
+            </Text>
           </View>
         </View>
       </View>
 
-      {/* Input section */}
+      {/* Input heading */}
       <View style={styles.sectionHeader}>
-        <SectionTitle
-          eyebrow="01 / INPUT"
-          title="What do you need to structure?"
-        />
+        <View style={styles.sectionTitleContainer}>
+          <SectionTitle
+            eyebrow="01 / INPUT"
+            title="What do you need to structure?"
+          />
+        </View>
 
         <Pressable
           onPress={loadExample}
+          hitSlop={6}
           style={({ pressed }) => [
-            styles.exampleButton,
-            pressed && styles.pressedSoft,
+            styles.secondaryButton,
+            pressed && styles.pressed,
           ]}
         >
           <Ionicons
             name="shuffle-outline"
-            size={15}
-            color={COLORS.muted}
+            size={14}
+            color={colors.muted}
           />
-          <Text style={styles.exampleText}>Try example</Text>
+
+          <Text style={styles.secondaryButtonText}>
+            Example
+          </Text>
         </Pressable>
       </View>
 
-      {/* Input card */}
+      {/* Editor */}
       <GlassCard style={styles.editorCard}>
-        <View style={styles.editorTopRow}>
+        <View style={styles.editorHeader}>
           <View style={styles.noteBadge}>
             <Ionicons
               name="document-text-outline"
-              size={14}
-              color={COLORS.aqua}
+              size={13}
+              color={colors.accent}
             />
+
             <Text style={styles.noteBadgeText}>NOTE</Text>
           </View>
 
@@ -283,14 +283,15 @@ export default function HomeScreen() {
               hitSlop={8}
               style={({ pressed }) => [
                 styles.clearButton,
-                pressed && styles.pressedSoft,
+                pressed && styles.pressed,
               ]}
             >
               <Ionicons
                 name="close-outline"
-                size={17}
-                color={COLORS.dim}
+                size={16}
+                color={colors.dim}
               />
+
               <Text style={styles.clearText}>Clear</Text>
             </Pressable>
           ) : null}
@@ -300,16 +301,19 @@ export default function HomeScreen() {
           value={text}
           onChangeText={(value) => {
             setText(value);
-            if (error) setError('');
+
+            if (error) {
+              setError('');
+            }
           }}
           multiline
           textAlignVertical="top"
           autoCapitalize="sentences"
           autoCorrect
           spellCheck
-          maxLength={characterLimit}
+          maxLength={CHARACTER_LIMIT}
           placeholder="Paste meeting notes, messages, ideas, reminders..."
-          placeholderTextColor={COLORS.dim}
+          placeholderTextColor={colors.dim}
           style={[
             styles.input,
             isCompact && styles.inputCompact,
@@ -317,13 +321,16 @@ export default function HomeScreen() {
         />
 
         <View style={styles.editorFooter}>
-          <View style={styles.privateStatus}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={13}
-              color={COLORS.dim}
-            />
-            <Text style={styles.privateText}>
+          <View style={styles.localStatus}>
+            <View style={styles.localStatusIcon}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={10}
+                color={colors.dim}
+              />
+            </View>
+
+            <Text style={styles.localStatusText}>
               Stored locally after generation
             </Text>
           </View>
@@ -334,7 +341,7 @@ export default function HomeScreen() {
               remainingCharacters < 300 && styles.counterWarning,
             ]}
           >
-            {text.length}/{characterLimit}
+            {text.length}/{CHARACTER_LIMIT}
           </Text>
         </View>
 
@@ -350,9 +357,15 @@ export default function HomeScreen() {
         </View>
       </GlassCard>
 
-      {/* Quick starts */}
+      {/* Quick start */}
       <View style={styles.quickSection}>
-        <Text style={styles.quickLabel}>QUICK START</Text>
+        <View style={styles.quickHeader}>
+          <Text style={styles.quickLabel}>QUICK START</Text>
+
+          <Text style={styles.quickHint}>
+            Start with a format
+          </Text>
+        </View>
 
         <ScrollView
           horizontal
@@ -372,11 +385,22 @@ export default function HomeScreen() {
                   pressed && styles.quickChipPressed,
                 ]}
               >
-                <Ionicons
-                  name={item.icon}
-                  size={15}
-                  color={active ? COLORS.aqua : COLORS.muted}
-                />
+                <View
+                  style={[
+                    styles.quickIcon,
+                    active && styles.quickIconActive,
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon}
+                    size={13}
+                    color={
+                      active
+                        ? colors.accent
+                        : colors.muted
+                    }
+                  />
+                </View>
 
                 <Text
                   style={[
@@ -392,46 +416,47 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      {/* Main action */}
+      {/* Create button */}
       <Pressable
         onPress={createBrief}
         disabled={loading || !text.trim()}
         style={({ pressed }) => [
           styles.createButton,
-          pressed && !loading && styles.createButtonPressed,
-          (!text.trim() || loading) && styles.createButtonDisabled,
+          pressed &&
+            !loading &&
+            styles.createButtonPressed,
+          (!text.trim() || loading) &&
+            styles.createButtonDisabled,
         ]}
       >
-        <View style={styles.createButtonLeft}>
+        <View style={styles.createLeft}>
           <View style={styles.createIcon}>
             {loading ? (
               <ActivityIndicator
                 size="small"
-                color={COLORS.bg}
+                color={colors.bg}
               />
             ) : (
               <Ionicons
                 name="sparkles"
-                size={18}
-                color={COLORS.bg}
+                size={17}
+                color={colors.bg}
               />
             )}
           </View>
 
-          <View>
-            <Text style={styles.createText}>
-              {loading ? 'Building your brief...' : 'Create brief'}
+          <View style={styles.createCopy}>
+            <Text style={styles.createTitle}>
+              {loading
+                ? 'Building your brief...'
+                : 'Create brief'}
             </Text>
 
-            {!loading ? (
-              <Text style={styles.createSubtext}>
-                Turn this into something actionable
-              </Text>
-            ) : (
-              <Text style={styles.createSubtext}>
-                Analyzing and structuring your notes
-              </Text>
-            )}
+            <Text style={styles.createSubtitle}>
+              {loading
+                ? 'Analyzing and structuring your notes'
+                : 'Turn this into something actionable'}
+            </Text>
           </View>
         </View>
 
@@ -439,8 +464,8 @@ export default function HomeScreen() {
           <View style={styles.arrowCircle}>
             <Ionicons
               name="arrow-forward"
-              size={18}
-              color={COLORS.bg}
+              size={17}
+              color={colors.bg}
             />
           </View>
         ) : null}
@@ -452,14 +477,19 @@ export default function HomeScreen() {
           <View style={styles.errorIcon}>
             <Ionicons
               name="alert-circle-outline"
-              size={18}
-              color={COLORS.danger}
+              size={17}
+              color={colors.danger}
             />
           </View>
 
-          <View style={styles.errorBody}>
-            <Text style={styles.errorTitle}>Something went wrong</Text>
-            <Text style={styles.errorText}>{error}</Text>
+          <View style={styles.errorContent}>
+            <Text style={styles.errorTitle}>
+              Something went wrong
+            </Text>
+
+            <Text style={styles.errorText}>
+              {error}
+            </Text>
           </View>
         </View>
       ) : null}
@@ -468,7 +498,7 @@ export default function HomeScreen() {
       {brief ? (
         <View style={styles.resultSection}>
           <View style={styles.resultHeader}>
-            <View style={styles.resultTitleWrap}>
+            <View style={styles.resultTitleContainer}>
               <SectionTitle
                 eyebrow="02 / RESULT"
                 title="Here’s the signal."
@@ -479,7 +509,7 @@ export default function HomeScreen() {
               <Ionicons
                 name="checkmark"
                 size={14}
-                color={COLORS.bg}
+                color={colors.bg}
               />
             </View>
           </View>
@@ -487,15 +517,17 @@ export default function HomeScreen() {
           <BriefResult brief={brief} />
 
           <View style={styles.disclaimerCard}>
-            <Ionicons
-              name="information-circle-outline"
-              size={16}
-              color={COLORS.dim}
-            />
+            <View style={styles.disclaimerIcon}>
+              <Ionicons
+                name="information-circle-outline"
+                size={15}
+                color={colors.dim}
+              />
+            </View>
 
             <Text style={styles.disclaimer}>
-              AI-generated result. Review important dates, numbers,
-              names, and commitments before sending.
+              AI-generated result. Review important dates,
+              numbers, names, and commitments before sending.
             </Text>
           </View>
 
@@ -503,25 +535,27 @@ export default function HomeScreen() {
             onPress={startAnother}
             style={({ pressed }) => [
               styles.newBriefButton,
-              pressed && styles.pressedSoft,
+              pressed && styles.pressed,
             ]}
           >
             <Ionicons
               name="add-outline"
-              size={18}
-              color={COLORS.aqua}
+              size={17}
+              color={colors.accent}
             />
-            <Text style={styles.newBriefText}>Start another brief</Text>
+
+            <Text style={styles.newBriefText}>
+              Start another brief
+            </Text>
           </Pressable>
         </View>
       ) : (
-        /* Empty state */
         <GlassCard style={styles.tipCard}>
           <View style={styles.tipIcon}>
             <Ionicons
               name="bulb-outline"
-              size={20}
-              color={COLORS.aqua}
+              size={19}
+              color={colors.accent}
             />
           </View>
 
@@ -531,9 +565,9 @@ export default function HomeScreen() {
             </Text>
 
             <Text style={styles.tipText}>
-              You do not need to rewrite anything first. Paste the
-              rough version and let SnapBrief organize the important
-              parts for you.
+              You do not need to rewrite anything first.
+              Paste the rough version and let SnapBrief
+              organize the important parts for you.
             </Text>
           </View>
         </GlassCard>
@@ -547,19 +581,19 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.bg,
   },
 
   content: {
-    paddingTop: 18,
-    paddingBottom: 32,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 22,
+    marginBottom: spacing.xl,
   },
 
   brandBlock: {
@@ -575,149 +609,150 @@ const styles = StyleSheet.create({
   brandMark: {
     width: 27,
     height: 27,
-    borderRadius: 9,
+    borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.aqua,
-    marginRight: 9,
+    backgroundColor: colors.accent,
+    marginRight: 8,
   },
 
   brandName: {
-    color: COLORS.aquaSoft,
-    fontSize: 11,
+    color: colors.accentSoft,
+    fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.8,
   },
 
   headerTitle: {
-    color: COLORS.white,
+    color: colors.white,
     fontSize: 24,
     lineHeight: 29,
-    fontWeight: '700',
-    letterSpacing: -0.6,
+    fontWeight: '800',
+    letterSpacing: -0.7,
   },
 
   headerTitleCompact: {
-    fontSize: 22,
+    fontSize: 21,
+    lineHeight: 26,
   },
 
   avatar: {
     width: 42,
     height: 42,
-    borderRadius: 15,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.panelRaised,
+    backgroundColor: colors.surface2,
     borderWidth: 1,
-    borderColor: COLORS.borderStrong,
-    marginLeft: 14,
+    borderColor: colors.border,
+    marginLeft: spacing.md,
   },
 
   avatarText: {
-    color: COLORS.aquaSoft,
-    fontSize: 12,
+    color: colors.accentSoft,
+    fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 0.8,
+    letterSpacing: 0.7,
   },
 
   hero: {
+    position: 'relative',
     overflow: 'hidden',
-    borderRadius: 28,
-    padding: 22,
-    backgroundColor: COLORS.panel,
+    padding: spacing.xl,
+    borderRadius: 26,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    marginBottom: 28,
+    borderColor: colors.border,
+    marginBottom: spacing.xxl,
   },
 
   heroGlow: {
     position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    right: -80,
-    top: -70,
-    backgroundColor: 'rgba(45, 225, 214, 0.08)',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    right: -95,
+    top: -90,
+    backgroundColor: 'rgba(45, 225, 214, 0.07)',
   },
 
-  heroTopRow: {
+  heroHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 22,
   },
 
-  heroBadge: {
+  statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 11,
+    paddingHorizontal: 10,
     paddingVertical: 7,
-    borderRadius: 100,
-    backgroundColor: COLORS.panelRaised,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface2,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
 
-  liveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: COLORS.aqua,
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.accent,
     marginRight: 7,
   },
 
-  heroBadgeText: {
-    color: COLORS.muted,
-    fontSize: 9,
+  statusText: {
+    color: colors.muted,
+    fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 1.3,
+    letterSpacing: 1.2,
   },
 
   heroIcon: {
-    width: 38,
-    height: 38,
+    width: 37,
+    height: 37,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.08)',
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
     borderWidth: 1,
-    borderColor: COLORS.borderStrong,
+    borderColor: colors.border,
   },
 
   heroTitle: {
-    color: COLORS.white,
+    color: colors.white,
     fontSize: 38,
     lineHeight: 41,
     fontWeight: '800',
-    letterSpacing: -1.5,
+    letterSpacing: -1.6,
   },
 
   heroTitleCompact: {
-    fontSize: 32,
+    fontSize: 31,
     lineHeight: 35,
   },
 
-  heroTitleAccent: {
-    color: COLORS.aqua,
+  heroAccent: {
+    color: colors.accent,
   },
 
-  heroCopy: {
-    color: COLORS.text,
-    fontSize: 15,
-    lineHeight: 23,
-    marginTop: 16,
-    maxWidth: 550,
+  heroDescription: {
+    color: colors.text,
+    fontSize: 14,
+    lineHeight: 22,
+    marginTop: 15,
+    maxWidth: 560,
   },
 
-  heroMetaRow: {
+  heroFooter: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 14,
-    marginTop: 21,
-    paddingTop: 16,
+    marginTop: 20,
+    paddingTop: 15,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: colors.border,
   },
 
   metaItem: {
@@ -726,54 +761,55 @@ const styles = StyleSheet.create({
   },
 
   metaText: {
-    color: COLORS.dim,
-    fontSize: 11,
-    marginLeft: 6,
+    color: colors.dim,
+    fontSize: 10,
+    marginLeft: 5,
   },
 
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 10,
     marginBottom: 12,
   },
 
-  exampleButton: {
+  sectionTitleContainer: {
+    flex: 1,
+  },
+
+  secondaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 7,
-    borderRadius: 100,
-    backgroundColor: COLORS.panel,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
 
-  pressedSoft: {
-    opacity: 0.72,
-  },
-
-  exampleText: {
-    color: COLORS.muted,
-    fontSize: 11,
-    fontWeight: '600',
+  secondaryButtonText: {
+    color: colors.muted,
+    fontSize: 10,
+    fontWeight: '700',
     marginLeft: 5,
   },
 
-  editorCard: {
-    padding: 16,
-    borderRadius: 22,
-    backgroundColor: COLORS.panel,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  pressed: {
+    opacity: 0.68,
   },
 
-  editorTopRow: {
+  editorCard: {
+    padding: spacing.md,
+    borderRadius: 22,
+  },
+
+  editorHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
   noteBadge: {
@@ -781,42 +817,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 9,
     paddingVertical: 6,
-    borderRadius: 100,
-    backgroundColor: 'rgba(45, 225, 214, 0.07)',
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
 
   noteBadgeText: {
-    color: COLORS.aquaSoft,
-    fontSize: 9,
+    color: colors.accentSoft,
+    fontSize: 8,
     fontWeight: '800',
     letterSpacing: 1,
-    marginLeft: 6,
+    marginLeft: 5,
   },
 
   clearButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 4,
+    paddingHorizontal: 3,
+    paddingVertical: 4,
   },
 
   clearText: {
-    color: COLORS.dim,
-    fontSize: 11,
+    color: colors.dim,
+    fontSize: 10,
     marginLeft: 3,
   },
 
   input: {
     minHeight: 190,
     maxHeight: 310,
-    color: COLORS.white,
+    color: colors.white,
     fontSize: 16,
     lineHeight: 25,
     fontWeight: '500',
-    paddingTop: 7,
-    paddingBottom: 7,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
 
   inputCompact: {
@@ -829,58 +865,80 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 5,
+    marginTop: 4,
   },
 
-  privateStatus: {
+  localStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     flexShrink: 1,
   },
 
-  privateText: {
-    color: COLORS.dim,
-    fontSize: 10,
-    marginLeft: 5,
+  localStatusIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+
+  localStatusText: {
+    color: colors.dim,
+    fontSize: 9,
+    marginLeft: 6,
   },
 
   counter: {
-    color: COLORS.dim,
-    fontSize: 10,
+    color: colors.dim,
+    fontSize: 9,
     fontWeight: '700',
-    marginLeft: 12,
+    marginLeft: 10,
   },
 
   counterWarning: {
-    color: COLORS.aquaSoft,
+    color: colors.accentSoft,
   },
 
   progressTrack: {
     height: 3,
     width: '100%',
-    borderRadius: 99,
-    backgroundColor: COLORS.panelRaised,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface2,
     overflow: 'hidden',
-    marginTop: 11,
+    marginTop: 10,
   },
 
   progressFill: {
     height: '100%',
-    borderRadius: 99,
-    backgroundColor: COLORS.aqua,
+    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
   },
 
   quickSection: {
     marginTop: 18,
-    marginBottom: 18,
+    marginBottom: 17,
+  },
+
+  quickHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 9,
   },
 
   quickLabel: {
-    color: COLORS.dim,
-    fontSize: 9,
+    color: colors.dim,
+    fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 1.5,
-    marginBottom: 9,
+    letterSpacing: 1.4,
+  },
+
+  quickHint: {
+    color: colors.dim,
+    fontSize: 9,
   },
 
   quickRow: {
@@ -891,43 +949,56 @@ const styles = StyleSheet.create({
   quickChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 100,
-    backgroundColor: COLORS.panel,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
 
   quickChipActive: {
-    backgroundColor: 'rgba(45, 225, 214, 0.09)',
-    borderColor: COLORS.borderStrong,
+    backgroundColor: 'rgba(45, 225, 214, 0.07)',
+    borderColor: colors.accent,
   },
 
   quickChipPressed: {
-    opacity: 0.72,
+    opacity: 0.68,
+  },
+
+  quickIcon: {
+    width: 23,
+    height: 23,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface2,
+  },
+
+  quickIconActive: {
+    backgroundColor: 'rgba(45, 225, 214, 0.09)',
   },
 
   quickChipText: {
-    color: COLORS.muted,
-    fontSize: 11,
+    color: colors.muted,
+    fontSize: 10,
     fontWeight: '700',
     marginLeft: 6,
   },
 
   quickChipTextActive: {
-    color: COLORS.aquaSoft,
+    color: colors.accentSoft,
   },
 
   createButton: {
-    minHeight: 70,
-    borderRadius: 22,
-    paddingHorizontal: 14,
+    minHeight: 68,
+    borderRadius: 21,
+    paddingHorizontal: 13,
     paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.aqua,
+    backgroundColor: colors.accent,
   },
 
   createButtonPressed: {
@@ -936,97 +1007,101 @@ const styles = StyleSheet.create({
   },
 
   createButtonDisabled: {
-    opacity: 0.42,
+    opacity: 0.4,
   },
 
-  createButtonLeft: {
+  createLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
 
   createIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 15,
+    width: 43,
+    height: 43,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.12)',
+    backgroundColor: 'rgba(6, 17, 19, 0.11)',
     marginRight: 11,
   },
 
-  createText: {
-    color: COLORS.bg,
-    fontSize: 16,
+  createCopy: {
+    flex: 1,
+  },
+
+  createTitle: {
+    color: colors.bg,
+    fontSize: 15,
     fontWeight: '800',
   },
 
-  createSubtext: {
-    color: 'rgba(6, 17, 19, 0.66)',
-    fontSize: 10,
+  createSubtitle: {
+    color: 'rgba(6, 17, 19, 0.62)',
+    fontSize: 9,
     fontWeight: '600',
     marginTop: 2,
   },
 
   arrowCircle: {
-    width: 42,
-    height: 42,
+    width: 41,
+    height: 41,
     borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.12)',
+    backgroundColor: 'rgba(6, 17, 19, 0.11)',
   },
 
   errorCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 14,
-    padding: 14,
-    borderRadius: 17,
-    backgroundColor: 'rgba(255, 124, 135, 0.06)',
+    marginTop: 13,
+    padding: 13,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 124, 135, 0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 124, 135, 0.18)',
+    borderColor: 'rgba(255, 124, 135, 0.16)',
   },
 
   errorIcon: {
-    width: 34,
-    height: 34,
+    width: 33,
+    height: 33,
     borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 124, 135, 0.08)',
-    marginRight: 11,
+    backgroundColor: 'rgba(255, 124, 135, 0.07)',
+    marginRight: 10,
   },
 
-  errorBody: {
+  errorContent: {
     flex: 1,
   },
 
   errorTitle: {
-    color: COLORS.white,
-    fontSize: 12,
+    color: colors.white,
+    fontSize: 11,
     fontWeight: '800',
     marginBottom: 3,
   },
 
   errorText: {
-    color: COLORS.muted,
-    fontSize: 11,
-    lineHeight: 17,
+    color: colors.muted,
+    fontSize: 10,
+    lineHeight: 16,
   },
 
   resultSection: {
-    marginTop: 30,
+    marginTop: 29,
   },
 
   resultHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    marginBottom: 13,
+    marginBottom: 12,
   },
 
-  resultTitleWrap: {
+  resultTitleContainer: {
     flex: 1,
   },
 
@@ -1036,27 +1111,36 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.aqua,
+    backgroundColor: colors.accent,
     marginLeft: 12,
   },
 
   disclaimerCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 8,
-    padding: 13,
-    marginTop: 12,
+    padding: 12,
+    marginTop: 11,
     borderRadius: 15,
-    backgroundColor: COLORS.panel,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
+  },
+
+  disclaimerIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface2,
+    marginRight: 7,
   },
 
   disclaimer: {
     flex: 1,
-    color: COLORS.dim,
-    fontSize: 10,
-    lineHeight: 16,
+    color: colors.dim,
+    fontSize: 9,
+    lineHeight: 15,
   },
 
   newBriefButton: {
@@ -1064,42 +1148,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
-    paddingVertical: 11,
-    borderRadius: 100,
-    marginTop: 15,
-    backgroundColor: COLORS.panel,
+    paddingVertical: 10,
+    borderRadius: radius.pill,
+    marginTop: 14,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.borderStrong,
+    borderColor: colors.border,
   },
 
   newBriefText: {
-    color: COLORS.aquaSoft,
-    fontSize: 11,
+    color: colors.accentSoft,
+    fontSize: 10,
     fontWeight: '800',
-    marginLeft: 6,
+    marginLeft: 5,
   },
 
   tipCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 18,
-    padding: 16,
+    marginTop: 17,
+    padding: spacing.md,
     borderRadius: 19,
-    backgroundColor: COLORS.panel,
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
 
   tipIcon: {
-    width: 40,
-    height: 40,
+    width: 39,
+    height: 39,
     borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.07)',
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
     borderWidth: 1,
-    borderColor: COLORS.border,
-    marginRight: 12,
+    borderColor: colors.border,
+    marginRight: 11,
   },
 
   tipBody: {
@@ -1107,19 +1188,19 @@ const styles = StyleSheet.create({
   },
 
   tipTitle: {
-    color: COLORS.white,
-    fontSize: 13,
+    color: colors.white,
+    fontSize: 12,
     fontWeight: '800',
-    marginBottom: 5,
+    marginBottom: 4,
   },
 
   tipText: {
-    color: COLORS.muted,
-    fontSize: 11,
-    lineHeight: 17,
+    color: colors.muted,
+    fontSize: 10,
+    lineHeight: 16,
   },
 
   footerSpace: {
-    height: 20,
+    height: 18,
   },
 });
