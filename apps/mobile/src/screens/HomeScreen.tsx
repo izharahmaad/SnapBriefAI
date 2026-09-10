@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,6 +20,8 @@ import { generateBrief } from '@/lib/api';
 import { saveBrief } from '@/lib/storage';
 import { colors, radius, spacing } from '@/theme';
 import { Brief } from '@/types/brief';
+
+const CHARACTER_LIMIT = 3000;
 
 const QUICK_STARTS = [
   {
@@ -47,17 +50,17 @@ const QUICK_STARTS = [
   },
 ];
 
-const CHARACTER_LIMIT = 3000;
+const HERO_IMAGE = require('../../assets/images/snapbrief-crystal.png');
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
 
-  const isCompact = width < 380;
-  const isWide = width >= 600;
+  const compact = width < 380;
+  const wide = width >= 600;
 
-  const horizontalPadding = isCompact
+  const horizontalPadding = compact
     ? 16
-    : isWide
+    : wide
       ? 28
       : 20;
 
@@ -74,7 +77,7 @@ export default function HomeScreen() {
     return Math.min(text.length / CHARACTER_LIMIT, 1);
   }, [text.length]);
 
-  const remainingCharacters = CHARACTER_LIMIT - text.length;
+  const remaining = CHARACTER_LIMIT - text.length;
 
   async function createBrief() {
     const trimmed = text.trim();
@@ -146,135 +149,132 @@ export default function HomeScreen() {
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
+      {/* ───────────────── HEADER ───────────────── */}
       <View style={styles.header}>
-        <View style={styles.brandBlock}>
+        <View style={styles.headerBrand}>
           <View style={styles.brandRow}>
-            <View style={styles.brandMark}>
-              <Ionicons
-                name="sparkles"
-                size={14}
-                color={colors.bg}
-              />
-            </View>
-
-            <Text style={styles.brandName}>SNAPBRIEF AI</Text>
+            <View style={styles.brandDot} />
+            <Text style={styles.brandText}>SNAPBRIEF AI</Text>
           </View>
+
+          <Text style={styles.headerTitle}>
+            Executive intelligence,
+            {'\n'}
+            without the clutter.
+          </Text>
+        </View>
+
+        <View style={styles.readyBadge}>
+          <View style={styles.readyDot} />
+          <Text style={styles.readyText}>READY</Text>
+        </View>
+      </View>
+
+      {/* ───────────────── HERO ───────────────── */}
+      <View style={styles.hero}>
+        <View style={styles.heroContent}>
+          <Text style={styles.heroEyebrow}>
+            EXECUTIVE INTELLIGENCE ENGINE
+          </Text>
 
           <Text
             style={[
-              styles.headerTitle,
-              isCompact && styles.headerTitleCompact,
+              styles.heroTitle,
+              compact && styles.heroTitleCompact,
             ]}
           >
-            Make clarity happen.
+            Turn messy notes into
+            {'\n'}
+            <Text style={styles.heroAccent}>
+              clear decisions.
+            </Text>
           </Text>
-        </View>
 
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>SB</Text>
-        </View>
-      </View>
+          <Text style={styles.heroDescription}>
+            Distill unstructured thoughts, meeting notes,
+            messages and ideas into concise briefs with clear
+            priorities and next actions.
+          </Text>
 
-      {/* Hero */}
-      <View style={styles.hero}>
-        <View style={styles.heroGlow} />
+          <View style={styles.heroMeta}>
+            <View style={styles.heroMetaItem}>
+              <View style={styles.metaStatusDot} />
+              <Text style={styles.heroMetaText}>
+                AI processing ready
+              </Text>
+            </View>
 
-        <View style={styles.heroHeader}>
-          <View style={styles.statusBadge}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>AI BRIEF BUILDER</Text>
+            <View style={styles.heroMetaItem}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={13}
+                color={colors.accent}
+              />
+              <Text style={styles.heroMetaText}>
+                Local result cache
+              </Text>
+            </View>
           </View>
+        </View>
 
-          <View style={styles.heroIcon}>
+        <View style={styles.heroVisual}>
+          <Image
+            source={HERO_IMAGE}
+            resizeMode="cover"
+            style={styles.heroImage}
+          />
+
+          <View style={styles.imageFrame} />
+
+          <View style={styles.visualBadge}>
             <Ionicons
-              name="flash-outline"
-              size={17}
+              name="sparkles"
+              size={12}
               color={colors.accent}
             />
-          </View>
-        </View>
 
-        <Text
-          style={[
-            styles.heroTitle,
-            isCompact && styles.heroTitleCompact,
-          ]}
-        >
-          Messy input.{'\n'}
-          <Text style={styles.heroAccent}>Sharp output.</Text>
-        </Text>
-
-        <Text style={styles.heroDescription}>
-          Turn rough notes, messages, ideas, and meeting summaries
-          into a clear brief you can actually use.
-        </Text>
-
-        <View style={styles.heroFooter}>
-          <View style={styles.metaItem}>
-            <Ionicons
-              name="time-outline"
-              size={14}
-              color={colors.dim}
-            />
-            <Text style={styles.metaText}>
-              Usually takes a few seconds
-            </Text>
-          </View>
-
-          <View style={styles.metaItem}>
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={14}
-              color={colors.dim}
-            />
-            <Text style={styles.metaText}>
-              Review before sharing
+            <Text style={styles.visualBadgeText}>
+              SYNTHESIS
             </Text>
           </View>
         </View>
       </View>
 
-      {/* Input heading */}
-      <View style={styles.sectionHeader}>
-        <View style={styles.sectionTitleContainer}>
-          <SectionTitle
-            eyebrow="01 / INPUT"
-            title="What do you need to structure?"
-          />
-        </View>
+      {/* ───────────────── INPUT ───────────────── */}
+      <View style={styles.sectionHeading}>
+        <SectionTitle
+          eyebrow="01 / INPUT BUFFER"
+          title="What should SnapBrief structure?"
+        />
 
         <Pressable
           onPress={loadExample}
-          hitSlop={6}
+          hitSlop={8}
           style={({ pressed }) => [
-            styles.secondaryButton,
+            styles.loadButton,
             pressed && styles.pressed,
           ]}
         >
-          <Ionicons
-            name="shuffle-outline"
-            size={14}
-            color={colors.muted}
-          />
-
-          <Text style={styles.secondaryButtonText}>
-            Example
+          <Text style={styles.loadButtonText}>
+            Try sample
           </Text>
+
+          <Ionicons
+            name="arrow-forward"
+            size={14}
+            color={colors.accent}
+          />
         </Pressable>
       </View>
 
-      {/* Editor */}
       <GlassCard style={styles.editorCard}>
-        <View style={styles.editorHeader}>
-          <View style={styles.noteBadge}>
-            <Ionicons
-              name="document-text-outline"
-              size={13}
-              color={colors.accent}
-            />
+        <View style={styles.editorTop}>
+          <View style={styles.bufferBadge}>
+            <View style={styles.bufferDot} />
 
-            <Text style={styles.noteBadgeText}>NOTE</Text>
+            <Text style={styles.bufferText}>
+              INPUT BUFFER
+            </Text>
           </View>
 
           {text.length > 0 ? (
@@ -286,13 +286,13 @@ export default function HomeScreen() {
                 pressed && styles.pressed,
               ]}
             >
+              <Text style={styles.clearText}>Clear</Text>
+
               <Ionicons
                 name="close-outline"
-                size={16}
+                size={15}
                 color={colors.dim}
               />
-
-              <Text style={styles.clearText}>Clear</Text>
             </Pressable>
           ) : null}
         </View>
@@ -312,43 +312,71 @@ export default function HomeScreen() {
           autoCorrect
           spellCheck
           maxLength={CHARACTER_LIMIT}
-          placeholder="Paste meeting notes, messages, ideas, reminders..."
+          placeholder="Type or paste raw thoughts, transcripts, Slack threads, meeting notes..."
           placeholderTextColor={colors.dim}
           style={[
             styles.input,
-            isCompact && styles.inputCompact,
+            compact && styles.inputCompact,
           ]}
         />
 
-        <View style={styles.editorFooter}>
-          <View style={styles.localStatus}>
-            <View style={styles.localStatusIcon}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={10}
-                color={colors.dim}
-              />
-            </View>
+        <View style={styles.inputFooter}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.quickRow}
+          >
+            {QUICK_STARTS.map((item) => {
+              const active = text === item.text;
 
-            <Text style={styles.localStatusText}>
-              Stored locally after generation
-            </Text>
-          </View>
+              return (
+                <Pressable
+                  key={item.label}
+                  onPress={() => selectQuickStart(item.text)}
+                  style={({ pressed }) => [
+                    styles.quickChip,
+                    active && styles.quickChipActive,
+                    pressed && styles.quickChipPressed,
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon}
+                    size={12}
+                    color={
+                      active
+                        ? colors.accent
+                        : colors.muted
+                    }
+                  />
+
+                  <Text
+                    style={[
+                      styles.quickText,
+                      active && styles.quickTextActive,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
 
           <Text
             style={[
               styles.counter,
-              remainingCharacters < 300 && styles.counterWarning,
+              remaining < 300 && styles.counterWarning,
             ]}
           >
-            {text.length}/{CHARACTER_LIMIT}
+            {text.length.toLocaleString()} /{' '}
+            {CHARACTER_LIMIT.toLocaleString()}
           </Text>
         </View>
 
         <View style={styles.progressTrack}>
           <View
             style={[
-              styles.progressFill,
+              styles.progress,
               {
                 width: `${progress * 100}%`,
               },
@@ -357,66 +385,7 @@ export default function HomeScreen() {
         </View>
       </GlassCard>
 
-      {/* Quick start */}
-      <View style={styles.quickSection}>
-        <View style={styles.quickHeader}>
-          <Text style={styles.quickLabel}>QUICK START</Text>
-
-          <Text style={styles.quickHint}>
-            Start with a format
-          </Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.quickRow}
-        >
-          {QUICK_STARTS.map((item) => {
-            const active = text === item.text;
-
-            return (
-              <Pressable
-                key={item.label}
-                onPress={() => selectQuickStart(item.text)}
-                style={({ pressed }) => [
-                  styles.quickChip,
-                  active && styles.quickChipActive,
-                  pressed && styles.quickChipPressed,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.quickIcon,
-                    active && styles.quickIconActive,
-                  ]}
-                >
-                  <Ionicons
-                    name={item.icon}
-                    size={13}
-                    color={
-                      active
-                        ? colors.accent
-                        : colors.muted
-                    }
-                  />
-                </View>
-
-                <Text
-                  style={[
-                    styles.quickChipText,
-                    active && styles.quickChipTextActive,
-                  ]}
-                >
-                  {item.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* Create button */}
+      {/* ───────────────── ACTION ───────────────── */}
       <Pressable
         onPress={createBrief}
         disabled={loading || !text.trim()}
@@ -445,33 +414,33 @@ export default function HomeScreen() {
             )}
           </View>
 
-          <View style={styles.createCopy}>
+          <View>
             <Text style={styles.createTitle}>
               {loading
-                ? 'Building your brief...'
-                : 'Create brief'}
+                ? 'Synthesizing brief'
+                : 'Synthesize executive brief'}
             </Text>
 
-            <Text style={styles.createSubtitle}>
+            <Text style={styles.createSubtext}>
               {loading
-                ? 'Analyzing and structuring your notes'
-                : 'Turn this into something actionable'}
+                ? 'Analyzing your input...'
+                : 'Convert unstructured input into signal'}
             </Text>
           </View>
         </View>
 
         {!loading ? (
-          <View style={styles.arrowCircle}>
+          <View style={styles.actionArrow}>
             <Ionicons
               name="arrow-forward"
-              size={17}
+              size={18}
               color={colors.bg}
             />
           </View>
         ) : null}
       </Pressable>
 
-      {/* Error */}
+      {/* ───────────────── ERROR ───────────────── */}
       {error ? (
         <View style={styles.errorCard}>
           <View style={styles.errorIcon}>
@@ -484,7 +453,7 @@ export default function HomeScreen() {
 
           <View style={styles.errorContent}>
             <Text style={styles.errorTitle}>
-              Something went wrong
+              Generation failed
             </Text>
 
             <Text style={styles.errorText}>
@@ -494,40 +463,36 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
-      {/* Result */}
+      {/* ───────────────── RESULT ───────────────── */}
       {brief ? (
         <View style={styles.resultSection}>
-          <View style={styles.resultHeader}>
-            <View style={styles.resultTitleContainer}>
-              <SectionTitle
-                eyebrow="02 / RESULT"
-                title="Here’s the signal."
-              />
-            </View>
+          <View style={styles.sectionHeading}>
+            <SectionTitle
+              eyebrow="02 / SYNTHESIZED BRIEF"
+              title="The signal is ready."
+            />
 
-            <View style={styles.successBadge}>
-              <Ionicons
-                name="checkmark"
-                size={14}
-                color={colors.bg}
-              />
+            <View style={styles.liveBadge}>
+              <View style={styles.liveBadgeDot} />
+
+              <Text style={styles.liveBadgeText}>
+                LIVE RESULT
+              </Text>
             </View>
           </View>
 
           <BriefResult brief={brief} />
 
-          <View style={styles.disclaimerCard}>
-            <View style={styles.disclaimerIcon}>
-              <Ionicons
-                name="information-circle-outline"
-                size={15}
-                color={colors.dim}
-              />
-            </View>
+          <View style={styles.disclaimer}>
+            <Ionicons
+              name="information-circle-outline"
+              size={15}
+              color={colors.dim}
+            />
 
-            <Text style={styles.disclaimer}>
-              AI-generated result. Review important dates,
-              numbers, names, and commitments before sending.
+            <Text style={styles.disclaimerText}>
+              AI-generated output. Review important dates,
+              numbers, names and commitments before sharing.
             </Text>
           </View>
 
@@ -540,40 +505,39 @@ export default function HomeScreen() {
           >
             <Ionicons
               name="add-outline"
-              size={17}
+              size={16}
               color={colors.accent}
             />
 
             <Text style={styles.newBriefText}>
-              Start another brief
+              Create another brief
             </Text>
           </Pressable>
         </View>
       ) : (
-        <GlassCard style={styles.tipCard}>
-          <View style={styles.tipIcon}>
+        <View style={styles.emptyState}>
+          <View style={styles.emptyIcon}>
             <Ionicons
-              name="bulb-outline"
-              size={19}
+              name="layers-outline"
+              size={17}
               color={colors.accent}
             />
           </View>
 
-          <View style={styles.tipBody}>
-            <Text style={styles.tipTitle}>
-              Keep your notes messy.
+          <View style={styles.emptyContent}>
+            <Text style={styles.emptyTitle}>
+              Your workspace is ready.
             </Text>
 
-            <Text style={styles.tipText}>
-              You do not need to rewrite anything first.
-              Paste the rough version and let SnapBrief
-              organize the important parts for you.
+            <Text style={styles.emptyText}>
+              Paste the raw version. SnapBrief handles the
+              structure.
             </Text>
           </View>
-        </GlassCard>
+        </View>
       )}
 
-      <View style={styles.footerSpace} />
+      <View style={styles.bottomSpace} />
     </ScrollView>
   );
 }
@@ -589,148 +553,109 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
 
+  /* Header */
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: spacing.xl,
+    marginBottom: 22,
   },
 
-  brandBlock: {
+  headerBrand: {
     flex: 1,
+    paddingRight: 15,
   },
 
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 7,
+    marginBottom: 9,
   },
 
-  brandMark: {
-    width: 27,
-    height: 27,
-    borderRadius: radius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
+  brandDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
     backgroundColor: colors.accent,
     marginRight: 8,
   },
 
-  brandName: {
+  brandText: {
     color: colors.accentSoft,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '800',
-    letterSpacing: 1.8,
+    letterSpacing: 1.7,
   },
 
   headerTitle: {
     color: colors.white,
-    fontSize: 24,
-    lineHeight: 29,
-    fontWeight: '800',
-    letterSpacing: -0.7,
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: '700',
+    letterSpacing: -0.25,
   },
 
-  headerTitleCompact: {
-    fontSize: 21,
-    lineHeight: 26,
-  },
-
-  avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: radius.md,
+  readyBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface2,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginLeft: spacing.md,
-  },
-
-  avatarText: {
-    color: colors.accentSoft,
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.7,
-  },
-
-  hero: {
-    position: 'relative',
-    overflow: 'hidden',
-    padding: spacing.xl,
-    borderRadius: 26,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    borderRadius: radius.pill,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: spacing.xxl,
   },
 
-  heroGlow: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    right: -95,
-    top: -90,
-    backgroundColor: 'rgba(45, 225, 214, 0.07)',
-  },
-
-  heroHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 22,
-  },
-
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface2,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  statusDot: {
+  readyDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: colors.accent,
-    marginRight: 7,
+    marginRight: 6,
   },
 
-  statusText: {
+  readyText: {
     color: colors.muted,
     fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 1.2,
+    letterSpacing: 1.1,
   },
 
-  heroIcon: {
-    width: 37,
-    height: 37,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+  /* Hero */
+  hero: {
+    overflow: 'hidden',
+    minHeight: 400,
+    borderRadius: 25,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
+    marginBottom: 28,
+  },
+
+  heroContent: {
+    padding: 20,
+    paddingBottom: 17,
+  },
+
+  heroEyebrow: {
+    color: colors.accent,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.4,
+    marginBottom: 11,
   },
 
   heroTitle: {
     color: colors.white,
-    fontSize: 38,
-    lineHeight: 41,
+    fontSize: 30,
+    lineHeight: 33,
     fontWeight: '800',
-    letterSpacing: -1.6,
+    letterSpacing: -1.1,
   },
 
   heroTitleCompact: {
-    fontSize: 31,
-    lineHeight: 35,
+    fontSize: 27,
+    lineHeight: 30,
   },
 
   heroAccent: {
@@ -739,91 +664,79 @@ const styles = StyleSheet.create({
 
   heroDescription: {
     color: colors.text,
-    fontSize: 14,
-    lineHeight: 22,
-    marginTop: 15,
-    maxWidth: 560,
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 13,
   },
 
-  heroFooter: {
+  heroMeta: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 14,
-    marginTop: 20,
-    paddingTop: 15,
+    marginTop: 17,
+    paddingTop: 13,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
 
-  metaItem: {
+  heroMetaItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  metaText: {
-    color: colors.dim,
-    fontSize: 10,
-    marginLeft: 5,
+  metaStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.accent,
+    marginRight: 6,
   },
 
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    gap: 10,
+  heroMetaText: {
+    color: colors.muted,
+    fontSize: 9,
+    fontWeight: '600',
+  },
+
+  heroVisual: {
+    height: 185,
+    marginHorizontal: 12,
     marginBottom: 12,
-  },
-
-  sectionTitleContainer: {
-    flex: 1,
-  },
-
-  secondaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: '#031012',
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  secondaryButtonText: {
-    color: colors.muted,
-    fontSize: 10,
-    fontWeight: '700',
-    marginLeft: 5,
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 0.94,
   },
 
-  pressed: {
-    opacity: 0.68,
+  imageFrame: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 1,
+    borderColor: 'rgba(146, 255, 247, 0.07)',
+    borderRadius: 18,
   },
 
-  editorCard: {
-    padding: spacing.md,
-    borderRadius: 22,
-  },
-
-  editorHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-
-  noteBadge: {
+  visualBadge: {
+    position: 'absolute',
+    left: 12,
+    top: 12,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 9,
     paddingVertical: 6,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor: 'rgba(6, 17, 19, 0.78)',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(45, 225, 214, 0.16)',
   },
 
-  noteBadgeText: {
+  visualBadgeText: {
     color: colors.accentSoft,
     fontSize: 8,
     fontWeight: '800',
@@ -831,128 +744,120 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 
+  /* Section */
+  sectionHeading: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 11,
+  },
+
+  loadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 3,
+  },
+
+  loadButtonText: {
+    color: colors.accent,
+    fontSize: 10,
+    fontWeight: '800',
+    marginRight: 5,
+  },
+
+  pressed: {
+    opacity: 0.62,
+  },
+
+  /* Editor */
+  editorCard: {
+    padding: 14,
+    borderRadius: 21,
+  },
+
+  editorTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+
+  bufferBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(45, 225, 214, 0.05)',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+
+  bufferDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.accent,
+    marginRight: 6,
+  },
+
+  bufferText: {
+    color: colors.accentSoft,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 1.1,
+  },
+
   clearButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 3,
     paddingVertical: 4,
   },
 
   clearText: {
     color: colors.dim,
-    fontSize: 10,
-    marginLeft: 3,
+    fontSize: 9,
+    fontWeight: '700',
+    marginRight: 2,
   },
 
   input: {
-    minHeight: 190,
-    maxHeight: 310,
+    minHeight: 175,
+    maxHeight: 300,
     color: colors.white,
-    fontSize: 16,
-    lineHeight: 25,
+    fontSize: 15,
+    lineHeight: 24,
     fontWeight: '500',
     paddingTop: 8,
     paddingBottom: 8,
   },
 
   inputCompact: {
-    minHeight: 170,
-    fontSize: 15,
-    lineHeight: 23,
+    minHeight: 155,
+    fontSize: 14,
+    lineHeight: 22,
   },
 
-  editorFooter: {
+  inputFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 4,
-  },
-
-  localStatus: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexShrink: 1,
-  },
-
-  localStatusIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface2,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  localStatusText: {
-    color: colors.dim,
-    fontSize: 9,
-    marginLeft: 6,
-  },
-
-  counter: {
-    color: colors.dim,
-    fontSize: 9,
-    fontWeight: '700',
-    marginLeft: 10,
-  },
-
-  counterWarning: {
-    color: colors.accentSoft,
-  },
-
-  progressTrack: {
-    height: 3,
-    width: '100%',
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface2,
-    overflow: 'hidden',
-    marginTop: 10,
-  },
-
-  progressFill: {
-    height: '100%',
-    borderRadius: radius.pill,
-    backgroundColor: colors.accent,
-  },
-
-  quickSection: {
-    marginTop: 18,
-    marginBottom: 17,
-  },
-
-  quickHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 9,
-  },
-
-  quickLabel: {
-    color: colors.dim,
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 1.4,
-  },
-
-  quickHint: {
-    color: colors.dim,
-    fontSize: 9,
+    marginTop: 5,
   },
 
   quickRow: {
-    gap: 8,
-    paddingRight: 4,
+    gap: 7,
+    paddingRight: 7,
   },
 
   quickChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: radius.pill,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -966,35 +871,48 @@ const styles = StyleSheet.create({
     opacity: 0.68,
   },
 
-  quickIcon: {
-    width: 23,
-    height: 23,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface2,
-  },
-
-  quickIconActive: {
-    backgroundColor: 'rgba(45, 225, 214, 0.09)',
-  },
-
-  quickChipText: {
+  quickText: {
     color: colors.muted,
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '700',
-    marginLeft: 6,
+    marginLeft: 5,
   },
 
-  quickChipTextActive: {
+  quickTextActive: {
     color: colors.accentSoft,
   },
 
+  counter: {
+    color: colors.dim,
+    fontSize: 9,
+    fontWeight: '700',
+    marginLeft: 7,
+  },
+
+  counterWarning: {
+    color: colors.accentSoft,
+  },
+
+  progressTrack: {
+    height: 2,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface2,
+    marginTop: 10,
+    overflow: 'hidden',
+  },
+
+  progress: {
+    height: '100%',
+    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
+  },
+
+  /* Action */
   createButton: {
-    minHeight: 68,
-    borderRadius: 21,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
+    minHeight: 66,
+    marginTop: 14,
+    borderRadius: 20,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -1007,7 +925,7 @@ const styles = StyleSheet.create({
   },
 
   createButtonDisabled: {
-    opacity: 0.4,
+    opacity: 0.38,
   },
 
   createLeft: {
@@ -1017,60 +935,57 @@ const styles = StyleSheet.create({
   },
 
   createIcon: {
-    width: 43,
-    height: 43,
+    width: 42,
+    height: 42,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.11)',
-    marginRight: 11,
-  },
-
-  createCopy: {
-    flex: 1,
+    backgroundColor: 'rgba(6, 17, 19, 0.10)',
+    marginRight: 10,
   },
 
   createTitle: {
     color: colors.bg,
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '800',
   },
 
-  createSubtitle: {
-    color: 'rgba(6, 17, 19, 0.62)',
+  createSubtext: {
+    color: 'rgba(6, 17, 19, 0.60)',
     fontSize: 9,
     fontWeight: '600',
     marginTop: 2,
   },
 
-  arrowCircle: {
-    width: 41,
-    height: 41,
-    borderRadius: 21,
+  actionArrow: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.11)',
+    backgroundColor: 'rgba(6, 17, 19, 0.10)',
   },
 
+  /* Error */
   errorCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 13,
-    padding: 13,
-    borderRadius: 16,
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 15,
     backgroundColor: 'rgba(255, 124, 135, 0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 124, 135, 0.16)',
+    borderColor: 'rgba(255, 124, 135, 0.15)',
   },
 
   errorIcon: {
-    width: 33,
-    height: 33,
-    borderRadius: 11,
+    width: 31,
+    height: 31,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 124, 135, 0.07)',
-    marginRight: 10,
+    backgroundColor: 'rgba(255, 124, 135, 0.06)',
+    marginRight: 9,
   },
 
   errorContent: {
@@ -1090,70 +1005,62 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 
+  /* Result */
   resultSection: {
-    marginTop: 29,
+    marginTop: 30,
   },
 
-  resultHeader: {
+  liveBadge: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-
-  resultTitleContainer: {
-    flex: 1,
-  },
-
-  successBadge: {
-    width: 29,
-    height: 29,
-    borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accent,
-    marginLeft: 12,
+    paddingBottom: 3,
   },
 
-  disclaimerCard: {
+  liveBadgeDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.accent,
+    marginRight: 5,
+  },
+
+  liveBadgeText: {
+    color: colors.accentSoft,
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.9,
+  },
+
+  disclaimer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding: 12,
     marginTop: 11,
-    borderRadius: 15,
+    padding: 11,
+    borderRadius: 14,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  disclaimerIcon: {
-    width: 22,
-    height: 22,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface2,
-    marginRight: 7,
-  },
-
-  disclaimer: {
+  disclaimerText: {
     flex: 1,
     color: colors.dim,
     fontSize: 9,
     lineHeight: 15,
+    marginLeft: 7,
   },
 
   newBriefButton: {
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: radius.pill,
-    marginTop: 14,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
+    marginTop: 13,
   },
 
   newBriefText: {
@@ -1163,44 +1070,48 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 
-  tipCard: {
+  /* Empty */
+  emptyState: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 17,
-    padding: spacing.md,
-    borderRadius: 19,
-  },
-
-  tipIcon: {
-    width: 39,
-    height: 39,
-    borderRadius: 13,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    marginTop: 17,
+    padding: 13,
+    borderRadius: 17,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    marginRight: 11,
   },
 
-  tipBody: {
+  emptyIcon: {
+    width: 35,
+    height: 35,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(45, 225, 214, 0.05)',
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginRight: 10,
+  },
+
+  emptyContent: {
     flex: 1,
   },
 
-  tipTitle: {
+  emptyTitle: {
     color: colors.white,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
-    marginBottom: 4,
+    marginBottom: 3,
   },
 
-  tipText: {
+  emptyText: {
     color: colors.muted,
-    fontSize: 10,
-    lineHeight: 16,
+    fontSize: 9,
+    lineHeight: 15,
   },
 
-  footerSpace: {
+  bottomSpace: {
     height: 18,
   },
 });
