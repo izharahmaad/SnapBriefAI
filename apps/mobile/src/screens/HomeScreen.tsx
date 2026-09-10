@@ -23,6 +23,8 @@ import { Brief } from '@/types/brief';
 
 const CHARACTER_LIMIT = 3000;
 
+const HERO_IMAGE = require('../../assets/images/snapbrief-crystal.png');
+
 const QUICK_STARTS = [
   {
     label: 'Meeting',
@@ -50,17 +52,15 @@ const QUICK_STARTS = [
   },
 ];
 
-const HERO_IMAGE = require('../../assets/images/snapbrief-crystal.png');
-
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
 
-  const compact = width < 380;
-  const wide = width >= 600;
+  const isCompact = width < 380;
+  const isWide = width >= 600;
 
-  const horizontalPadding = compact
+  const horizontalPadding = isCompact
     ? 16
-    : wide
+    : isWide
       ? 28
       : 20;
 
@@ -77,7 +77,7 @@ export default function HomeScreen() {
     return Math.min(text.length / CHARACTER_LIMIT, 1);
   }, [text.length]);
 
-  const remaining = CHARACTER_LIMIT - text.length;
+  const remainingCharacters = CHARACTER_LIMIT - text.length;
 
   async function createBrief() {
     const trimmed = text.trim();
@@ -149,7 +149,7 @@ export default function HomeScreen() {
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* ───────────────── HEADER ───────────────── */}
+      {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.headerBrand}>
           <View style={styles.brandRow}>
@@ -170,7 +170,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* ───────────────── HERO ───────────────── */}
+      {/* HERO */}
       <View style={styles.hero}>
         <View style={styles.heroContent}>
           <Text style={styles.heroEyebrow}>
@@ -180,7 +180,7 @@ export default function HomeScreen() {
           <Text
             style={[
               styles.heroTitle,
-              compact && styles.heroTitleCompact,
+              isCompact && styles.heroTitleCompact,
             ]}
           >
             Turn messy notes into
@@ -210,6 +210,7 @@ export default function HomeScreen() {
                 size={13}
                 color={colors.accent}
               />
+
               <Text style={styles.heroMetaText}>
                 Local result cache
               </Text>
@@ -224,7 +225,10 @@ export default function HomeScreen() {
             style={styles.heroImage}
           />
 
-          <View style={styles.imageFrame} />
+          <View
+            pointerEvents="none"
+            style={styles.imageFrame}
+          />
 
           <View style={styles.visualBadge}>
             <Ionicons
@@ -240,12 +244,14 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* ───────────────── INPUT ───────────────── */}
+      {/* INPUT HEADER */}
       <View style={styles.sectionHeading}>
-        <SectionTitle
-          eyebrow="01 / INPUT BUFFER"
-          title="What should SnapBrief structure?"
-        />
+        <View style={styles.sectionTitleContainer}>
+          <SectionTitle
+            eyebrow="01 / INPUT BUFFER"
+            title="What should SnapBrief structure?"
+          />
+        </View>
 
         <Pressable
           onPress={loadExample}
@@ -267,6 +273,7 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
+      {/* INPUT CARD */}
       <GlassCard style={styles.editorCard}>
         <View style={styles.editorTop}>
           <View style={styles.bufferBadge}>
@@ -316,7 +323,7 @@ export default function HomeScreen() {
           placeholderTextColor={colors.dim}
           style={[
             styles.input,
-            compact && styles.inputCompact,
+            isCompact && styles.inputCompact,
           ]}
         />
 
@@ -332,7 +339,9 @@ export default function HomeScreen() {
               return (
                 <Pressable
                   key={item.label}
-                  onPress={() => selectQuickStart(item.text)}
+                  onPress={() =>
+                    selectQuickStart(item.text)
+                  }
                   style={({ pressed }) => [
                     styles.quickChip,
                     active && styles.quickChipActive,
@@ -365,7 +374,8 @@ export default function HomeScreen() {
           <Text
             style={[
               styles.counter,
-              remaining < 300 && styles.counterWarning,
+              remainingCharacters < 300 &&
+                styles.counterWarning,
             ]}
           >
             {text.length.toLocaleString()} /{' '}
@@ -385,7 +395,7 @@ export default function HomeScreen() {
         </View>
       </GlassCard>
 
-      {/* ───────────────── ACTION ───────────────── */}
+      {/* CREATE */}
       <Pressable
         onPress={createBrief}
         disabled={loading || !text.trim()}
@@ -414,7 +424,7 @@ export default function HomeScreen() {
             )}
           </View>
 
-          <View>
+          <View style={styles.createCopy}>
             <Text style={styles.createTitle}>
               {loading
                 ? 'Synthesizing brief'
@@ -440,7 +450,7 @@ export default function HomeScreen() {
         ) : null}
       </Pressable>
 
-      {/* ───────────────── ERROR ───────────────── */}
+      {/* ERROR */}
       {error ? (
         <View style={styles.errorCard}>
           <View style={styles.errorIcon}>
@@ -463,14 +473,16 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
-      {/* ───────────────── RESULT ───────────────── */}
+      {/* RESULT */}
       {brief ? (
         <View style={styles.resultSection}>
           <View style={styles.sectionHeading}>
-            <SectionTitle
-              eyebrow="02 / SYNTHESIZED BRIEF"
-              title="The signal is ready."
-            />
+            <View style={styles.resultTitleContainer}>
+              <SectionTitle
+                eyebrow="02 / SYNTHESIZED BRIEF"
+                title="The signal is ready."
+              />
+            </View>
 
             <View style={styles.liveBadge}>
               <View style={styles.liveBadgeDot} />
@@ -716,7 +728,7 @@ const styles = StyleSheet.create({
   },
 
   imageFrame: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderWidth: 1,
     borderColor: 'rgba(146, 255, 247, 0.07)',
     borderRadius: 18,
@@ -751,6 +763,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 10,
     marginBottom: 11,
+  },
+
+  sectionTitleContainer: {
+    flex: 1,
+  },
+
+  resultTitleContainer: {
+    flex: 1,
   },
 
   loadButton: {
@@ -907,7 +927,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
 
-  /* Action */
+  /* Create */
   createButton: {
     minHeight: 66,
     marginTop: 14,
@@ -942,6 +962,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(6, 17, 19, 0.10)',
     marginRight: 10,
+  },
+
+  createCopy: {
+    flex: 1,
   },
 
   createTitle: {
@@ -1070,7 +1094,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 
-  /* Empty */
+  /* Empty state */
   emptyState: {
     flexDirection: 'row',
     alignItems: 'center',
