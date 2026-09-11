@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Image,
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -46,36 +46,11 @@ const QUICK_STARTS = [
   },
 ];
 
-const SAMPLE_BRIEF: Brief = {
-  id: 'sample',
-  title: 'Launch Planning & Execution',
-  summary:
-    'The launch plan is moving forward with clear ownership, a Friday review point, and a focused set of remaining deliverables.',
-  key_points: [
-    'Launch timeline has been defined and ownership is assigned.',
-    'Remaining work should be reviewed before the Friday checkpoint.',
-  ],
-  actions: [
-    'Confirm owners for outstanding launch tasks.',
-    'Review implementation progress before Friday.',
-    'Resolve any blockers before final sign-off.',
-  ],
-  tags: ['strategy', 'launch', 'planning'],
-  priority: 'High',
-  due_date: undefined,
-};
-
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
 
   const compact = width < 380;
-  const wide = width >= 600;
-
-  const horizontalPadding = compact
-    ? 16
-    : wide
-      ? 28
-      : 20;
+  const horizontalPadding = compact ? 16 : 20;
 
   const [text, setText] = useState(examples[0] ?? '');
   const [brief, setBrief] = useState<Brief | null>(null);
@@ -89,8 +64,6 @@ export default function HomeScreen() {
 
     return Math.min(text.length / CHARACTER_LIMIT, 1);
   }, [text.length]);
-
-  const remaining = CHARACTER_LIMIT - text.length;
 
   async function createBrief() {
     const trimmed = text.trim();
@@ -151,45 +124,40 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.screen}>
-      <ScrollView
-        style={styles.page}
-        contentContainerStyle={[
-          styles.content,
-          {
-            paddingHorizontal: horizontalPadding,
-          },
-        ]}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        {/* HEADER */}
-        <View style={styles.header}>
-          <View style={styles.brandCluster}>
-            <View style={styles.brandPill}>
-              <View style={styles.brandDot} />
-              <Text style={styles.brandText}>SNAPBRIEF AI</Text>
-            </View>
+    <ScrollView
+      style={styles.page}
+      contentContainerStyle={[
+        styles.content,
+        { paddingHorizontal: horizontalPadding },
+      ]}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      {/* HEADER */}
+      <View style={styles.header}>
+        <View>
+          <View style={styles.brandRow}>
+            <View style={styles.brandDot} />
 
-            <Text style={styles.headerSubtitle}>
-              Executive clarity engine
+            <Text style={styles.brandText}>
+              SNAPBRIEF AI
             </Text>
           </View>
 
-          <View style={styles.headerActions}>
-            <View style={styles.activePill}>
-              <View style={styles.activeDot} />
-              <Text style={styles.activeText}>ACTIVE</Text>
-            </View>
-
-            <View style={styles.profileButton}>
-              <Text style={styles.profileText}>SB</Text>
-            </View>
-          </View>
+          <Text style={styles.headerSubtitle}>
+            Executive clarity engine
+          </Text>
         </View>
 
-        {/* HERO */}
-        <View style={styles.hero}>
+        <View style={styles.statusPill}>
+          <View style={styles.statusDot} />
+          <Text style={styles.statusText}>ACTIVE</Text>
+        </View>
+      </View>
+
+      {/* HERO */}
+      <View style={styles.hero}>
+        <View style={styles.heroCopy}>
           <Text style={styles.heroEyebrow}>
             EXECUTIVE INTELLIGENCE ENGINE
           </Text>
@@ -202,411 +170,310 @@ export default function HomeScreen() {
           >
             Messy notes into
             {'\n'}
-            <Text style={styles.heroAccent}>
-              executive clarity.
-            </Text>
+            executive clarity.
           </Text>
 
           <Text style={styles.heroDescription}>
-            Distill unformatted streams, transcripts, messages,
+            Distill unformatted thoughts, transcripts, messages,
             and raw notes into focused, actionable briefs.
           </Text>
 
-          <View style={styles.heroStats}>
-            <View style={styles.heroStat}>
-              <View style={styles.statDot} />
-              <Text style={styles.statText}>4s typical latency</Text>
+          <View style={styles.heroMeta}>
+            <View style={styles.metaItem}>
+              <View style={styles.metaDot} />
+
+              <Text style={styles.metaText}>
+                4s typical latency
+              </Text>
             </View>
 
-            <View style={styles.heroStat}>
+            <View style={styles.metaItem}>
               <Ionicons
                 name="lock-closed-outline"
                 size={12}
                 color={colors.accent}
               />
 
-              <Text style={styles.statText}>
+              <Text style={styles.metaText}>
                 Confidential cache
               </Text>
             </View>
           </View>
-
-          {/* Contained visual tile */}
-          <View style={styles.visualWrap}>
-            <View style={styles.visualTile}>
-              <Image
-                source={HERO_IMAGE}
-                resizeMode="contain"
-                style={styles.heroImage}
-              />
-
-              <View
-                pointerEvents="none"
-                style={styles.visualOverlay}
-              />
-
-              <View style={styles.visualLabel}>
-                <View style={styles.visualLabelDot} />
-                <Text style={styles.visualLabelText}>
-                  SYNTHESIS
-                </Text>
-              </View>
-            </View>
-          </View>
         </View>
 
-        {/* INPUT SECTION */}
-        <View style={styles.sectionHeader}>
-          <SectionTitle
-            eyebrow="01 / INPUT BUFFER"
-            title="Raw input"
-          />
+        {/* Full-width visual banner */}
+        <ImageBackground
+          source={HERO_IMAGE}
+          resizeMode="cover"
+          style={styles.heroImage}
+          imageStyle={styles.heroImageStyle}
+        >
+          <View style={styles.heroImageShade} />
 
-          <Pressable
-            onPress={loadExample}
-            hitSlop={8}
-            style={({ pressed }) => [
-              styles.loadButton,
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text style={styles.loadText}>Load sample</Text>
-            <Ionicons
-              name="arrow-forward"
-              size={13}
-              color={colors.accent}
-            />
-          </Pressable>
-        </View>
+          <View style={styles.imageLabel}>
+            <View style={styles.imageLabelDot} />
 
-        {/* INPUT CARD */}
-        <GlassCard style={styles.inputCard}>
-          <View style={styles.inputHeader}>
-            <View style={styles.bufferPill}>
-              <View style={styles.bufferDot} />
-              <Text style={styles.bufferText}>
-                INPUT BUFFER
-              </Text>
-            </View>
-
-            {text.length > 0 ? (
-              <Pressable
-                onPress={clearInput}
-                hitSlop={8}
-                style={({ pressed }) => [
-                  styles.clearButton,
-                  pressed && styles.pressed,
-                ]}
-              >
-                <Text style={styles.clearText}>Clear</Text>
-                <Ionicons
-                  name="close-outline"
-                  size={14}
-                  color={colors.dim}
-                />
-              </Pressable>
-            ) : null}
+            <Text style={styles.imageLabelText}>
+              SNAPBRIEF / SYNTHESIS
+            </Text>
           </View>
+        </ImageBackground>
+      </View>
 
-          <TextInput
-            value={text}
-            onChangeText={(value) => {
-              setText(value);
+      {/* INPUT */}
+      <View style={styles.sectionHeader}>
+        <SectionTitle
+          eyebrow="01 / INPUT BUFFER"
+          title="Raw input"
+        />
 
-              if (error) {
-                setError('');
-              }
-            }}
-            multiline
-            textAlignVertical="top"
-            autoCapitalize="sentences"
-            autoCorrect
-            spellCheck
-            maxLength={CHARACTER_LIMIT}
-            placeholder="Type or paste raw thoughts, transcripts, Slack threads, strategic notes..."
-            placeholderTextColor={colors.dim}
-            style={[
-              styles.input,
-              compact && styles.inputCompact,
-            ]}
+        <Pressable
+          onPress={loadExample}
+          hitSlop={8}
+          style={({ pressed }) => [
+            styles.loadButton,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Text style={styles.loadText}>
+            Load sample
+          </Text>
+
+          <Ionicons
+            name="arrow-forward"
+            size={13}
+            color={colors.accent}
           />
+        </Pressable>
+      </View>
 
-          <View style={styles.inputBottom}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chipsRow}
-            >
-              {QUICK_STARTS.map((item) => {
-                const active = text === item.text;
+      <GlassCard style={styles.inputCard}>
+        <View style={styles.inputHeader}>
+          <View style={styles.bufferLabel}>
+            <View style={styles.bufferDot} />
 
-                return (
-                  <Pressable
-                    key={item.label}
-                    onPress={() =>
-                      selectQuickStart(item.text)
-                    }
-                    style={({ pressed }) => [
-                      styles.quickChip,
-                      active && styles.quickChipActive,
-                      pressed && styles.quickChipPressed,
-                    ]}
-                  >
-                    <Ionicons
-                      name={item.icon}
-                      size={11}
-                      color={
-                        active
-                          ? colors.accent
-                          : colors.muted
-                      }
-                    />
-
-                    <Text
-                      style={[
-                        styles.quickChipText,
-                        active &&
-                          styles.quickChipTextActive,
-                      ]}
-                    >
-                      {item.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-
-            <Text
-              style={[
-                styles.counter,
-                remaining < 300 && styles.counterWarning,
-              ]}
-            >
-              {text.length.toLocaleString()} / 3,000
+            <Text style={styles.bufferText}>
+              INPUT BUFFER
             </Text>
           </View>
 
-          <View style={styles.progressTrack}>
-            <View
-              style={[
-                styles.progressFill,
-                {
-                  width: `${progress * 100}%`,
-                },
+          {text.length > 0 ? (
+            <Pressable
+              onPress={clearInput}
+              hitSlop={8}
+              style={({ pressed }) => [
+                styles.clearButton,
+                pressed && styles.pressed,
               ]}
-            />
-          </View>
-        </GlassCard>
+            >
+              <Text style={styles.clearText}>Clear</Text>
 
-        {/* PRIMARY ACTION */}
-        <Pressable
-          onPress={createBrief}
-          disabled={loading || !text.trim()}
-          style={({ pressed }) => [
-            styles.primaryButton,
-            pressed &&
-              !loading &&
-              styles.primaryButtonPressed,
-            (!text.trim() || loading) &&
-              styles.primaryButtonDisabled,
-          ]}
-        >
-          <View style={styles.primaryButtonContent}>
-            <View style={styles.primaryIcon}>
-              {loading ? (
-                <ActivityIndicator
-                  size="small"
-                  color={colors.bg}
-                />
-              ) : (
-                <Ionicons
-                  name="sparkles"
-                  size={17}
-                  color={colors.bg}
-                />
-              )}
-            </View>
-
-            <View style={styles.primaryCopy}>
-              <Text style={styles.primaryTitle}>
-                {loading
-                  ? 'Synthesizing brief'
-                  : 'Synthesize executive brief'}
-              </Text>
-
-              <Text style={styles.primarySubtitle}>
-                {loading
-                  ? 'Processing your input...'
-                  : 'Convert noise into actionable signal'}
-              </Text>
-            </View>
-          </View>
-
-          {!loading ? (
-            <View style={styles.primaryArrow}>
               <Ionicons
-                name="arrow-forward"
+                name="close-outline"
+                size={14}
+                color={colors.dim}
+              />
+            </Pressable>
+          ) : null}
+        </View>
+
+        <TextInput
+          value={text}
+          onChangeText={(value) => {
+            setText(value);
+
+            if (error) {
+              setError('');
+            }
+          }}
+          multiline
+          textAlignVertical="top"
+          autoCapitalize="sentences"
+          autoCorrect
+          spellCheck
+          maxLength={CHARACTER_LIMIT}
+          placeholder="Type or paste raw thoughts, transcripts, Slack threads, strategic notes..."
+          placeholderTextColor={colors.dim}
+          style={[
+            styles.input,
+            compact && styles.inputCompact,
+          ]}
+        />
+
+        <View style={styles.inputFooter}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.quickRow}
+          >
+            {QUICK_STARTS.map((item) => {
+              const active = text === item.text;
+
+              return (
+                <Pressable
+                  key={item.label}
+                  onPress={() =>
+                    selectQuickStart(item.text)
+                  }
+                  style={({ pressed }) => [
+                    styles.quickChip,
+                    active && styles.quickChipActive,
+                    pressed && styles.quickChipPressed,
+                  ]}
+                >
+                  <Ionicons
+                    name={item.icon}
+                    size={11}
+                    color={
+                      active
+                        ? colors.accent
+                        : colors.muted
+                    }
+                  />
+
+                  <Text
+                    style={[
+                      styles.quickChipText,
+                      active &&
+                        styles.quickChipTextActive,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          <Text style={styles.counter}>
+            {text.length.toLocaleString()} / 3,000
+          </Text>
+        </View>
+
+        <View style={styles.progressTrack}>
+          <View
+            style={[
+              styles.progressFill,
+              {
+                width: `${progress * 100}%`,
+              },
+            ]}
+          />
+        </View>
+      </GlassCard>
+
+      {/* ACTION */}
+      <Pressable
+        onPress={createBrief}
+        disabled={loading || !text.trim()}
+        style={({ pressed }) => [
+          styles.primaryButton,
+          pressed &&
+            !loading &&
+            styles.primaryButtonPressed,
+          (!text.trim() || loading) &&
+            styles.primaryButtonDisabled,
+        ]}
+      >
+        <View style={styles.primaryLeft}>
+          <View style={styles.primaryIcon}>
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color={colors.bg}
+              />
+            ) : (
+              <Ionicons
+                name="sparkles"
                 size={17}
                 color={colors.bg}
               />
-            </View>
-          ) : null}
-        </Pressable>
-
-        {/* ERROR */}
-        {error ? (
-          <View style={styles.errorCard}>
-            <View style={styles.errorIcon}>
-              <Ionicons
-                name="alert-circle-outline"
-                size={16}
-                color={colors.danger}
-              />
-            </View>
-
-            <View style={styles.errorBody}>
-              <Text style={styles.errorTitle}>
-                Generation failed
-              </Text>
-
-              <Text style={styles.errorText}>
-                {error}
-              </Text>
-            </View>
-          </View>
-        ) : null}
-
-        {/* RESULT / SPECIMEN */}
-        <View style={styles.resultSection}>
-          <View style={styles.sectionHeader}>
-            <SectionTitle
-              eyebrow="02 / SYNTHESIZED MEMO"
-              title={brief ? 'The signal is ready.' : 'Output preview'}
-            />
-
-            <View style={styles.resultStatus}>
-              <View style={styles.resultStatusDot} />
-
-              <Text style={styles.resultStatusText}>
-                {brief ? 'LIVE RESULT' : 'SAMPLE SPECIMEN'}
-              </Text>
-            </View>
+            )}
           </View>
 
-          {brief ? (
-            <BriefResult brief={brief} />
-          ) : (
-            <View style={styles.sampleResultCard}>
-              <View style={styles.sampleTop}>
-                <View style={styles.sampleTags}>
-                  <View style={styles.sampleTag}>
-                    <Text style={styles.sampleTagText}>
-                      STRATEGY
-                    </Text>
-                  </View>
+          <View style={styles.primaryCopy}>
+            <Text style={styles.primaryTitle}>
+              {loading
+                ? 'Synthesizing executive brief'
+                : 'Synthesize executive brief'}
+            </Text>
 
-                  <View
-                    style={[
-                      styles.sampleTag,
-                      styles.sampleTagAccent,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.sampleTagText,
-                        styles.sampleTagAccentText,
-                      ]}
-                    >
-                      Q3 ROADMAP
-                    </Text>
-                  </View>
-                </View>
-
-                <Text style={styles.samplePriority}>
-                  HIGH
-                </Text>
-              </View>
-
-              <Text style={styles.sampleTitle}>
-                {SAMPLE_BRIEF.title}
-              </Text>
-
-              <Text style={styles.sampleMeta}>
-                SAMPLE SPECIMEN · EXECUTIVE OPERATIONS
-              </Text>
-
-              <View style={styles.takeawayBox}>
-                <Text style={styles.takeawayLabel}>
-                  KEY TAKEAWAYS
-                </Text>
-
-                {SAMPLE_BRIEF.key_points.map(
-                  (point, index) => (
-                    <View
-                      style={styles.takeawayRow}
-                      key={`${point}-${index}`}
-                    >
-                      <View style={styles.takeawayDot} />
-                      <Text style={styles.takeawayText}>
-                        {point}
-                      </Text>
-                    </View>
-                  )
-                )}
-              </View>
-
-              <View style={styles.actionsPreview}>
-                <Text style={styles.actionsLabel}>
-                  ASSIGNED DELIVERABLES
-                </Text>
-
-                {SAMPLE_BRIEF.actions
-                  .slice(0, 3)
-                  .map((action, index) => (
-                    <View
-                      style={styles.actionPreview}
-                      key={`${action}-${index}`}
-                    >
-                      <View style={styles.actionCheck}>
-                        <Ionicons
-                          name="checkmark"
-                          size={10}
-                          color={colors.bg}
-                        />
-                      </View>
-
-                      <Text
-                        style={styles.actionPreviewText}
-                        numberOfLines={1}
-                      >
-                        {action}
-                      </Text>
-
-                      <View style={styles.ownerBadge}>
-                        <Text style={styles.ownerText}>
-                          READY
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
-              </View>
-            </View>
-          )}
-
-          <View style={styles.disclaimer}>
-            <Ionicons
-              name="information-circle-outline"
-              size={14}
-              color={colors.dim}
-            />
-
-            <Text style={styles.disclaimerText}>
-              AI-generated output should be reviewed before
-              important decisions or external sharing.
+            <Text style={styles.primarySubtitle}>
+              {loading
+                ? 'Analyzing your input...'
+                : 'Convert raw input into actionable signal'}
             </Text>
           </View>
+        </View>
 
-          {brief ? (
+        {!loading ? (
+          <View style={styles.primaryArrow}>
+            <Ionicons
+              name="arrow-forward"
+              size={17}
+              color={colors.bg}
+            />
+          </View>
+        ) : null}
+      </Pressable>
+
+      {/* ERROR */}
+      {error ? (
+        <View style={styles.errorCard}>
+          <View style={styles.errorIcon}>
+            <Ionicons
+              name="alert-circle-outline"
+              size={16}
+              color={colors.danger}
+            />
+          </View>
+
+          <View style={styles.errorBody}>
+            <Text style={styles.errorTitle}>
+              Generation failed
+            </Text>
+
+            <Text style={styles.errorText}>
+              {error}
+            </Text>
+          </View>
+        </View>
+      ) : null}
+
+      {/* RESULT */}
+      <View style={styles.resultSection}>
+        <View style={styles.sectionHeader}>
+          <SectionTitle
+            eyebrow="02 / SYNTHESIZED MEMO"
+            title={brief ? 'Signal ready' : 'Output'}
+          />
+
+          <View style={styles.resultStatus}>
+            <View style={styles.resultDot} />
+
+            <Text style={styles.resultStatusText}>
+              {brief ? 'LIVE RESULT' : 'READY'}
+            </Text>
+          </View>
+        </View>
+
+        {brief ? (
+          <>
+            <BriefResult brief={brief} />
+
+            <View style={styles.disclaimer}>
+              <Ionicons
+                name="information-circle-outline"
+                size={14}
+                color={colors.dim}
+              />
+
+              <Text style={styles.disclaimerText}>
+                AI-generated output. Review important dates,
+                numbers, names, and commitments before sharing.
+              </Text>
+            </View>
+
             <Pressable
               onPress={startAnother}
               style={({ pressed }) => [
@@ -624,21 +491,116 @@ export default function HomeScreen() {
                 Create another brief
               </Text>
             </Pressable>
-          ) : null}
-        </View>
+          </>
+        ) : (
+          <View style={styles.outputPreview}>
+            <View style={styles.previewHeader}>
+              <View style={styles.previewLabels}>
+                <View style={styles.previewLabel}>
+                  <Text style={styles.previewLabelText}>
+                    STRATEGY
+                  </Text>
+                </View>
 
-        <View style={styles.bottomSpace} />
-      </ScrollView>
-    </View>
+                <View
+                  style={[
+                    styles.previewLabel,
+                    styles.previewLabelAccent,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.previewLabelText,
+                      styles.previewLabelAccentText,
+                    ]}
+                  >
+                    BRIEF
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={styles.previewPriority}>
+                HIGH
+              </Text>
+            </View>
+
+            <Text style={styles.previewTitle}>
+              Clear, concise, decision-ready.
+            </Text>
+
+            <Text style={styles.previewDescription}>
+              SnapBrief turns a messy stream of information
+              into the key points and next actions that
+              matter.
+            </Text>
+
+            <View style={styles.previewDivider} />
+
+            <View style={styles.previewSection}>
+              <Text style={styles.previewSectionLabel}>
+                KEY TAKEAWAYS
+              </Text>
+
+              <View style={styles.previewPoint}>
+                <View style={styles.previewDot} />
+
+                <Text style={styles.previewPointText}>
+                  Important context is separated from noise.
+                </Text>
+              </View>
+
+              <View style={styles.previewPoint}>
+                <View style={styles.previewDot} />
+
+                <Text style={styles.previewPointText}>
+                  Decisions and priorities become easier to scan.
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.previewSection}>
+              <Text style={styles.previewSectionLabel}>
+                NEXT ACTIONS
+              </Text>
+
+              <View style={styles.previewAction}>
+                <View style={styles.previewCheck}>
+                  <Ionicons
+                    name="checkmark"
+                    size={10}
+                    color={colors.bg}
+                  />
+                </View>
+
+                <Text style={styles.previewActionText}>
+                  Review the generated brief
+                </Text>
+              </View>
+
+              <View style={styles.previewAction}>
+                <View style={styles.previewCheck}>
+                  <Ionicons
+                    name="checkmark"
+                    size={10}
+                    color={colors.bg}
+                  />
+                </View>
+
+                <Text style={styles.previewActionText}>
+                  Move forward with the important parts
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.bottomSpace} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-
   page: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -646,7 +608,7 @@ const styles = StyleSheet.create({
 
   content: {
     paddingTop: 14,
-    paddingBottom: 30,
+    paddingBottom: 28,
   },
 
   /* Header */
@@ -654,23 +616,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 17,
   },
 
-  brandCluster: {
-    flex: 1,
-  },
-
-  brandPill: {
+  brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
 
   brandDot: {
@@ -683,26 +634,19 @@ const styles = StyleSheet.create({
 
   brandText: {
     color: colors.accentSoft,
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: '800',
-    letterSpacing: 1.4,
+    letterSpacing: 1.6,
   },
 
   headerSubtitle: {
     color: colors.dim,
     fontSize: 9,
-    marginTop: 7,
-    marginLeft: 2,
+    marginTop: 6,
+    marginLeft: 1,
   },
 
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-    marginLeft: 10,
-  },
-
-  activePill: {
+  statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 9,
@@ -713,7 +657,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
 
-  activeDot: {
+  statusDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
@@ -721,42 +665,27 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  activeText: {
+  statusText: {
     color: colors.muted,
     fontSize: 8,
     fontWeight: '800',
     letterSpacing: 0.9,
   },
 
-  profileButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 13,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface2,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  profileText: {
-    color: colors.accentSoft,
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.7,
-  },
-
   /* Hero */
   hero: {
     overflow: 'hidden',
-    borderRadius: 23,
-    paddingTop: 20,
-    paddingHorizontal: 20,
-    paddingBottom: 15,
+    borderRadius: 24,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 24,
+    marginBottom: 25,
+  },
+
+  heroCopy: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 17,
   },
 
   heroEyebrow: {
@@ -769,7 +698,7 @@ const styles = StyleSheet.create({
 
   heroTitle: {
     color: colors.white,
-    fontSize: 30,
+    fontSize: 31,
     lineHeight: 33,
     fontWeight: '800',
     letterSpacing: -1,
@@ -780,34 +709,29 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
 
-  heroAccent: {
-    color: colors.white,
-  },
-
   heroDescription: {
     color: colors.text,
     fontSize: 13,
     lineHeight: 20,
     marginTop: 12,
-    maxWidth: 500,
   },
 
-  heroStats: {
+  heroMeta: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 13,
-    marginTop: 16,
+    gap: 14,
+    marginTop: 17,
     paddingTop: 13,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
 
-  heroStat: {
+  metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  statDot: {
+  metaDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
@@ -815,57 +739,49 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  statText: {
+  metaText: {
     color: colors.muted,
     fontSize: 9,
     fontWeight: '600',
     marginLeft: 4,
   },
 
-  visualWrap: {
-    alignItems: 'center',
-    marginTop: 18,
-  },
-
-  visualTile: {
-    position: 'relative',
-    width: 154,
-    height: 154,
-    borderRadius: 19,
-    overflow: 'hidden',
-    backgroundColor: '#031012',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
+  /*
+   * Wide cinematic image.
+   * The image fills the card width but stays short enough
+   * to behave like a visual banner rather than a poster.
+   */
   heroImage: {
     width: '100%',
+    height: 205,
+    justifyContent: 'flex-start',
+  },
+
+  heroImageStyle: {
+    width: '100%',
     height: '100%',
-    opacity: 0.92,
   },
 
-  visualOverlay: {
+  heroImageShade: {
     ...StyleSheet.absoluteFill,
-    borderWidth: 1,
-    borderColor: 'rgba(45, 225, 214, 0.05)',
-    borderRadius: 19,
+    backgroundColor: 'rgba(3, 15, 17, 0.08)',
   },
 
-  visualLabel: {
-    position: 'absolute',
-    left: 10,
-    top: 10,
+  imageLabel: {
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 7,
-    paddingVertical: 5,
+    marginTop: 12,
+    marginLeft: 12,
+    paddingHorizontal: 9,
+    paddingVertical: 6,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(6, 17, 19, 0.72)',
+    backgroundColor: 'rgba(6, 17, 19, 0.76)',
     borderWidth: 1,
     borderColor: 'rgba(45, 225, 214, 0.12)',
   },
 
-  visualLabelDot: {
+  imageLabelDot: {
     width: 5,
     height: 5,
     borderRadius: 3,
@@ -873,7 +789,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  visualLabelText: {
+  imageLabelText: {
     color: colors.accentSoft,
     fontSize: 7,
     fontWeight: '800',
@@ -918,7 +834,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  bufferPill: {
+  bufferLabel: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
@@ -957,8 +873,8 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    minHeight: 155,
-    maxHeight: 290,
+    minHeight: 160,
+    maxHeight: 285,
     color: colors.white,
     fontSize: 15,
     lineHeight: 24,
@@ -973,23 +889,22 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
-  inputBottom: {
+  inputFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 2,
   },
 
-  chipsRow: {
+  quickRow: {
     gap: 6,
-    paddingRight: 8,
+    paddingRight: 6,
   },
 
   quickChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 9,
-    paddingVertical: 6,
+    paddingVertical: 7,
     borderRadius: radius.pill,
     backgroundColor: colors.surface2,
     borderWidth: 1,
@@ -1020,15 +935,10 @@ const styles = StyleSheet.create({
     color: colors.dim,
     fontSize: 8,
     fontWeight: '700',
-    marginLeft: 5,
-  },
-
-  counterWarning: {
-    color: colors.accentSoft,
+    marginLeft: 6,
   },
 
   progressTrack: {
-    width: '100%',
     height: 2,
     borderRadius: radius.pill,
     backgroundColor: colors.surface2,
@@ -1042,9 +952,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
 
-  /* Primary action */
+  /* Primary */
   primaryButton: {
-    minHeight: 62,
+    minHeight: 64,
     marginTop: 13,
     paddingHorizontal: 12,
     borderRadius: 19,
@@ -1063,15 +973,15 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
 
-  primaryButtonContent: {
+  primaryLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
 
   primaryIcon: {
-    width: 40,
-    height: 40,
+    width: 41,
+    height: 41,
     borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1155,7 +1065,7 @@ const styles = StyleSheet.create({
     paddingBottom: 3,
   },
 
-  resultStatusDot: {
+  resultDot: {
     width: 5,
     height: 5,
     borderRadius: 3,
@@ -1170,8 +1080,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 
-  /* Sample preview */
-  sampleResultCard: {
+  /* Preview */
+  outputPreview: {
     padding: 15,
     borderRadius: 20,
     backgroundColor: colors.surface,
@@ -1179,18 +1089,18 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
 
-  sampleTop: {
+  previewHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
 
-  sampleTags: {
+  previewLabels: {
     flexDirection: 'row',
     gap: 6,
   },
 
-  sampleTag: {
+  previewLabel: {
     paddingHorizontal: 7,
     paddingVertical: 5,
     borderRadius: radius.pill,
@@ -1199,108 +1109,96 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
 
-  sampleTagAccent: {
+  previewLabelAccent: {
     backgroundColor: 'rgba(45, 225, 214, 0.05)',
-    borderColor: 'rgba(45, 225, 214, 0.15)',
+    borderColor: 'rgba(45, 225, 214, 0.14)',
   },
 
-  sampleTagText: {
+  previewLabelText: {
     color: colors.muted,
     fontSize: 7,
     fontWeight: '800',
     letterSpacing: 0.8,
   },
 
-  sampleTagAccentText: {
+  previewLabelAccentText: {
     color: colors.accentSoft,
   },
 
-  samplePriority: {
+  previewPriority: {
     color: colors.accent,
     fontSize: 7,
     fontWeight: '800',
     letterSpacing: 1,
   },
 
-  sampleTitle: {
+  previewTitle: {
     color: colors.white,
-    fontSize: 21,
+    fontSize: 20,
     lineHeight: 25,
     fontWeight: '800',
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
     marginTop: 14,
   },
 
-  sampleMeta: {
-    color: colors.dim,
-    fontSize: 7,
-    fontWeight: '700',
-    letterSpacing: 1,
-    marginTop: 7,
+  previewDescription: {
+    color: colors.muted,
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 8,
   },
 
-  takeawayBox: {
-    marginTop: 17,
-    padding: 13,
-    borderRadius: 15,
-    backgroundColor: colors.bg,
-    borderWidth: 1,
-    borderColor: colors.border,
+  previewDivider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginVertical: 16,
   },
 
-  takeawayLabel: {
+  previewSection: {
+    marginBottom: 15,
+  },
+
+  previewSectionLabel: {
     color: colors.accent,
     fontSize: 7,
     fontWeight: '800',
     letterSpacing: 1.1,
-    marginBottom: 10,
-  },
-
-  takeawayRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
     marginBottom: 9,
   },
 
-  takeawayDot: {
-    width: 6,
-    height: 6,
+  previewPoint: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+
+  previewDot: {
+    width: 5,
+    height: 5,
     borderRadius: 3,
     backgroundColor: colors.accent,
     marginTop: 5,
     marginRight: 8,
   },
 
-  takeawayText: {
+  previewPointText: {
     flex: 1,
     color: colors.text,
-    fontSize: 11,
-    lineHeight: 17,
+    fontSize: 10,
+    lineHeight: 16,
   },
 
-  actionsPreview: {
-    marginTop: 16,
-  },
-
-  actionsLabel: {
-    color: colors.dim,
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 1.1,
-    marginBottom: 8,
-  },
-
-  actionPreview: {
-    minHeight: 37,
+  previewAction: {
+    minHeight: 35,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 9,
-    borderRadius: 11,
+    paddingHorizontal: 8,
+    borderRadius: 10,
     backgroundColor: colors.surface2,
     marginBottom: 6,
   },
 
-  actionCheck: {
+  previewCheck: {
     width: 19,
     height: 19,
     borderRadius: 7,
@@ -1310,32 +1208,17 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 
-  actionPreviewText: {
+  previewActionText: {
     flex: 1,
     color: colors.text,
-    fontSize: 10,
-    marginRight: 7,
-  },
-
-  ownerBadge: {
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    borderRadius: radius.pill,
-    backgroundColor: colors.bg,
-  },
-
-  ownerText: {
-    color: colors.muted,
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontSize: 9,
   },
 
   disclaimer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginTop: 10,
-    paddingHorizontal: 3,
+    paddingHorizontal: 2,
   },
 
   disclaimerText: {
@@ -1367,6 +1250,6 @@ const styles = StyleSheet.create({
   },
 
   bottomSpace: {
-    height: 16,
+    height: 18,
   },
 });
