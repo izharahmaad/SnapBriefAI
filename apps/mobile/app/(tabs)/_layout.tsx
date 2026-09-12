@@ -85,10 +85,7 @@ function CustomTabBar({
           tint="dark"
           style={styles.blurBar}
         >
-          <View
-            pointerEvents="none"
-            style={styles.overlay}
-          />
+          <View style={styles.overlay} />
 
           <View style={styles.inner}>
             {tabs.map((tab) => {
@@ -113,10 +110,7 @@ function CustomTabBar({
                   canPreventDefault: true,
                 });
 
-                if (
-                  !focused &&
-                  !event.defaultPrevented
-                ) {
+                if (!focused && !event.defaultPrevented) {
                   navigation.navigate(route.name);
                 }
               };
@@ -170,9 +164,7 @@ function CustomTabBar({
                   {focused ? (
                     <View style={styles.activeDot} />
                   ) : (
-                    <View
-                      style={styles.dotPlaceholder}
-                    />
+                    <View style={styles.dotPlaceholder} />
                   )}
                 </Pressable>
               );
@@ -228,6 +220,9 @@ export default function TabsLayout() {
         }}
       />
 
+      {/* Existing route kept so an existing history screen does
+          not disappear from the route tree while Vault is being
+          introduced. It is hidden from the custom navigation. */}
       <Tabs.Screen
         name="history"
         options={{
@@ -277,7 +272,8 @@ const styles = StyleSheet.create({
   },
 
   overlay: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
+
     backgroundColor: 'rgba(6, 17, 19, 0.18)',
   },
 
@@ -294,6 +290,7 @@ const styles = StyleSheet.create({
 
   tab: {
     flex: 1,
+
     height: 52,
 
     alignItems: 'center',
@@ -314,6 +311,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
 
     borderRadius: 10,
+
     backgroundColor: 'transparent',
   },
 
@@ -328,6 +326,7 @@ const styles = StyleSheet.create({
     lineHeight: 10,
 
     fontWeight: '700',
+
     letterSpacing: 0.2,
 
     marginTop: 2,
