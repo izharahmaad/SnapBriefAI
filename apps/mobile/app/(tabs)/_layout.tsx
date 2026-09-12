@@ -1,8 +1,6 @@
 import { Tabs } from 'expo-router';
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import {
   Pressable,
   StyleSheet,
@@ -11,48 +9,29 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, radius } from '@/theme';
+import { colors } from '@/theme';
 
-type IconFamily = 'ionicons' | 'material';
-
-type NavItem = {
-  label: string;
-  route: string;
-  icon: string;
-  activeIcon: string;
-  family: IconFamily;
+type TabIconProps = {
+  name: keyof typeof Ionicons.glyphMap;
+  focused: boolean;
 };
 
-const NAV_ITEMS: NavItem[] = [
-  {
-    label: 'Briefs',
-    route: 'home',
-    icon: 'grid-outline',
-    activeIcon: 'grid',
-    family: 'ionicons',
-  },
-  {
-    label: 'Synthesis',
-    route: 'synthesis',
-    icon: 'auto-fix-high',
-    activeIcon: 'auto-fix',
-    family: 'material',
-  },
-  {
-    label: 'Vault',
-    route: 'vault',
-    icon: 'archive-outline',
-    activeIcon: 'archive',
-    family: 'ionicons',
-  },
-  {
-    label: 'Settings',
-    route: 'settings',
-    icon: 'options-outline',
-    activeIcon: 'options',
-    family: 'ionicons',
-  },
-];
+function TabIcon({ name, focused }: TabIconProps) {
+  return (
+    <View
+      style={[
+        styles.iconWrap,
+        focused && styles.iconWrapActive,
+      ]}
+    >
+      <Ionicons
+        name={name}
+        size={17}
+        color={focused ? colors.accent : colors.dim}
+      />
+    </View>
+  );
+}
 
 function CustomTabBar({
   state,
@@ -63,130 +42,143 @@ function CustomTabBar({
 }) {
   const insets = useSafeAreaInsets();
 
-  const currentRoute = state.routes[state.index]?.name;
+  const tabs = [
+    {
+      route: 'home',
+      label: 'Briefs',
+      icon: 'grid-outline' as const,
+      activeIcon: 'grid' as const,
+    },
+    {
+      route: 'synthesis',
+      label: 'Synthesis',
+      icon: 'sparkles-outline' as const,
+      activeIcon: 'sparkles' as const,
+    },
+    {
+      route: 'vault',
+      label: 'Vault',
+      icon: 'archive-outline' as const,
+      activeIcon: 'archive' as const,
+    },
+    {
+      route: 'settings',
+      label: 'Settings',
+      icon: 'settings-outline' as const,
+      activeIcon: 'settings' as const,
+    },
+  ];
 
   return (
     <View
       pointerEvents="box-none"
       style={[
-        styles.tabBarContainer,
+        styles.container,
         {
-          paddingBottom: Math.max(insets.bottom, 8),
+          paddingBottom: Math.max(insets.bottom, 6),
         },
       ]}
     >
-      <View style={styles.tabBar}>
-        <View style={styles.topHighlight} />
+      <View style={styles.barShadow}>
+        <BlurView
+          intensity={75}
+          tint="dark"
+          style={styles.blurBar}
+        >
+          <View
+            pointerEvents="none"
+            style={styles.overlay}
+          />
 
-        {NAV_ITEMS.map((item) => {
-          const routeIndex = state.routes.findIndex(
-            (route: { name: string }) =>
-              route.name === item.route
-          );
+          <View style={styles.inner}>
+            {tabs.map((tab) => {
+              const routeIndex = state.routes.findIndex(
+                (route: { name: string }) =>
+                  route.name === tab.route
+              );
 
-          const focused = currentRoute === item.route;
+              const focused =
+                state.routes[state.index]?.name === tab.route;
 
-          const onPress = () => {
-            if (routeIndex === -1) {
-              return;
-            }
+              const handlePress = () => {
+                if (routeIndex === -1) {
+                  return;
+                }
 
-            const route = state.routes[routeIndex];
+                const route = state.routes[routeIndex];
 
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
+                const event = navigation.emit({
+                  type: 'tabPress',
+                  target: route.key,
+                  canPreventDefault: true,
+                });
 
-            if (!focused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-          };
+                if (
+                  !focused &&
+                  !event.defaultPrevented
+                ) {
+                  navigation.navigate(route.name);
+                }
+              };
 
-          const onLongPress = () => {
-            if (routeIndex === -1) {
-              return;
-            }
+              const handleLongPress = () => {
+                if (routeIndex === -1) {
+                  return;
+                }
 
-            const route = state.routes[routeIndex];
+                const route = state.routes[routeIndex];
 
-            navigation.emit({
-              type: 'tabLongPress',
-              target: route.key,
-            });
-          };
+                navigation.emit({
+                  type: 'tabLongPress',
+                  target: route.key,
+                });
+              };
 
-          return (
-            <Pressable
-              key={item.route}
-              accessibilityRole="button"
-              accessibilityState={
-                focused ? { selected: true } : {}
-              }
-              accessibilityLabel={`${item.label} tab`}
-              testID={`${item.route}-tab`}
-              onPress={onPress}
-              onLongPress={onLongPress}
-              style={({ pressed }) => [
-                styles.tabButton,
-                pressed && styles.tabPressed,
-              ]}
-            >
-              <View
-                style={[
-                  styles.iconContainer,
-                  focused && styles.iconContainerActive,
-                ]}
-              >
-                {item.family === 'material' ? (
-                  <MaterialCommunityIcons
+              return (
+                <Pressable
+                  key={tab.route}
+                  onPress={handlePress}
+                  onLongPress={handleLongPress}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${tab.label} tab`}
+                  accessibilityState={{
+                    selected: focused,
+                  }}
+                  style={({ pressed }) => [
+                    styles.tab,
+                    pressed && styles.tabPressed,
+                  ]}
+                >
+                  <TabIcon
                     name={
                       focused
-                        ? (item.activeIcon as any)
-                        : (item.icon as any)
+                        ? tab.activeIcon
+                        : tab.icon
                     }
-                    size={19}
-                    color={
-                      focused
-                        ? colors.accent
-                        : colors.dim
-                    }
+                    focused={focused}
                   />
-                ) : (
-                  <Ionicons
-                    name={
-                      focused
-                        ? (item.activeIcon as any)
-                        : (item.icon as any)
-                    }
-                    size={19}
-                    color={
-                      focused
-                        ? colors.accent
-                        : colors.dim
-                    }
-                  />
-                )}
-              </View>
 
-              <Text
-                style={[
-                  styles.tabLabel,
-                  focused && styles.tabLabelActive,
-                ]}
-              >
-                {item.label}
-              </Text>
+                  <Text
+                    style={[
+                      styles.label,
+                      focused && styles.labelActive,
+                    ]}
+                  >
+                    {tab.label}
+                  </Text>
 
-              {focused ? (
-                <View style={styles.activeIndicator} />
-              ) : (
-                <View style={styles.inactiveIndicator} />
-              )}
-            </Pressable>
-          );
-        })}
+                  {focused ? (
+                    <View style={styles.activeDot} />
+                  ) : (
+                    <View
+                      style={styles.dotPlaceholder}
+                    />
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        </BlurView>
       </View>
     </View>
   );
@@ -195,10 +187,14 @@ function CustomTabBar({
 export default function TabsLayout() {
   return (
     <Tabs
-      tabBar={(props) => <CustomTabBar {...props} />}
+      tabBar={(props) => (
+        <CustomTabBar
+          state={props.state}
+          navigation={props.navigation}
+        />
+      )}
       screenOptions={{
         headerShown: false,
-        tabBarHideOnKeyboard: true,
         sceneStyle: {
           backgroundColor: colors.bg,
         },
@@ -231,113 +227,132 @@ export default function TabsLayout() {
           title: 'Settings',
         }}
       />
+
+      <Tabs.Screen
+        name="history"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
-  tabBarContainer: {
+  container: {
     position: 'absolute',
-    left: 12,
-    right: 12,
+    left: 14,
+    right: 14,
     bottom: 0,
     alignItems: 'center',
   },
 
-  tabBar: {
-    position: 'relative',
+  barShadow: {
     width: '100%',
-    minHeight: 69,
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    justifyContent: 'space-between',
-
-    paddingHorizontal: 6,
-    paddingTop: 7,
-    paddingBottom: 5,
-
-    borderRadius: 23,
-
-    backgroundColor: colors.surface,
-
-    borderWidth: 1,
-    borderColor: colors.border,
+    maxWidth: 500,
 
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 9,
+      height: 7,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 18,
+    shadowOpacity: 0.28,
+    shadowRadius: 16,
 
     elevation: 10,
   },
 
-  topHighlight: {
-    position: 'absolute',
-    top: 0,
-    left: 42,
-    right: 42,
-    height: 1,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(146, 255, 247, 0.11)',
+  blurBar: {
+    width: '100%',
+    minHeight: 62,
+
+    overflow: 'hidden',
+
+    borderRadius: 999,
+
+    borderWidth: 1,
+    borderColor: 'rgba(146, 255, 247, 0.10)',
+
+    backgroundColor: 'rgba(11, 24, 27, 0.72)',
   },
 
-  tabButton: {
+  overlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(6, 17, 19, 0.18)',
+  },
+
+  inner: {
     flex: 1,
-    minWidth: 66,
+
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+  },
+
+  tab: {
+    flex: 1,
+    height: 52,
+
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 3,
+
+    borderRadius: 999,
   },
 
   tabPressed: {
-    opacity: 0.65,
+    opacity: 0.62,
   },
 
-  iconContainer: {
-    width: 34,
-    height: 30,
+  iconWrap: {
+    width: 29,
+    height: 27,
+
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 11,
+
+    borderRadius: 10,
     backgroundColor: 'transparent',
   },
 
-  iconContainerActive: {
-    backgroundColor: 'rgba(45, 225, 214, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(45, 225, 214, 0.10)',
+  iconWrapActive: {
+    backgroundColor: 'rgba(45, 225, 214, 0.09)',
   },
 
-  tabLabel: {
+  label: {
     color: colors.dim,
-    fontSize: 8,
-    lineHeight: 11,
+
+    fontSize: 7.5,
+    lineHeight: 10,
+
     fontWeight: '700',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
+
     marginTop: 2,
   },
 
-  tabLabelActive: {
+  labelActive: {
     color: colors.accentSoft,
     fontWeight: '800',
   },
 
-  activeIndicator: {
-    width: 4,
-    height: 4,
+  activeDot: {
+    width: 3.5,
+    height: 3.5,
+
     borderRadius: 2,
+
     backgroundColor: colors.accent,
-    marginTop: 4,
+
+    marginTop: 3,
   },
 
-  inactiveIndicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'transparent',
-    marginTop: 4,
+  dotPlaceholder: {
+    width: 3.5,
+    height: 3.5,
+
+    marginTop: 3,
   },
 });
