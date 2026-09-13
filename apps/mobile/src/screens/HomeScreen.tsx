@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { BriefResult } from '@/components/BriefResult';
 import { GlassCard } from '@/components/GlassCard';
@@ -33,18 +34,37 @@ const QUICK_STARTS = [
       'Meeting notes: We discussed the launch timeline, assigned owners for the remaining tasks, and agreed to review progress again on Friday.',
   },
   {
-    label: 'Concept',
+    label: 'Idea',
     icon: 'bulb-outline' as const,
     text:
       'Idea: Build a lightweight mobile tool that turns rough notes into structured briefs with a clear summary, action items, priority, and useful tags.',
   },
   {
-    label: 'Action',
+    label: 'Tasks',
     icon: 'checkmark-circle-outline' as const,
     text:
       'Tasks: Finish the landing page, test the API connection, update the README, review the mobile UI, and prepare the final GitHub push.',
   },
 ];
+
+const SAMPLE_BRIEF: Brief = {
+  id: 'sample',
+  title: 'Launch Planning & Execution',
+  summary:
+    'The launch plan is moving forward with clear ownership, a Friday review point, and a focused set of remaining deliverables.',
+  key_points: [
+    'Launch timeline has been defined and ownership is assigned.',
+    'Remaining work should be reviewed before the Friday checkpoint.',
+  ],
+  actions: [
+    'Confirm owners for outstanding launch tasks.',
+    'Review implementation progress before Friday.',
+    'Resolve blockers before final sign-off.',
+  ],
+  tags: ['strategy', 'launch'],
+  priority: 'High',
+  due_date: undefined,
+};
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
@@ -105,7 +125,7 @@ export default function HomeScreen() {
     setError('');
   }
 
-  function selectQuickStart(value: string) {
+  function chooseQuickStart(value: string) {
     setText(value);
     setBrief(null);
     setError('');
@@ -139,7 +159,7 @@ export default function HomeScreen() {
           <View style={styles.brandRow}>
             <View style={styles.brandDot} />
 
-            <Text style={styles.brandText}>
+            <Text style={styles.brand}>
               SNAPBRIEF AI
             </Text>
           </View>
@@ -151,92 +171,177 @@ export default function HomeScreen() {
 
         <View style={styles.statusPill}>
           <View style={styles.statusDot} />
-          <Text style={styles.statusText}>ACTIVE</Text>
+
+          <Text style={styles.statusText}>
+            ACTIVE
+          </Text>
         </View>
       </View>
 
       {/* HERO */}
       <View style={styles.hero}>
-        <View style={styles.heroCopy}>
-          <Text style={styles.heroEyebrow}>
-            EXECUTIVE INTELLIGENCE ENGINE
-          </Text>
-
-          <Text
-            style={[
-              styles.heroTitle,
-              compact && styles.heroTitleCompact,
-            ]}
-          >
-            Messy notes into
-            {'\n'}
-            executive clarity.
-          </Text>
-
-          <Text style={styles.heroDescription}>
-            Distill unformatted thoughts, transcripts, messages,
-            and raw notes into focused, actionable briefs.
-          </Text>
-
-          <View style={styles.heroMeta}>
-            <View style={styles.metaItem}>
-              <View style={styles.metaDot} />
-
-              <Text style={styles.metaText}>
-                4s typical latency
-              </Text>
-            </View>
-
-            <View style={styles.metaItem}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={12}
-                color={colors.accent}
-              />
-
-              <Text style={styles.metaText}>
-                Confidential cache
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Full-width visual banner */}
         <ImageBackground
           source={HERO_IMAGE}
           resizeMode="cover"
           style={styles.heroImage}
           imageStyle={styles.heroImageStyle}
         >
-          <View style={styles.heroImageShade} />
+          <LinearGradient
+            colors={[
+              'rgba(6, 17, 19, 0.20)',
+              'rgba(6, 17, 19, 0.20)',
+              'rgba(6, 17, 19, 0.92)',
+            ]}
+            locations={[0, 0.38, 1]}
+            style={styles.heroGradient}
+          >
+            <View style={styles.heroTop}>
+              <View style={styles.heroPill}>
+                <View style={styles.heroPillDot} />
 
-          <View style={styles.imageLabel}>
-            <View style={styles.imageLabelDot} />
+                <Text style={styles.heroPillText}>
+                  EXECUTIVE INTELLIGENCE
+                </Text>
+              </View>
 
-            <Text style={styles.imageLabelText}>
-              SNAPBRIEF / SYNTHESIS
-            </Text>
-          </View>
+              <View style={styles.heroIconButton}>
+                <Ionicons
+                  name="sparkles-outline"
+                  size={16}
+                  color={colors.white}
+                />
+              </View>
+            </View>
+
+            <View style={styles.heroCopy}>
+              <Text
+                style={[
+                  styles.heroTitle,
+                  compact && styles.heroTitleCompact,
+                ]}
+              >
+                Turn messy notes into
+                {'\n'}
+                <Text style={styles.heroAccent}>
+                  clear decisions.
+                </Text>
+              </Text>
+
+              <Text style={styles.heroDescription}>
+                Distill rough thoughts, meeting notes,
+                messages and ideas into focused briefs,
+                clear priorities and next actions.
+              </Text>
+
+              <View style={styles.heroMeta}>
+                <View style={styles.heroMetaItem}>
+                  <Ionicons
+                    name="flash-outline"
+                    size={12}
+                    color={colors.accent}
+                  />
+
+                  <Text style={styles.heroMetaText}>
+                    4s typical synthesis
+                  </Text>
+                </View>
+
+                <View style={styles.heroMetaItem}>
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={12}
+                    color={colors.accent}
+                  />
+
+                  <Text style={styles.heroMetaText}>
+                    Local cache
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </LinearGradient>
         </ImageBackground>
       </View>
+
+      {/* METRICS */}
+      <View style={styles.metrics}>
+        <Metric
+          value={brief ? '1' : '0'}
+          label="CURRENT BRIEF"
+        />
+
+        <View style={styles.metricDivider} />
+
+        <Metric
+          value="AI"
+          label="ENGINE STATUS"
+        />
+
+        <View style={styles.metricDivider} />
+
+        <Metric
+          value="3K"
+          label="INPUT CAPACITY"
+        />
+      </View>
+
+      {/* DAILY / WORKSPACE CARD */}
+      <GlassCard style={styles.dailyCard}>
+        <View style={styles.dailyHeader}>
+          <View style={styles.dailyLeft}>
+            <View style={styles.dailyIcon}>
+              <Ionicons
+                name="analytics-outline"
+                size={17}
+                color={colors.accent}
+              />
+            </View>
+
+            <View>
+              <Text style={styles.dailyTitle}>
+                Today's workspace
+              </Text>
+
+              <Text style={styles.dailySubtitle}>
+                Keep the thinking moving.
+              </Text>
+            </View>
+          </View>
+
+          <Text style={styles.dailyPercent}>
+            {brief ? '100%' : '0%'}
+          </Text>
+        </View>
+
+        <View style={styles.dailyTrack}>
+          <View
+            style={[
+              styles.dailyProgress,
+              {
+                width: brief ? '100%' : '6%',
+              },
+            ]}
+          />
+        </View>
+      </GlassCard>
 
       {/* INPUT */}
       <View style={styles.sectionHeader}>
         <SectionTitle
           eyebrow="01 / INPUT BUFFER"
-          title="Raw input"
+          title="Start with the raw version."
         />
 
         <Pressable
           onPress={loadExample}
           hitSlop={8}
           style={({ pressed }) => [
-            styles.loadButton,
+            styles.actionLink,
             pressed && styles.pressed,
           ]}
         >
-          <Text style={styles.loadText}>
-            Load sample
+          <Text style={styles.actionLinkText}>
+            Example
           </Text>
 
           <Ionicons
@@ -247,13 +352,13 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      <GlassCard style={styles.inputCard}>
-        <View style={styles.inputHeader}>
-          <View style={styles.bufferLabel}>
+      <GlassCard style={styles.editorCard}>
+        <View style={styles.editorHeader}>
+          <View style={styles.bufferBadge}>
             <View style={styles.bufferDot} />
 
             <Text style={styles.bufferText}>
-              INPUT BUFFER
+              RAW INPUT
             </Text>
           </View>
 
@@ -266,7 +371,9 @@ export default function HomeScreen() {
                 pressed && styles.pressed,
               ]}
             >
-              <Text style={styles.clearText}>Clear</Text>
+              <Text style={styles.clearText}>
+                Clear
+              </Text>
 
               <Ionicons
                 name="close-outline"
@@ -292,7 +399,7 @@ export default function HomeScreen() {
           autoCorrect
           spellCheck
           maxLength={CHARACTER_LIMIT}
-          placeholder="Type or paste raw thoughts, transcripts, Slack threads, strategic notes..."
+          placeholder="Paste meeting notes, ideas, transcripts, messages..."
           placeholderTextColor={colors.dim}
           style={[
             styles.input,
@@ -300,11 +407,11 @@ export default function HomeScreen() {
           ]}
         />
 
-        <View style={styles.inputFooter}>
+        <View style={styles.quickRow}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.quickRow}
+            contentContainerStyle={styles.quickContent}
           >
             {QUICK_STARTS.map((item) => {
               const active = text === item.text;
@@ -313,7 +420,7 @@ export default function HomeScreen() {
                 <Pressable
                   key={item.label}
                   onPress={() =>
-                    selectQuickStart(item.text)
+                    chooseQuickStart(item.text)
                   }
                   style={({ pressed }) => [
                     styles.quickChip,
@@ -346,14 +453,14 @@ export default function HomeScreen() {
           </ScrollView>
 
           <Text style={styles.counter}>
-            {text.length.toLocaleString()} / 3,000
+            {text.length}/3000
           </Text>
         </View>
 
-        <View style={styles.progressTrack}>
+        <View style={styles.inputProgress}>
           <View
             style={[
-              styles.progressFill,
+              styles.inputProgressValue,
               {
                 width: `${progress * 100}%`,
               },
@@ -362,7 +469,7 @@ export default function HomeScreen() {
         </View>
       </GlassCard>
 
-      {/* ACTION */}
+      {/* MAIN ACTION */}
       <Pressable
         onPress={createBrief}
         disabled={loading || !text.trim()}
@@ -394,14 +501,14 @@ export default function HomeScreen() {
           <View style={styles.primaryCopy}>
             <Text style={styles.primaryTitle}>
               {loading
-                ? 'Synthesizing executive brief'
-                : 'Synthesize executive brief'}
+                ? 'Synthesizing brief...'
+                : 'Synthesize brief'}
             </Text>
 
             <Text style={styles.primarySubtitle}>
               {loading
-                ? 'Analyzing your input...'
-                : 'Convert raw input into actionable signal'}
+                ? 'Reading and structuring your input'
+                : 'Turn raw thinking into useful signal'}
             </Text>
           </View>
         </View>
@@ -440,19 +547,19 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
-      {/* RESULT */}
-      <View style={styles.resultSection}>
+      {/* OUTPUT */}
+      <View style={styles.outputSection}>
         <View style={styles.sectionHeader}>
           <SectionTitle
-            eyebrow="02 / SYNTHESIZED MEMO"
-            title={brief ? 'Signal ready' : 'Output'}
+            eyebrow="02 / OUTPUT"
+            title={brief ? 'The signal is ready.' : 'Brief preview.'}
           />
 
-          <View style={styles.resultStatus}>
-            <View style={styles.resultDot} />
+          <View style={styles.outputStatus}>
+            <View style={styles.outputDot} />
 
-            <Text style={styles.resultStatusText}>
-              {brief ? 'LIVE RESULT' : 'READY'}
+            <Text style={styles.outputStatusText}>
+              {brief ? 'LIVE' : 'READY'}
             </Text>
           </View>
         </View>
@@ -469,15 +576,16 @@ export default function HomeScreen() {
               />
 
               <Text style={styles.disclaimerText}>
-                AI-generated output. Review important dates,
-                numbers, names, and commitments before sharing.
+                AI-generated output. Review important
+                dates, numbers, names and commitments
+                before sharing.
               </Text>
             </View>
 
             <Pressable
               onPress={startAnother}
               style={({ pressed }) => [
-                styles.newBriefButton,
+                styles.newBrief,
                 pressed && styles.pressed,
               ]}
             >
@@ -488,35 +596,23 @@ export default function HomeScreen() {
               />
 
               <Text style={styles.newBriefText}>
-                Create another brief
+                Start another brief
               </Text>
             </Pressable>
           </>
         ) : (
-          <View style={styles.outputPreview}>
+          <View style={styles.previewCard}>
             <View style={styles.previewHeader}>
-              <View style={styles.previewLabels}>
-                <View style={styles.previewLabel}>
-                  <Text style={styles.previewLabelText}>
-                    STRATEGY
-                  </Text>
-                </View>
+              <View style={styles.previewBadge}>
+                <Ionicons
+                  name="sparkles-outline"
+                  size={11}
+                  color={colors.accent}
+                />
 
-                <View
-                  style={[
-                    styles.previewLabel,
-                    styles.previewLabelAccent,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.previewLabelText,
-                      styles.previewLabelAccentText,
-                    ]}
-                  >
-                    BRIEF
-                  </Text>
-                </View>
+                <Text style={styles.previewBadgeText}>
+                  SAMPLE OUTPUT
+                </Text>
               </View>
 
               <Text style={styles.previewPriority}>
@@ -525,78 +621,91 @@ export default function HomeScreen() {
             </View>
 
             <Text style={styles.previewTitle}>
-              Clear, concise, decision-ready.
+              {SAMPLE_BRIEF.title}
             </Text>
 
-            <Text style={styles.previewDescription}>
-              SnapBrief turns a messy stream of information
-              into the key points and next actions that
-              matter.
+            <Text style={styles.previewSummary}>
+              {SAMPLE_BRIEF.summary}
             </Text>
 
             <View style={styles.previewDivider} />
 
-            <View style={styles.previewSection}>
-              <Text style={styles.previewSectionLabel}>
-                KEY TAKEAWAYS
-              </Text>
+            <Text style={styles.previewLabel}>
+              KEY POINTS
+            </Text>
 
-              <View style={styles.previewPoint}>
-                <View style={styles.previewDot} />
+            {SAMPLE_BRIEF.key_points.map(
+              (point, index) => (
+                <View
+                  key={`${point}-${index}`}
+                  style={styles.previewRow}
+                >
+                  <View style={styles.previewBullet} />
 
-                <Text style={styles.previewPointText}>
-                  Important context is separated from noise.
-                </Text>
-              </View>
-
-              <View style={styles.previewPoint}>
-                <View style={styles.previewDot} />
-
-                <Text style={styles.previewPointText}>
-                  Decisions and priorities become easier to scan.
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.previewSection}>
-              <Text style={styles.previewSectionLabel}>
-                NEXT ACTIONS
-              </Text>
-
-              <View style={styles.previewAction}>
-                <View style={styles.previewCheck}>
-                  <Ionicons
-                    name="checkmark"
-                    size={10}
-                    color={colors.bg}
-                  />
+                  <Text style={styles.previewText}>
+                    {point}
+                  </Text>
                 </View>
+              )
+            )}
 
-                <Text style={styles.previewActionText}>
-                  Review the generated brief
-                </Text>
-              </View>
+            <Text
+              style={[
+                styles.previewLabel,
+                styles.actionsLabel,
+              ]}
+            >
+              NEXT ACTIONS
+            </Text>
 
-              <View style={styles.previewAction}>
-                <View style={styles.previewCheck}>
-                  <Ionicons
-                    name="checkmark"
-                    size={10}
-                    color={colors.bg}
-                  />
+            {SAMPLE_BRIEF.actions.slice(0, 2).map(
+              (action, index) => (
+                <View
+                  key={`${action}-${index}`}
+                  style={styles.previewAction}
+                >
+                  <View style={styles.previewCheck}>
+                    <Ionicons
+                      name="checkmark"
+                      size={10}
+                      color={colors.bg}
+                    />
+                  </View>
+
+                  <Text style={styles.previewText}>
+                    {action}
+                  </Text>
                 </View>
-
-                <Text style={styles.previewActionText}>
-                  Move forward with the important parts
-                </Text>
-              </View>
-            </View>
+              )
+            )}
           </View>
         )}
       </View>
 
       <View style={styles.bottomSpace} />
     </ScrollView>
+  );
+}
+
+function Metric({
+  value,
+  label,
+}: {
+  value: string;
+  label: string;
+}) {
+  return (
+    <View style={styles.metric}>
+      <Text style={styles.metricValue}>
+        {value}
+      </Text>
+
+      <Text style={styles.metricLabel}>
+        {label}
+      </Text>
+
+      <View style={styles.metricLine} />
+    </View>
   );
 }
 
@@ -607,16 +716,17 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingTop: 14,
-    paddingBottom: 28,
+    paddingTop: 13,
+    paddingBottom: 115,
   },
 
   /* Header */
+
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 17,
+    marginBottom: 16,
   },
 
   brandRow: {
@@ -632,7 +742,7 @@ const styles = StyleSheet.create({
     marginRight: 7,
   },
 
-  brandText: {
+  brand: {
     color: colors.accentSoft,
     fontSize: 9,
     fontWeight: '800',
@@ -643,7 +753,6 @@ const styles = StyleSheet.create({
     color: colors.dim,
     fontSize: 9,
     marginTop: 6,
-    marginLeft: 1,
   },
 
   statusPill: {
@@ -658,130 +767,6 @@ const styles = StyleSheet.create({
   },
 
   statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.accent,
-    marginRight: 5,
-  },
-
-  statusText: {
-    color: colors.muted,
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 0.9,
-  },
-
-  /* Hero */
-  hero: {
-    overflow: 'hidden',
-    borderRadius: 24,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 25,
-  },
-
-  heroCopy: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 17,
-  },
-
-  heroEyebrow: {
-    color: colors.accent,
-    fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 1.4,
-    marginBottom: 10,
-  },
-
-  heroTitle: {
-    color: colors.white,
-    fontSize: 31,
-    lineHeight: 33,
-    fontWeight: '800',
-    letterSpacing: -1,
-  },
-
-  heroTitleCompact: {
-    fontSize: 27,
-    lineHeight: 30,
-  },
-
-  heroDescription: {
-    color: colors.text,
-    fontSize: 13,
-    lineHeight: 20,
-    marginTop: 12,
-  },
-
-  heroMeta: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 14,
-    marginTop: 17,
-    paddingTop: 13,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  metaDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.accent,
-    marginRight: 5,
-  },
-
-  metaText: {
-    color: colors.muted,
-    fontSize: 9,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-
-  /*
-   * Wide cinematic image.
-   * The image fills the card width but stays short enough
-   * to behave like a visual banner rather than a poster.
-   */
-  heroImage: {
-    width: '100%',
-    height: 205,
-    justifyContent: 'flex-start',
-  },
-
-  heroImageStyle: {
-    width: '100%',
-    height: '100%',
-  },
-
-  heroImageShade: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(3, 15, 17, 0.08)',
-  },
-
-  imageLabel: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    marginLeft: 12,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(6, 17, 19, 0.76)',
-    borderWidth: 1,
-    borderColor: 'rgba(45, 225, 214, 0.12)',
-  },
-
-  imageLabelDot: {
     width: 5,
     height: 5,
     borderRadius: 3,
@@ -789,14 +774,246 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  imageLabelText: {
+  statusText: {
+    color: colors.muted,
+    fontSize: 7,
+    fontWeight: '800',
+    letterSpacing: 0.9,
+  },
+
+  /* Hero */
+
+  hero: {
+    height: 470,
+    overflow: 'hidden',
+    borderRadius: 24,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 22,
+  },
+
+  heroImage: {
+    flex: 1,
+  },
+
+  heroImageStyle: {
+    width: '100%',
+    height: '100%',
+  },
+
+  heroGradient: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 13,
+    paddingTop: 13,
+  },
+
+  heroPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 9,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(6, 17, 19, 0.70)',
+    borderWidth: 1,
+    borderColor: 'rgba(146, 255, 247, 0.12)',
+  },
+
+  heroPillDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.accent,
+    marginRight: 5,
+  },
+
+  heroPillText: {
     color: colors.accentSoft,
     fontSize: 7,
     fontWeight: '800',
     letterSpacing: 0.9,
   },
 
+  heroIconButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(6, 17, 19, 0.58)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+  },
+
+  heroCopy: {
+    paddingHorizontal: 19,
+    paddingBottom: 20,
+  },
+
+  heroTitle: {
+    color: colors.white,
+    fontSize: 34,
+    lineHeight: 37,
+    fontWeight: '800',
+    letterSpacing: -1.2,
+  },
+
+  heroTitleCompact: {
+    fontSize: 29,
+    lineHeight: 32,
+  },
+
+  heroAccent: {
+    color: colors.accent,
+  },
+
+  heroDescription: {
+    color: 'rgba(243, 255, 254, 0.86)',
+    fontSize: 12,
+    lineHeight: 19,
+    marginTop: 11,
+    maxWidth: 340,
+  },
+
+  heroMeta: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 15,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.12)',
+  },
+
+  heroMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  heroMetaText: {
+    color: 'rgba(243, 255, 254, 0.68)',
+    fontSize: 8,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+
+  /* Metrics */
+
+  metrics: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 17,
+  },
+
+  metric: {
+    flex: 1,
+  },
+
+  metricDivider: {
+    width: 1,
+    height: 43,
+    backgroundColor: colors.border,
+    marginHorizontal: 13,
+  },
+
+  metricValue: {
+    color: colors.white,
+    fontSize: 25,
+    lineHeight: 29,
+    fontWeight: '800',
+    letterSpacing: -0.6,
+  },
+
+  metricLabel: {
+    color: colors.dim,
+    fontSize: 7,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginTop: 3,
+  },
+
+  metricLine: {
+    width: 25,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: colors.accent,
+    marginTop: 7,
+  },
+
+  /* Daily */
+
+  dailyCard: {
+    padding: 13,
+    borderRadius: 18,
+    marginBottom: 27,
+  },
+
+  dailyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  dailyLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+
+  dailyIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(45, 225, 214, 0.07)',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+
+  dailyTitle: {
+    color: colors.white,
+    fontSize: 11,
+    fontWeight: '800',
+    marginLeft: 9,
+  },
+
+  dailySubtitle: {
+    color: colors.dim,
+    fontSize: 8,
+    marginLeft: 9,
+    marginTop: 2,
+  },
+
+  dailyPercent: {
+    color: colors.accentSoft,
+    fontSize: 11,
+    fontWeight: '800',
+  },
+
+  dailyTrack: {
+    height: 4,
+    borderRadius: 3,
+    overflow: 'hidden',
+    backgroundColor: colors.surface2,
+    marginTop: 11,
+  },
+
+  dailyProgress: {
+    height: '100%',
+    borderRadius: 3,
+    backgroundColor: colors.accent,
+  },
+
   /* Section */
+
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -805,15 +1022,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
-  loadButton: {
+  actionLink: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingBottom: 2,
   },
 
-  loadText: {
+  actionLinkText: {
     color: colors.accent,
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '800',
     marginRight: 5,
   },
@@ -822,19 +1039,20 @@ const styles = StyleSheet.create({
     opacity: 0.62,
   },
 
-  /* Input */
-  inputCard: {
-    padding: 14,
+  /* Editor */
+
+  editorCard: {
+    padding: 13,
     borderRadius: 20,
   },
 
-  inputHeader: {
+  editorHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
 
-  bufferLabel: {
+  bufferBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
@@ -867,44 +1085,47 @@ const styles = StyleSheet.create({
 
   clearText: {
     color: colors.dim,
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '700',
     marginRight: 2,
   },
 
   input: {
-    minHeight: 160,
+    minHeight: 150,
     maxHeight: 285,
     color: colors.white,
-    fontSize: 15,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 22,
     fontWeight: '500',
     paddingTop: 12,
-    paddingBottom: 9,
+    paddingBottom: 10,
   },
 
   inputCompact: {
-    minHeight: 145,
-    fontSize: 14,
-    lineHeight: 22,
+    minHeight: 140,
+    fontSize: 13,
+    lineHeight: 21,
+  },
+
+  quickRow: {
+    flex: 1,
+  },
+
+  quickContent: {
+    gap: 6,
+    paddingRight: 8,
   },
 
   inputFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  quickRow: {
-    gap: 6,
-    paddingRight: 6,
   },
 
   quickChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 9,
-    paddingVertical: 7,
+    paddingVertical: 6,
     borderRadius: radius.pill,
     backgroundColor: colors.surface2,
     borderWidth: 1,
@@ -912,7 +1133,7 @@ const styles = StyleSheet.create({
   },
 
   quickChipActive: {
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor: 'rgba(45, 225, 214, 0.07)',
     borderColor: colors.accent,
   },
 
@@ -935,32 +1156,33 @@ const styles = StyleSheet.create({
     color: colors.dim,
     fontSize: 8,
     fontWeight: '700',
-    marginLeft: 6,
+    marginLeft: 7,
   },
 
-  progressTrack: {
+  inputProgress: {
     height: 2,
     borderRadius: radius.pill,
-    backgroundColor: colors.surface2,
     overflow: 'hidden',
+    backgroundColor: colors.surface2,
     marginTop: 9,
   },
 
-  progressFill: {
+  inputProgressValue: {
     height: '100%',
     backgroundColor: colors.accent,
     borderRadius: radius.pill,
   },
 
   /* Primary */
+
   primaryButton: {
-    minHeight: 64,
-    marginTop: 13,
-    paddingHorizontal: 12,
-    borderRadius: 19,
+    minHeight: 63,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    marginTop: 12,
+    borderRadius: 20,
     backgroundColor: colors.accent,
   },
 
@@ -980,8 +1202,8 @@ const styles = StyleSheet.create({
   },
 
   primaryIcon: {
-    width: 41,
-    height: 41,
+    width: 40,
+    height: 40,
     borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1016,6 +1238,7 @@ const styles = StyleSheet.create({
   },
 
   /* Error */
+
   errorCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -1045,7 +1268,7 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 10,
     fontWeight: '800',
-    marginBottom: 3,
+    marginBottom: 2,
   },
 
   errorText: {
@@ -1054,18 +1277,19 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
 
-  /* Result */
-  resultSection: {
-    marginTop: 28,
+  /* Output */
+
+  outputSection: {
+    marginTop: 29,
   },
 
-  resultStatus: {
+  outputStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingBottom: 3,
   },
 
-  resultDot: {
+  outputDot: {
     width: 5,
     height: 5,
     borderRadius: 3,
@@ -1073,7 +1297,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  resultStatusText: {
+  outputStatusText: {
     color: colors.accentSoft,
     fontSize: 7,
     fontWeight: '800',
@@ -1081,7 +1305,8 @@ const styles = StyleSheet.create({
   },
 
   /* Preview */
-  outputPreview: {
+
+  previewCard: {
     padding: 15,
     borderRadius: 20,
     backgroundColor: colors.surface,
@@ -1095,34 +1320,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  previewLabels: {
+  previewBadge: {
     flexDirection: 'row',
-    gap: 6,
-  },
-
-  previewLabel: {
-    paddingHorizontal: 7,
+    alignItems: 'center',
+    paddingHorizontal: 8,
     paddingVertical: 5,
     borderRadius: radius.pill,
-    backgroundColor: colors.surface2,
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  previewLabelAccent: {
-    backgroundColor: 'rgba(45, 225, 214, 0.05)',
-    borderColor: 'rgba(45, 225, 214, 0.14)',
-  },
-
-  previewLabelText: {
-    color: colors.muted,
+  previewBadgeText: {
+    color: colors.accentSoft,
     fontSize: 7,
     fontWeight: '800',
     letterSpacing: 0.8,
-  },
-
-  previewLabelAccentText: {
-    color: colors.accentSoft,
+    marginLeft: 4,
   },
 
   previewPriority: {
@@ -1134,31 +1348,27 @@ const styles = StyleSheet.create({
 
   previewTitle: {
     color: colors.white,
-    fontSize: 20,
+    fontSize: 21,
     lineHeight: 25,
     fontWeight: '800',
-    letterSpacing: -0.4,
+    letterSpacing: -0.5,
     marginTop: 14,
   },
 
-  previewDescription: {
+  previewSummary: {
     color: colors.muted,
-    fontSize: 11,
+    fontSize: 10,
     lineHeight: 17,
-    marginTop: 8,
+    marginTop: 7,
   },
 
   previewDivider: {
     height: 1,
     backgroundColor: colors.border,
-    marginVertical: 16,
+    marginVertical: 15,
   },
 
-  previewSection: {
-    marginBottom: 15,
-  },
-
-  previewSectionLabel: {
+  previewLabel: {
     color: colors.accent,
     fontSize: 7,
     fontWeight: '800',
@@ -1166,13 +1376,17 @@ const styles = StyleSheet.create({
     marginBottom: 9,
   },
 
-  previewPoint: {
+  actionsLabel: {
+    marginTop: 4,
+  },
+
+  previewRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 8,
   },
 
-  previewDot: {
+  previewBullet: {
     width: 5,
     height: 5,
     borderRadius: 3,
@@ -1181,7 +1395,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 
-  previewPointText: {
+  previewText: {
     flex: 1,
     color: colors.text,
     fontSize: 10,
@@ -1189,9 +1403,9 @@ const styles = StyleSheet.create({
   },
 
   previewAction: {
-    minHeight: 35,
     flexDirection: 'row',
     alignItems: 'center',
+    minHeight: 34,
     paddingHorizontal: 8,
     borderRadius: 10,
     backgroundColor: colors.surface2,
@@ -1206,12 +1420,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.accent,
     marginRight: 8,
-  },
-
-  previewActionText: {
-    flex: 1,
-    color: colors.text,
-    fontSize: 9,
   },
 
   disclaimer: {
@@ -1229,7 +1437,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
 
-  newBriefButton: {
+  newBrief: {
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
@@ -1250,6 +1458,6 @@ const styles = StyleSheet.create({
   },
 
   bottomSpace: {
-    height: 18,
+    height: 20,
   },
 });
