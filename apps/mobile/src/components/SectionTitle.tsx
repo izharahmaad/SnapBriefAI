@@ -12,9 +12,9 @@ export function SectionTitle({
   title,
 }: SectionTitleProps) {
   return (
-    <View style={styles.wrap}>
+    <View style={styles.container}>
       <View style={styles.eyebrowRow}>
-        <View style={styles.accentLine} />
+        <View style={styles.dot} />
 
         <Text style={styles.eyebrow}>
           {eyebrow}
@@ -29,8 +29,8 @@ export function SectionTitle({
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    gap: 5,
+  container: {
+    gap: 6,
   },
 
   eyebrowRow: {
@@ -38,26 +38,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  accentLine: {
-    width: 14,
-    height: 2,
-    borderRadius: 99,
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 999,
     backgroundColor: colors.accent,
     marginRight: 7,
   },
 
   eyebrow: {
     color: colors.accentSoft,
-    fontSize: 9,
+    fontSize: 8,
+    lineHeight: 10,
     fontWeight: '800',
     letterSpacing: 1.5,
+    textTransform: 'uppercase',
   },
 
   title: {
     color: colors.white,
-    fontSize: 22,
-    lineHeight: 27,
+    fontSize: 23,
+    lineHeight: 28,
     fontWeight: '800',
-    letterSpacing: -0.55,
+    letterSpacing: -0.6,
   },
 });
