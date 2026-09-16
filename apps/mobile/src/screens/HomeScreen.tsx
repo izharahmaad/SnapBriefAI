@@ -62,8 +62,9 @@ const SAMPLE_BRIEF: Brief = {
     'Resolve blockers before final sign-off.',
   ],
   tags: ['strategy', 'launch'],
-  priority: 'High',
+  priority: 'high',
   due_date: undefined,
+  created_at: new Date().toISOString(),
 };
 
 export default function HomeScreen() {
