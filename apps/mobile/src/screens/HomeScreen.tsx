@@ -64,6 +64,7 @@ const SAMPLE_BRIEF: Brief = {
   tags: ['strategy', 'launch'],
   priority: 'high',
   due_date: undefined,
+  created_at: new Date().toISOString(),
 };
 
 export default function HomeScreen() {
