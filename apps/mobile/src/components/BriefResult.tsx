@@ -4,7 +4,6 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Brief } from '@/types/brief';
 import { colors, radius, spacing } from '@/theme';
 import { Chip } from './Chip';
-import { GlassCard } from './GlassCard';
 
 export function BriefResult({ brief }: { brief: Brief }) {
   const priority = (brief.priority || 'normal').toLowerCase();
@@ -14,25 +13,25 @@ export function BriefResult({ brief }: { brief: Brief }) {
       icon: 'alert-circle-outline' as const,
       color: colors.accent,
       background: 'rgba(45, 225, 214, 0.08)',
-      label: 'HIGH PRIORITY',
+      label: 'High priority',
     },
     medium: {
       icon: 'time-outline' as const,
       color: colors.accentSoft,
       background: 'rgba(146, 255, 247, 0.06)',
-      label: 'MEDIUM PRIORITY',
+      label: 'Medium priority',
     },
     low: {
       icon: 'arrow-down-circle-outline' as const,
       color: colors.muted,
       background: 'rgba(135, 166, 165, 0.06)',
-      label: 'LOW PRIORITY',
+      label: 'Low priority',
     },
     normal: {
       icon: 'remove-circle-outline' as const,
       color: colors.muted,
       background: 'rgba(135, 166, 165, 0.06)',
-      label: 'NORMAL',
+      label: 'Normal',
     },
   };
 
@@ -41,27 +40,30 @@ export function BriefResult({ brief }: { brief: Brief }) {
     priorityConfig.normal;
 
   return (
-    <GlassCard style={styles.wrap}>
-      {/* Header */}
+    <View style={styles.container}>
+      {/* Result identity */}
       <View style={styles.header}>
-        <View style={styles.aiBadge}>
-          <View style={styles.aiIcon}>
+        <View style={styles.identity}>
+          <View style={styles.sparkIcon}>
             <Ionicons
               name="sparkles"
-              size={12}
+              size={13}
               color={colors.bg}
             />
           </View>
 
-          <Text style={styles.aiBadgeText}>AI BRIEF</Text>
+          <View>
+            <Text style={styles.eyebrow}>SNAPBRIEF</Text>
+            <Text style={styles.generatedLabel}>Generated brief</Text>
+          </View>
         </View>
 
         <View
           style={[
-            styles.priorityBadge,
+            styles.priority,
             {
               backgroundColor: priorityStyle.background,
-              borderColor: `${priorityStyle.color}35`,
+              borderColor: `${priorityStyle.color}30`,
             },
           ]}
         >
@@ -74,9 +76,7 @@ export function BriefResult({ brief }: { brief: Brief }) {
           <Text
             style={[
               styles.priorityText,
-              {
-                color: priorityStyle.color,
-              },
+              { color: priorityStyle.color },
             ]}
           >
             {priorityStyle.label}
@@ -91,37 +91,29 @@ export function BriefResult({ brief }: { brief: Brief }) {
         <Text style={styles.summary}>{brief.summary}</Text>
       </View>
 
-      {/* Divider */}
-      <View style={styles.divider} />
-
       {/* Key points */}
       {brief.key_points?.length ? (
         <View style={styles.section}>
-          <View style={styles.headingRow}>
-            <View style={styles.headingIcon}>
-              <Ionicons
-                name="list-outline"
-                size={15}
-                color={colors.accent}
-              />
-            </View>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionNumber}>01</Text>
 
             <View>
-              <Text style={styles.heading}>Key points</Text>
-              <Text style={styles.headingMeta}>
+              <Text style={styles.sectionTitle}>Key points</Text>
+
+              <Text style={styles.sectionCaption}>
                 What matters most
               </Text>
             </View>
           </View>
 
-          <View style={styles.pointsList}>
+          <View style={styles.list}>
             {brief.key_points.map((point, index) => (
               <View
-                style={styles.point}
                 key={`${point}-${index}`}
+                style={styles.listItem}
               >
-                <View style={styles.pointMarker}>
-                  <View style={styles.pointDot} />
+                <View style={styles.bullet}>
+                  <View style={styles.bulletDot} />
                 </View>
 
                 <Text style={styles.itemText}>{point}</Text>
@@ -134,33 +126,28 @@ export function BriefResult({ brief }: { brief: Brief }) {
       {/* Actions */}
       {brief.actions?.length ? (
         <View style={styles.section}>
-          <View style={styles.headingRow}>
-            <View style={styles.headingIcon}>
-              <Ionicons
-                name="arrow-forward-circle-outline"
-                size={15}
-                color={colors.accent}
-              />
-            </View>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionNumber}>02</Text>
 
             <View>
-              <Text style={styles.heading}>Next actions</Text>
-              <Text style={styles.headingMeta}>
-                Suggested moves
+              <Text style={styles.sectionTitle}>Next actions</Text>
+
+              <Text style={styles.sectionCaption}>
+                What to do next
               </Text>
             </View>
           </View>
 
-          <View style={styles.actionsList}>
+          <View style={styles.list}>
             {brief.actions.map((action, index) => (
               <View
-                style={styles.action}
                 key={`${action}-${index}`}
+                style={styles.listItem}
               >
-                <View style={styles.check}>
+                <View style={styles.actionIcon}>
                   <Ionicons
-                    name="checkmark"
-                    size={11}
+                    name="arrow-forward"
+                    size={10}
                     color={colors.bg}
                   />
                 </View>
@@ -172,19 +159,13 @@ export function BriefResult({ brief }: { brief: Brief }) {
         </View>
       ) : null}
 
-      {/* Tags */}
+      {/* Metadata */}
       {brief.tags?.length || brief.due_date ? (
-        <View style={styles.tagsSection}>
-          <View style={styles.tagHeading}>
-            <Ionicons
-              name="pricetags-outline"
-              size={14}
-              color={colors.dim}
-            />
+        <View style={styles.metadata}>
+          <View style={styles.metadataHeader}>
+            <Text style={styles.metadataLabel}>METADATA</Text>
 
-            <Text style={styles.tagHeadingText}>
-              ORGANIZED AS
-            </Text>
+            <View style={styles.metadataLine} />
           </View>
 
           <ScrollView
@@ -202,55 +183,52 @@ export function BriefResult({ brief }: { brief: Brief }) {
           </ScrollView>
         </View>
       ) : null}
-    </GlassCard>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    padding: spacing.xl,
-    borderRadius: 24,
-    gap: 0,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+  container: {
+    width: '100%',
   },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: spacing.md,
   },
 
-  aiBadge: {
+  identity: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: 11,
-    paddingLeft: 5,
-    paddingVertical: 5,
-    borderRadius: radius.pill,
-    backgroundColor: colors.accent,
+    flex: 1,
   },
 
-  aiIcon: {
-    width: 23,
-    height: 23,
-    borderRadius: 8,
+  sparkIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.12)',
-    marginRight: 6,
+    backgroundColor: colors.accent,
+    marginRight: 10,
   },
 
-  aiBadgeText: {
-    color: colors.bg,
-    fontSize: 9,
+  eyebrow: {
+    color: colors.accentSoft,
+    fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 1.2,
+    letterSpacing: 1.6,
   },
 
-  priorityBadge: {
+  generatedLabel: {
+    color: colors.dim,
+    fontSize: 10,
+    marginTop: 2,
+  },
+
+  priority: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 9,
@@ -262,108 +240,88 @@ const styles = StyleSheet.create({
   priorityText: {
     fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 0.9,
     marginLeft: 5,
   },
 
   intro: {
-    marginTop: 22,
+    marginTop: 25,
   },
 
   title: {
     color: colors.white,
-    fontSize: 27,
-    lineHeight: 33,
+    fontSize: 28,
+    lineHeight: 34,
     fontWeight: '800',
-    letterSpacing: -0.7,
+    letterSpacing: -0.8,
   },
 
   summary: {
     color: colors.text,
     fontSize: 14,
     lineHeight: 22,
-    marginTop: 10,
-  },
-
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: 22,
+    marginTop: 11,
   },
 
   section: {
-    marginBottom: 22,
+    marginTop: 28,
   },
 
-  headingRow: {
+  sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 13,
+    marginBottom: 14,
   },
 
-  headingIcon: {
-    width: 31,
-    height: 31,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.07)',
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginRight: 10,
+  sectionNumber: {
+    width: 28,
+    color: colors.accent,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
 
-  heading: {
+  sectionTitle: {
     color: colors.white,
     fontSize: 13,
     fontWeight: '800',
   },
 
-  headingMeta: {
+  sectionCaption: {
     color: colors.dim,
     fontSize: 9,
     marginTop: 2,
   },
 
-  pointsList: {
-    gap: 11,
+  list: {
+    gap: 12,
   },
 
-  point: {
+  listItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
 
-  pointMarker: {
+  bullet: {
     width: 20,
     height: 20,
     borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor: 'rgba(45, 225, 214, 0.07)',
     marginRight: 9,
     marginTop: 1,
   },
 
-  pointDot: {
+  bulletDot: {
     width: 5,
     height: 5,
-    borderRadius: 3,
+    borderRadius: 999,
     backgroundColor: colors.accent,
   },
 
-  actionsList: {
-    gap: 10,
-  },
-
-  action: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-
-  check: {
-    width: 21,
-    height: 21,
+  actionIcon: {
+    width: 20,
+    height: 20,
     borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
@@ -379,26 +337,32 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  tagsSection: {
-    paddingTop: 3,
+  metadata: {
+    marginTop: 28,
   },
 
-  tagHeading: {
+  metadataHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
 
-  tagHeadingText: {
+  metadataLabel: {
     color: colors.dim,
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 1.3,
-    marginLeft: 6,
+    letterSpacing: 1.4,
+  },
+
+  metadataLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+    marginLeft: 10,
   },
 
   tagsRow: {
-    gap: 8,
+    gap: 7,
     paddingRight: 4,
   },
 });
