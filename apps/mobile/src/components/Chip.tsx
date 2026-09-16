@@ -6,17 +6,19 @@ import { colors, radius } from '@/theme';
 export function Chip({ text }: { text: string }) {
   return (
     <View style={styles.chip}>
-      <Ionicons
-        name="pricetag-outline"
-        size={11}
-        color={colors.accent}
-      />
+      <View style={styles.iconWrap}>
+        <Ionicons
+          name="pricetag-outline"
+          size={9}
+          color={colors.accent}
+        />
+      </View>
 
       <Text
         style={styles.text}
         numberOfLines={1}
       >
-        #{text}
+        {text.startsWith('#') ? text : `#${text}`}
       </Text>
     </View>
   );
@@ -28,24 +30,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
 
-    minHeight: 31,
+    minHeight: 28,
 
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingLeft: 5,
+    paddingRight: 10,
+    paddingVertical: 4,
 
     borderRadius: radius.pill,
 
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor: 'rgba(45, 225, 214, 0.045)',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(45, 225, 214, 0.12)',
+  },
+
+  iconWrap: {
+    width: 19,
+    height: 19,
+    borderRadius: 7,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: 'rgba(45, 225, 214, 0.08)',
+    marginRight: 6,
   },
 
   text: {
-    color: colors.accentSoft,
+    color: colors.text,
     fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 0.15,
-    marginLeft: 5,
+    letterSpacing: 0.1,
     maxWidth: 150,
   },
 });
