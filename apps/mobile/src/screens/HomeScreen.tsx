@@ -72,6 +72,7 @@ export default function HomeScreen() {
 
   const compact = width < 380;
   const horizontalPadding = compact ? 16 : 20;
+  const heroHeight = compact ? 430 : 460;
 
   const [text, setText] = useState(examples[0] ?? '');
   const [brief, setBrief] = useState<Brief | null>(null);
@@ -111,7 +112,7 @@ export default function HomeScreen() {
       setError(
         err instanceof Error
           ? err.message
-          : 'Could not create the brief. Please try again.'
+          : 'Could not create the brief. Please try again.',
       );
     } finally {
       setLoading(false);
@@ -147,40 +148,12 @@ export default function HomeScreen() {
   return (
     <ScrollView
       style={styles.page}
-      contentContainerStyle={[
-        styles.content,
-        { paddingHorizontal: horizontalPadding },
-      ]}
+      contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* HEADER */}
-      <View style={styles.header}>
-        <View>
-          <View style={styles.brandRow}>
-            <View style={styles.brandDot} />
-
-            <Text style={styles.brand}>
-              SNAPBRIEF AI
-            </Text>
-          </View>
-
-          <Text style={styles.headerSubtitle}>
-            Executive clarity engine
-          </Text>
-        </View>
-
-        <View style={styles.statusPill}>
-          <View style={styles.statusDot} />
-
-          <Text style={styles.statusText}>
-            ACTIVE
-          </Text>
-        </View>
-      </View>
-
-      {/* HERO */}
-      <View style={styles.hero}>
+      {/* FULL-WIDTH HERO */}
+      <View style={[styles.hero, { height: heroHeight }]}>
         <ImageBackground
           source={HERO_IMAGE}
           resizeMode="cover"
@@ -189,14 +162,51 @@ export default function HomeScreen() {
         >
           <LinearGradient
             colors={[
-              'rgba(6, 17, 19, 0.20)',
-              'rgba(6, 17, 19, 0.20)',
-              'rgba(6, 17, 19, 0.92)',
+              'rgba(6, 17, 19, 0.08)',
+              'rgba(6, 17, 19, 0.18)',
+              'rgba(6, 17, 19, 0.48)',
+              'rgba(6, 17, 19, 0.96)',
             ]}
-            locations={[0, 0.38, 1]}
+            locations={[0, 0.28, 0.62, 1]}
             style={styles.heroGradient}
           >
-            <View style={styles.heroTop}>
+            {/* HERO HEADER */}
+            <View style={styles.heroHeader}>
+              <View>
+                <View style={styles.brandRow}>
+                  <View style={styles.brandDot} />
+
+                  <Text style={styles.brand}>
+                    SNAPBRIEF AI
+                  </Text>
+                </View>
+
+                <Text style={styles.headerSubtitle}>
+                  Executive clarity engine
+                </Text>
+              </View>
+
+              <View style={styles.heroHeaderActions}>
+                <View style={styles.statusPill}>
+                  <View style={styles.statusDot} />
+
+                  <Text style={styles.statusText}>
+                    ACTIVE
+                  </Text>
+                </View>
+
+                <View style={styles.heroIconButton}>
+                  <Ionicons
+                    name="sparkles-outline"
+                    size={16}
+                    color={colors.white}
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/* HERO CONTENT */}
+            <View style={styles.heroBottom}>
               <View style={styles.heroPill}>
                 <View style={styles.heroPillDot} />
 
@@ -205,16 +215,6 @@ export default function HomeScreen() {
                 </Text>
               </View>
 
-              <View style={styles.heroIconButton}>
-                <Ionicons
-                  name="sparkles-outline"
-                  size={16}
-                  color={colors.white}
-                />
-              </View>
-            </View>
-
-            <View style={styles.heroCopy}>
               <Text
                 style={[
                   styles.heroTitle,
@@ -243,7 +243,7 @@ export default function HomeScreen() {
                   />
 
                   <Text style={styles.heroMetaText}>
-                    4s typical synthesis
+                    Fast synthesis
                   </Text>
                 </View>
 
@@ -258,432 +258,462 @@ export default function HomeScreen() {
                     Local cache
                   </Text>
                 </View>
+
+                <View style={styles.heroMetaItem}>
+                  <Ionicons
+                    name="text-outline"
+                    size={12}
+                    color={colors.accent}
+                  />
+
+                  <Text style={styles.heroMetaText}>
+                    3K characters
+                  </Text>
+                </View>
               </View>
             </View>
           </LinearGradient>
         </ImageBackground>
       </View>
 
-      {/* METRICS */}
-      <View style={styles.metrics}>
-        <Metric
-          value={brief ? '1' : '0'}
-          label="CURRENT BRIEF"
-        />
-
-        <View style={styles.metricDivider} />
-
-        <Metric
-          value="AI"
-          label="ENGINE STATUS"
-        />
-
-        <View style={styles.metricDivider} />
-
-        <Metric
-          value="3K"
-          label="INPUT CAPACITY"
-        />
-      </View>
-
-      {/* DAILY / WORKSPACE CARD */}
-      <GlassCard style={styles.dailyCard}>
-        <View style={styles.dailyHeader}>
-          <View style={styles.dailyLeft}>
-            <View style={styles.dailyIcon}>
-              <Ionicons
-                name="analytics-outline"
-                size={17}
-                color={colors.accent}
-              />
-            </View>
-
-            <View>
-              <Text style={styles.dailyTitle}>
-                Today's workspace
-              </Text>
-
-              <Text style={styles.dailySubtitle}>
-                Keep the thinking moving.
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.dailyPercent}>
-            {brief ? '100%' : '0%'}
-          </Text>
-        </View>
-
-        <View style={styles.dailyTrack}>
-          <View
-            style={[
-              styles.dailyProgress,
-              {
-                width: brief ? '100%' : '6%',
-              },
-            ]}
-          />
-        </View>
-      </GlassCard>
-
-      {/* INPUT */}
-      <View style={styles.sectionHeader}>
-        <SectionTitle
-          eyebrow="01 / INPUT BUFFER"
-          title="Start with the raw version."
-        />
-
-        <Pressable
-          onPress={loadExample}
-          hitSlop={8}
-          style={({ pressed }) => [
-            styles.actionLink,
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={styles.actionLinkText}>
-            Example
-          </Text>
-
-          <Ionicons
-            name="arrow-forward"
-            size={13}
-            color={colors.accent}
-          />
-        </Pressable>
-      </View>
-
-      <GlassCard style={styles.editorCard}>
-        <View style={styles.editorHeader}>
-          <View style={styles.bufferBadge}>
-            <View style={styles.bufferDot} />
-
-            <Text style={styles.bufferText}>
-              RAW INPUT
-            </Text>
-          </View>
-
-          {text.length > 0 ? (
-            <Pressable
-              onPress={clearInput}
-              hitSlop={8}
-              style={({ pressed }) => [
-                styles.clearButton,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={styles.clearText}>
-                Clear
-              </Text>
-
-              <Ionicons
-                name="close-outline"
-                size={14}
-                color={colors.dim}
-              />
-            </Pressable>
-          ) : null}
-        </View>
-
-        <TextInput
-          value={text}
-          onChangeText={(value) => {
-            setText(value);
-
-            if (error) {
-              setError('');
-            }
-          }}
-          multiline
-          textAlignVertical="top"
-          autoCapitalize="sentences"
-          autoCorrect
-          spellCheck
-          maxLength={CHARACTER_LIMIT}
-          placeholder="Paste meeting notes, ideas, transcripts, messages..."
-          placeholderTextColor={colors.dim}
-          style={[
-            styles.input,
-            compact && styles.inputCompact,
-          ]}
-        />
-
-        <View style={styles.quickRow}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.quickContent}
-          >
-            {QUICK_STARTS.map((item) => {
-              const active = text === item.text;
-
-              return (
-                <Pressable
-                  key={item.label}
-                  onPress={() =>
-                    chooseQuickStart(item.text)
-                  }
-                  style={({ pressed }) => [
-                    styles.quickChip,
-                    active && styles.quickChipActive,
-                    pressed && styles.quickChipPressed,
-                  ]}
-                >
-                  <Ionicons
-                    name={item.icon}
-                    size={11}
-                    color={
-                      active
-                        ? colors.accent
-                        : colors.muted
-                    }
-                  />
-
-                  <Text
-                    style={[
-                      styles.quickChipText,
-                      active &&
-                        styles.quickChipTextActive,
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <Text style={styles.counter}>
-            {text.length}/3000
-          </Text>
-        </View>
-
-        <View style={styles.inputProgress}>
-          <View
-            style={[
-              styles.inputProgressValue,
-              {
-                width: `${progress * 100}%`,
-              },
-            ]}
-          />
-        </View>
-      </GlassCard>
-
-      {/* MAIN ACTION */}
-      <Pressable
-        onPress={createBrief}
-        disabled={loading || !text.trim()}
-        style={({ pressed }) => [
-          styles.primaryButton,
-          pressed &&
-            !loading &&
-            styles.primaryButtonPressed,
-          (!text.trim() || loading) &&
-            styles.primaryButtonDisabled,
+      {/* BODY */}
+      <View
+        style={[
+          styles.body,
+          { paddingHorizontal: horizontalPadding },
         ]}
       >
-        <View style={styles.primaryLeft}>
-          <View style={styles.primaryIcon}>
-            {loading ? (
-              <ActivityIndicator
-                size="small"
-                color={colors.bg}
-              />
-            ) : (
-              <Ionicons
-                name="sparkles"
-                size={17}
-                color={colors.bg}
-              />
-            )}
-          </View>
-
-          <View style={styles.primaryCopy}>
-            <Text style={styles.primaryTitle}>
-              {loading
-                ? 'Synthesizing brief...'
-                : 'Synthesize brief'}
-            </Text>
-
-            <Text style={styles.primarySubtitle}>
-              {loading
-                ? 'Reading and structuring your input'
-                : 'Turn raw thinking into useful signal'}
-            </Text>
-          </View>
-        </View>
-
-        {!loading ? (
-          <View style={styles.primaryArrow}>
-            <Ionicons
-              name="arrow-forward"
-              size={17}
-              color={colors.bg}
-            />
-          </View>
-        ) : null}
-      </Pressable>
-
-      {/* ERROR */}
-      {error ? (
-        <View style={styles.errorCard}>
-          <View style={styles.errorIcon}>
-            <Ionicons
-              name="alert-circle-outline"
-              size={16}
-              color={colors.danger}
-            />
-          </View>
-
-          <View style={styles.errorBody}>
-            <Text style={styles.errorTitle}>
-              Generation failed
-            </Text>
-
-            <Text style={styles.errorText}>
-              {error}
-            </Text>
-          </View>
-        </View>
-      ) : null}
-
-      {/* OUTPUT */}
-      <View style={styles.outputSection}>
-        <View style={styles.sectionHeader}>
-          <SectionTitle
-            eyebrow="02 / OUTPUT"
-            title={brief ? 'The signal is ready.' : 'Brief preview.'}
+        {/* METRICS */}
+        <View style={styles.metrics}>
+          <Metric
+            value={brief ? '1' : '0'}
+            label="CURRENT BRIEF"
           />
 
-          <View style={styles.outputStatus}>
-            <View style={styles.outputDot} />
+          <View style={styles.metricDivider} />
 
-            <Text style={styles.outputStatusText}>
-              {brief ? 'LIVE' : 'READY'}
+          <Metric
+            value="AI"
+            label="ENGINE STATUS"
+          />
+
+          <View style={styles.metricDivider} />
+
+          <Metric
+            value="3K"
+            label="INPUT CAPACITY"
+          />
+        </View>
+
+        {/* WORKSPACE */}
+        <View style={styles.workspace}>
+          <View style={styles.workspaceTop}>
+            <View style={styles.workspaceIdentity}>
+              <View style={styles.workspaceIcon}>
+                <Ionicons
+                  name="analytics-outline"
+                  size={16}
+                  color={colors.accent}
+                />
+              </View>
+
+              <View>
+                <Text style={styles.workspaceTitle}>
+                  Today's workspace
+                </Text>
+
+                <Text style={styles.workspaceSubtitle}>
+                  Keep the thinking moving.
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.workspacePercent}>
+              {brief ? '100%' : '0%'}
             </Text>
+          </View>
+
+          <View style={styles.workspaceTrack}>
+            <View
+              style={[
+                styles.workspaceProgress,
+                {
+                  width: brief ? '100%' : '7%',
+                },
+              ]}
+            />
           </View>
         </View>
 
-        {brief ? (
-          <>
-            <BriefResult brief={brief} />
+        {/* INPUT SECTION */}
+        <View style={styles.sectionHeader}>
+          <SectionTitle
+            eyebrow="01 / INPUT BUFFER"
+            title="Start with the raw version."
+          />
 
-            <View style={styles.disclaimer}>
-              <Ionicons
-                name="information-circle-outline"
-                size={14}
-                color={colors.dim}
-              />
+          <Pressable
+            onPress={loadExample}
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.actionLink,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.actionLinkText}>
+              Example
+            </Text>
 
-              <Text style={styles.disclaimerText}>
-                AI-generated output. Review important
-                dates, numbers, names and commitments
-                before sharing.
+            <Ionicons
+              name="arrow-forward"
+              size={13}
+              color={colors.accent}
+            />
+          </Pressable>
+        </View>
+
+        {/* EDITOR */}
+        <GlassCard style={styles.editorCard}>
+          <View style={styles.editorHeader}>
+            <View style={styles.bufferIdentity}>
+              <View style={styles.bufferDot} />
+
+              <Text style={styles.bufferText}>
+                RAW INPUT
               </Text>
             </View>
 
-            <Pressable
-              onPress={startAnother}
-              style={({ pressed }) => [
-                styles.newBrief,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Ionicons
-                name="add-outline"
-                size={16}
-                color={colors.accent}
-              />
+            {text.length > 0 ? (
+              <Pressable
+                onPress={clearInput}
+                hitSlop={8}
+                style={({ pressed }) => [
+                  styles.clearButton,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={styles.clearText}>
+                  Clear
+                </Text>
 
-              <Text style={styles.newBriefText}>
-                Start another brief
-              </Text>
-            </Pressable>
-          </>
-        ) : (
-          <View style={styles.previewCard}>
-            <View style={styles.previewHeader}>
-              <View style={styles.previewBadge}>
                 <Ionicons
-                  name="sparkles-outline"
-                  size={11}
-                  color={colors.accent}
+                  name="close-outline"
+                  size={14}
+                  color={colors.dim}
+                />
+              </Pressable>
+            ) : null}
+          </View>
+
+          <TextInput
+            value={text}
+            onChangeText={(value) => {
+              setText(value);
+
+              if (error) {
+                setError('');
+              }
+            }}
+            multiline
+            textAlignVertical="top"
+            autoCapitalize="sentences"
+            autoCorrect
+            spellCheck
+            maxLength={CHARACTER_LIMIT}
+            placeholder="Paste meeting notes, ideas, transcripts, messages..."
+            placeholderTextColor={colors.dim}
+            style={[
+              styles.input,
+              compact && styles.inputCompact,
+            ]}
+          />
+
+          {/* QUICK STARTS */}
+          <View style={styles.quickRow}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.quickContent}
+            >
+              {QUICK_STARTS.map((item) => {
+                const active = text === item.text;
+
+                return (
+                  <Pressable
+                    key={item.label}
+                    onPress={() =>
+                      chooseQuickStart(item.text)
+                    }
+                    style={({ pressed }) => [
+                      styles.quickChip,
+                      active && styles.quickChipActive,
+                      pressed && styles.quickChipPressed,
+                    ]}
+                  >
+                    <Ionicons
+                      name={item.icon}
+                      size={11}
+                      color={
+                        active
+                          ? colors.accent
+                          : colors.muted
+                      }
+                    />
+
+                    <Text
+                      style={[
+                        styles.quickChipText,
+                        active &&
+                          styles.quickChipTextActive,
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+
+            <Text style={styles.counter}>
+              {text.length}/3000
+            </Text>
+          </View>
+
+          <View style={styles.inputProgress}>
+            <View
+              style={[
+                styles.inputProgressValue,
+                {
+                  width: `${progress * 100}%`,
+                },
+              ]}
+            />
+          </View>
+        </GlassCard>
+
+        {/* PRIMARY ACTION */}
+        <Pressable
+          onPress={createBrief}
+          disabled={loading || !text.trim()}
+          style={({ pressed }) => [
+            styles.primaryButton,
+            pressed &&
+              !loading &&
+              styles.primaryButtonPressed,
+            (!text.trim() || loading) &&
+              styles.primaryButtonDisabled,
+          ]}
+        >
+          <View style={styles.primaryLeft}>
+            <View style={styles.primaryIcon}>
+              {loading ? (
+                <ActivityIndicator
+                  size="small"
+                  color={colors.bg}
+                />
+              ) : (
+                <Ionicons
+                  name="sparkles"
+                  size={17}
+                  color={colors.bg}
+                />
+              )}
+            </View>
+
+            <View style={styles.primaryCopy}>
+              <Text style={styles.primaryTitle}>
+                {loading
+                  ? 'Synthesizing brief...'
+                  : 'Synthesize brief'}
+              </Text>
+
+              <Text style={styles.primarySubtitle}>
+                {loading
+                  ? 'Reading and structuring your input'
+                  : 'Turn raw thinking into useful signal'}
+              </Text>
+            </View>
+          </View>
+
+          {!loading ? (
+            <View style={styles.primaryArrow}>
+              <Ionicons
+                name="arrow-forward"
+                size={17}
+                color={colors.bg}
+              />
+            </View>
+          ) : null}
+        </Pressable>
+
+        {/* ERROR */}
+        {error ? (
+          <View style={styles.errorCard}>
+            <View style={styles.errorIcon}>
+              <Ionicons
+                name="alert-circle-outline"
+                size={16}
+                color={colors.danger}
+              />
+            </View>
+
+            <View style={styles.errorBody}>
+              <Text style={styles.errorTitle}>
+                Generation failed
+              </Text>
+
+              <Text style={styles.errorText}>
+                {error}
+              </Text>
+            </View>
+          </View>
+        ) : null}
+
+        {/* OUTPUT */}
+        <View style={styles.outputSection}>
+          <View style={styles.sectionHeader}>
+            <SectionTitle
+              eyebrow="02 / OUTPUT"
+              title={
+                brief
+                  ? 'The signal is ready.'
+                  : 'Brief preview.'
+              }
+            />
+
+            <View style={styles.outputStatus}>
+              <View style={styles.outputDot} />
+
+              <Text style={styles.outputStatusText}>
+                {brief ? 'LIVE' : 'READY'}
+              </Text>
+            </View>
+          </View>
+
+          {brief ? (
+            <>
+              <BriefResult brief={brief} />
+
+              <View style={styles.disclaimer}>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={14}
+                  color={colors.dim}
                 />
 
-                <Text style={styles.previewBadgeText}>
-                  SAMPLE OUTPUT
+                <Text style={styles.disclaimerText}>
+                  AI-generated output. Review important
+                  dates, numbers, names and commitments
+                  before sharing.
                 </Text>
               </View>
 
-              <Text style={styles.previewPriority}>
-                HIGH
-              </Text>
-            </View>
+              <Pressable
+                onPress={startAnother}
+                style={({ pressed }) => [
+                  styles.newBrief,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Ionicons
+                  name="add-outline"
+                  size={16}
+                  color={colors.accent}
+                />
 
-            <Text style={styles.previewTitle}>
-              {SAMPLE_BRIEF.title}
-            </Text>
+                <Text style={styles.newBriefText}>
+                  Start another brief
+                </Text>
+              </Pressable>
+            </>
+          ) : (
+            <View style={styles.preview}>
+              <View style={styles.previewAccent} />
 
-            <Text style={styles.previewSummary}>
-              {SAMPLE_BRIEF.summary}
-            </Text>
-
-            <View style={styles.previewDivider} />
-
-            <Text style={styles.previewLabel}>
-              KEY POINTS
-            </Text>
-
-            {SAMPLE_BRIEF.key_points.map(
-              (point, index) => (
-                <View
-                  key={`${point}-${index}`}
-                  style={styles.previewRow}
-                >
-                  <View style={styles.previewBullet} />
-
-                  <Text style={styles.previewText}>
-                    {point}
-                  </Text>
-                </View>
-              )
-            )}
-
-            <Text
-              style={[
-                styles.previewLabel,
-                styles.actionsLabel,
-              ]}
-            >
-              NEXT ACTIONS
-            </Text>
-
-            {SAMPLE_BRIEF.actions.slice(0, 2).map(
-              (action, index) => (
-                <View
-                  key={`${action}-${index}`}
-                  style={styles.previewAction}
-                >
-                  <View style={styles.previewCheck}>
+              <View style={styles.previewContent}>
+                <View style={styles.previewHeader}>
+                  <View style={styles.previewIdentity}>
                     <Ionicons
-                      name="checkmark"
-                      size={10}
-                      color={colors.bg}
+                      name="sparkles-outline"
+                      size={12}
+                      color={colors.accent}
                     />
+
+                    <Text style={styles.previewLabel}>
+                      SAMPLE OUTPUT
+                    </Text>
                   </View>
 
-                  <Text style={styles.previewText}>
-                    {action}
+                  <Text style={styles.previewPriority}>
+                    HIGH
                   </Text>
                 </View>
-              )
-            )}
-          </View>
-        )}
-      </View>
 
-      <View style={styles.bottomSpace} />
+                <Text style={styles.previewTitle}>
+                  {SAMPLE_BRIEF.title}
+                </Text>
+
+                <Text style={styles.previewSummary}>
+                  {SAMPLE_BRIEF.summary}
+                </Text>
+
+                <View style={styles.previewDivider} />
+
+                <Text style={styles.previewSectionLabel}>
+                  KEY POINTS
+                </Text>
+
+                {SAMPLE_BRIEF.key_points.map(
+                  (point, index) => (
+                    <View
+                      key={`${point}-${index}`}
+                      style={styles.previewRow}
+                    >
+                      <View style={styles.previewBullet} />
+
+                      <Text style={styles.previewText}>
+                        {point}
+                      </Text>
+                    </View>
+                  ),
+                )}
+
+                <Text
+                  style={[
+                    styles.previewSectionLabel,
+                    styles.actionsLabel,
+                  ]}
+                >
+                  NEXT ACTIONS
+                </Text>
+
+                {SAMPLE_BRIEF.actions
+                  .slice(0, 2)
+                  .map((action, index) => (
+                    <View
+                      key={`${action}-${index}`}
+                      style={styles.previewAction}
+                    >
+                      <View style={styles.previewCheck}>
+                        <Ionicons
+                          name="checkmark"
+                          size={10}
+                          color={colors.bg}
+                        />
+                      </View>
+
+                      <Text style={styles.previewText}>
+                        {action}
+                      </Text>
+                    </View>
+                  ))}
+              </View>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.bottomSpace} />
+      </View>
     </ScrollView>
   );
 }
@@ -717,85 +747,22 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingTop: 13,
     paddingBottom: 115,
   },
 
-  /* Header */
-
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  brandDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.accent,
-    marginRight: 7,
-  },
-
-  brand: {
-    color: colors.accentSoft,
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 1.6,
-  },
-
-  headerSubtitle: {
-    color: colors.dim,
-    fontSize: 9,
-    marginTop: 6,
-  },
-
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 9,
-    paddingVertical: 7,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  statusDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: colors.accent,
-    marginRight: 5,
-  },
-
-  statusText: {
-    color: colors.muted,
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 0.9,
-  },
-
-  /* Hero */
+  /* =========================
+     HERO
+  ========================= */
 
   hero: {
-    height: 470,
+    width: '100%',
     overflow: 'hidden',
-    borderRadius: 24,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 22,
   },
 
   heroImage: {
     flex: 1,
+    width: '100%',
   },
 
   heroImageStyle: {
@@ -806,31 +773,107 @@ const styles = StyleSheet.create({
   heroGradient: {
     flex: 1,
     justifyContent: 'space-between',
+    paddingTop: 16,
   },
 
-  heroTop: {
+  heroHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+  },
+
+  brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 13,
-    paddingTop: 13,
+  },
+
+  brandDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginRight: 7,
+  },
+
+  brand: {
+    color: colors.white,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1.6,
+  },
+
+  headerSubtitle: {
+    color: 'rgba(243, 255, 254, 0.58)',
+    fontSize: 9,
+    marginTop: 6,
+  },
+
+  heroHeaderActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(6, 17, 19, 0.54)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+  },
+
+  statusDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginRight: 5,
+  },
+
+  statusText: {
+    color: 'rgba(243, 255, 254, 0.76)',
+    fontSize: 7,
+    fontWeight: '800',
+    letterSpacing: 0.9,
+  },
+
+  heroIconButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(6, 17, 19, 0.48)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+  },
+
+  heroBottom: {
+    paddingHorizontal: 19,
+    paddingBottom: 23,
   },
 
   heroPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-start',
     paddingHorizontal: 9,
     paddingVertical: 6,
     borderRadius: radius.pill,
-    backgroundColor: 'rgba(6, 17, 19, 0.70)',
+    backgroundColor: 'rgba(6, 17, 19, 0.54)',
     borderWidth: 1,
     borderColor: 'rgba(146, 255, 247, 0.12)',
+    marginBottom: 12,
   },
 
   heroPillDot: {
     width: 5,
     height: 5,
-    borderRadius: 3,
+    borderRadius: 999,
     backgroundColor: colors.accent,
     marginRight: 5,
   },
@@ -842,33 +885,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.9,
   },
 
-  heroIconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.58)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-  },
-
-  heroCopy: {
-    paddingHorizontal: 19,
-    paddingBottom: 20,
-  },
-
   heroTitle: {
     color: colors.white,
-    fontSize: 34,
-    lineHeight: 37,
+    fontSize: 35,
+    lineHeight: 38,
     fontWeight: '800',
-    letterSpacing: -1.2,
+    letterSpacing: -1.25,
   },
 
   heroTitleCompact: {
-    fontSize: 29,
-    lineHeight: 32,
+    fontSize: 30,
+    lineHeight: 33,
   },
 
   heroAccent: {
@@ -876,16 +903,17 @@ const styles = StyleSheet.create({
   },
 
   heroDescription: {
-    color: 'rgba(243, 255, 254, 0.86)',
+    color: 'rgba(243, 255, 254, 0.78)',
     fontSize: 12,
     lineHeight: 19,
     marginTop: 11,
-    maxWidth: 340,
+    maxWidth: 350,
   },
 
   heroMeta: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    alignItems: 'center',
     gap: 12,
     marginTop: 15,
     paddingTop: 12,
@@ -899,18 +927,28 @@ const styles = StyleSheet.create({
   },
 
   heroMetaText: {
-    color: 'rgba(243, 255, 254, 0.68)',
+    color: 'rgba(243, 255, 254, 0.62)',
     fontSize: 8,
     fontWeight: '600',
     marginLeft: 4,
   },
 
-  /* Metrics */
+  /* =========================
+     BODY
+  ========================= */
+
+  body: {
+    paddingTop: 18,
+  },
+
+  /* =========================
+     METRICS
+  ========================= */
 
   metrics: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 17,
+    marginBottom: 22,
   },
 
   metric: {
@@ -919,15 +957,15 @@ const styles = StyleSheet.create({
 
   metricDivider: {
     width: 1,
-    height: 43,
+    height: 42,
     backgroundColor: colors.border,
-    marginHorizontal: 13,
+    marginHorizontal: 12,
   },
 
   metricValue: {
     color: colors.white,
-    fontSize: 25,
-    lineHeight: 29,
+    fontSize: 24,
+    lineHeight: 28,
     fontWeight: '800',
     letterSpacing: -0.6,
   },
@@ -941,86 +979,88 @@ const styles = StyleSheet.create({
   },
 
   metricLine: {
-    width: 25,
+    width: 22,
     height: 3,
-    borderRadius: 2,
+    borderRadius: 999,
     backgroundColor: colors.accent,
     marginTop: 7,
   },
 
-  /* Daily */
+  /* =========================
+     WORKSPACE
+  ========================= */
 
-  dailyCard: {
-    padding: 13,
-    borderRadius: 18,
-    marginBottom: 27,
+  workspace: {
+    marginBottom: 30,
   },
 
-  dailyHeader: {
+  workspaceTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
 
-  dailyLeft: {
+  workspaceIdentity: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
 
-  dailyIcon: {
+  workspaceIcon: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(45, 225, 214, 0.07)',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(45, 225, 214, 0.10)',
   },
 
-  dailyTitle: {
+  workspaceTitle: {
     color: colors.white,
     fontSize: 11,
     fontWeight: '800',
     marginLeft: 9,
   },
 
-  dailySubtitle: {
+  workspaceSubtitle: {
     color: colors.dim,
     fontSize: 8,
-    marginLeft: 9,
     marginTop: 2,
+    marginLeft: 9,
   },
 
-  dailyPercent: {
+  workspacePercent: {
     color: colors.accentSoft,
     fontSize: 11,
     fontWeight: '800',
   },
 
-  dailyTrack: {
+  workspaceTrack: {
     height: 4,
-    borderRadius: 3,
+    borderRadius: 999,
     overflow: 'hidden',
     backgroundColor: colors.surface2,
     marginTop: 11,
   },
 
-  dailyProgress: {
+  workspaceProgress: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 999,
     backgroundColor: colors.accent,
   },
 
-  /* Section */
+  /* =========================
+     SECTIONS
+  ========================= */
 
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     gap: 8,
-    marginBottom: 10,
+    marginBottom: 11,
   },
 
   actionLink: {
@@ -1040,11 +1080,13 @@ const styles = StyleSheet.create({
     opacity: 0.62,
   },
 
-  /* Editor */
+  /* =========================
+     EDITOR
+  ========================= */
 
   editorCard: {
-    padding: 13,
-    borderRadius: 20,
+    padding: 14,
+    borderRadius: radius.xl,
   },
 
   editorHeader: {
@@ -1053,30 +1095,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  bufferBadge: {
+  bufferIdentity: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surface2,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
 
   bufferDot: {
     width: 5,
     height: 5,
-    borderRadius: 3,
+    borderRadius: 999,
     backgroundColor: colors.accent,
-    marginRight: 5,
+    marginRight: 6,
   },
 
   bufferText: {
     color: colors.accentSoft,
     fontSize: 7,
     fontWeight: '800',
-    letterSpacing: 1,
+    letterSpacing: 1.1,
   },
 
   clearButton: {
@@ -1098,7 +1134,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     fontWeight: '500',
-    paddingTop: 12,
+    paddingTop: 13,
     paddingBottom: 10,
   },
 
@@ -1109,17 +1145,14 @@ const styles = StyleSheet.create({
   },
 
   quickRow: {
-    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   quickContent: {
+    flexGrow: 1,
     gap: 6,
-    paddingRight: 8,
-  },
-
-  inputFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingRight: 7,
   },
 
   quickChip: {
@@ -1135,7 +1168,7 @@ const styles = StyleSheet.create({
 
   quickChipActive: {
     backgroundColor: 'rgba(45, 225, 214, 0.07)',
-    borderColor: colors.accent,
+    borderColor: 'rgba(45, 225, 214, 0.28)',
   },
 
   quickChipPressed: {
@@ -1174,16 +1207,18 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
 
-  /* Primary */
+  /* =========================
+     PRIMARY ACTION
+  ========================= */
 
   primaryButton: {
-    minHeight: 63,
+    minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
     marginTop: 12,
-    borderRadius: 20,
+    borderRadius: radius.xl,
     backgroundColor: colors.accent,
   },
 
@@ -1232,20 +1267,22 @@ const styles = StyleSheet.create({
   primaryArrow: {
     width: 39,
     height: 39,
-    borderRadius: 20,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(6, 17, 19, 0.10)',
   },
 
-  /* Error */
+  /* =========================
+     ERROR
+  ========================= */
 
   errorCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginTop: 11,
     padding: 11,
-    borderRadius: 15,
+    borderRadius: radius.md,
     backgroundColor: 'rgba(255, 124, 135, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(255, 124, 135, 0.15)',
@@ -1278,10 +1315,12 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
 
-  /* Output */
+  /* =========================
+     OUTPUT
+  ========================= */
 
   outputSection: {
-    marginTop: 29,
+    marginTop: 32,
   },
 
   outputStatus: {
@@ -1293,7 +1332,7 @@ const styles = StyleSheet.create({
   outputDot: {
     width: 5,
     height: 5,
-    borderRadius: 3,
+    borderRadius: 999,
     backgroundColor: colors.accent,
     marginRight: 5,
   },
@@ -1305,14 +1344,28 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
 
-  /* Preview */
+  /* =========================
+     SAMPLE PREVIEW
+  ========================= */
 
-  previewCard: {
-    padding: 15,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+  preview: {
+    position: 'relative',
+    flexDirection: 'row',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(11, 24, 27, 0.58)',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(146, 255, 247, 0.08)',
+  },
+
+  previewAccent: {
+    width: 3,
+    backgroundColor: colors.accent,
+  },
+
+  previewContent: {
+    flex: 1,
+    padding: 16,
   },
 
   previewHeader: {
@@ -1321,23 +1374,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  previewBadge: {
+  previewIdentity: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
-    borderWidth: 1,
-    borderColor: colors.border,
   },
 
-  previewBadgeText: {
+  previewLabel: {
     color: colors.accentSoft,
     fontSize: 7,
     fontWeight: '800',
-    letterSpacing: 0.8,
-    marginLeft: 4,
+    letterSpacing: 0.9,
+    marginLeft: 5,
   },
 
   previewPriority: {
@@ -1350,7 +1397,7 @@ const styles = StyleSheet.create({
   previewTitle: {
     color: colors.white,
     fontSize: 21,
-    lineHeight: 25,
+    lineHeight: 26,
     fontWeight: '800',
     letterSpacing: -0.5,
     marginTop: 14,
@@ -1369,7 +1416,7 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
 
-  previewLabel: {
+  previewSectionLabel: {
     color: colors.accent,
     fontSize: 7,
     fontWeight: '800',
@@ -1390,7 +1437,7 @@ const styles = StyleSheet.create({
   previewBullet: {
     width: 5,
     height: 5,
-    borderRadius: 3,
+    borderRadius: 999,
     backgroundColor: colors.accent,
     marginTop: 5,
     marginRight: 8,
@@ -1423,10 +1470,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
 
+  /* =========================
+     RESULT
+  ========================= */
+
   disclaimer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 10,
+    marginTop: 11,
     paddingHorizontal: 2,
   },
 
@@ -1444,11 +1495,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 14,
     paddingVertical: 9,
-    marginTop: 12,
+    marginTop: 13,
     borderRadius: radius.pill,
-    backgroundColor: colors.surface,
+    backgroundColor: 'rgba(45, 225, 214, 0.05)',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(45, 225, 214, 0.12)',
   },
 
   newBriefText: {
