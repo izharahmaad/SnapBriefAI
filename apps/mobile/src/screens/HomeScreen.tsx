@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BriefResult } from '@/components/BriefResult';
 import { GlassCard } from '@/components/GlassCard';
@@ -69,10 +70,11 @@ const SAMPLE_BRIEF: Brief = {
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   const compact = width < 380;
   const horizontalPadding = compact ? 16 : 20;
-  const heroHeight = compact ? 430 : 460;
+  const heroHeight = compact ? 455 : 495;
 
   const [text, setText] = useState(examples[0] ?? '');
   const [brief, setBrief] = useState<Brief | null>(null);
@@ -152,7 +154,9 @@ export default function HomeScreen() {
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* FULL-WIDTH HERO */}
+      {/* =========================================================
+          HERO
+      ========================================================= */}
       <View style={[styles.hero, { height: heroHeight }]}>
         <ImageBackground
           source={HERO_IMAGE}
@@ -163,120 +167,103 @@ export default function HomeScreen() {
           <LinearGradient
             colors={[
               'rgba(6, 17, 19, 0.08)',
-              'rgba(6, 17, 19, 0.18)',
-              'rgba(6, 17, 19, 0.48)',
-              'rgba(6, 17, 19, 0.96)',
+              'rgba(6, 17, 19, 0.10)',
+              'rgba(6, 17, 19, 0.42)',
+              'rgba(6, 17, 19, 0.97)',
             ]}
-            locations={[0, 0.28, 0.62, 1]}
-            style={styles.heroGradient}
+            locations={[0, 0.32, 0.62, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+
+          {/* HERO NAVBAR */}
+          <View
+            style={[
+              styles.navbar,
+              {
+                paddingTop: Math.max(insets.top + 5, 18),
+              },
+            ]}
           >
-            {/* HERO HEADER */}
-            <View style={styles.heroHeader}>
+            <View style={styles.brandGroup}>
+              <View style={styles.brandMark}>
+                <Ionicons
+                  name="document-text-outline"
+                  size={17}
+                  color={colors.bg}
+                />
+              </View>
+
               <View>
-                <View style={styles.brandRow}>
-                  <View style={styles.brandDot} />
-
-                  <Text style={styles.brand}>
-                    SNAPBRIEF AI
-                  </Text>
-                </View>
-
-                <Text style={styles.headerSubtitle}>
-                  Executive clarity engine
+                <Text style={styles.brand}>
+                  SNAPBRIEF AI
                 </Text>
-              </View>
 
-              <View style={styles.heroHeaderActions}>
-                <View style={styles.statusPill}>
-                  <View style={styles.statusDot} />
-
-                  <Text style={styles.statusText}>
-                    ACTIVE
-                  </Text>
-                </View>
-
-                <View style={styles.heroIconButton}>
-                  <Ionicons
-                    name="sparkles-outline"
-                    size={16}
-                    color={colors.white}
-                  />
-                </View>
+                <Text style={styles.brandSubtitle}>
+                  From raw notes to clear action
+                </Text>
               </View>
             </View>
 
-            {/* HERO CONTENT */}
-            <View style={styles.heroBottom}>
-              <View style={styles.heroPill}>
-                <View style={styles.heroPillDot} />
+            <View style={styles.liveStatus}>
+              <View style={styles.liveDot} />
 
-                <Text style={styles.heroPillText}>
-                  EXECUTIVE INTELLIGENCE
-                </Text>
-              </View>
-
-              <Text
-                style={[
-                  styles.heroTitle,
-                  compact && styles.heroTitleCompact,
-                ]}
-              >
-                Turn messy notes into
-                {'\n'}
-                <Text style={styles.heroAccent}>
-                  clear decisions.
-                </Text>
+              <Text style={styles.liveText}>
+                ACTIVE
               </Text>
-
-              <Text style={styles.heroDescription}>
-                Distill rough thoughts, meeting notes,
-                messages and ideas into focused briefs,
-                clear priorities and next actions.
-              </Text>
-
-              <View style={styles.heroMeta}>
-                <View style={styles.heroMetaItem}>
-                  <Ionicons
-                    name="flash-outline"
-                    size={12}
-                    color={colors.accent}
-                  />
-
-                  <Text style={styles.heroMetaText}>
-                    Fast synthesis
-                  </Text>
-                </View>
-
-                <View style={styles.heroMetaItem}>
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={12}
-                    color={colors.accent}
-                  />
-
-                  <Text style={styles.heroMetaText}>
-                    Local cache
-                  </Text>
-                </View>
-
-                <View style={styles.heroMetaItem}>
-                  <Ionicons
-                    name="text-outline"
-                    size={12}
-                    color={colors.accent}
-                  />
-
-                  <Text style={styles.heroMetaText}>
-                    3K characters
-                  </Text>
-                </View>
-              </View>
             </View>
-          </LinearGradient>
+          </View>
+
+          {/* HERO CONTENT */}
+          <View style={styles.heroContent}>
+            <Text style={styles.heroEyebrow}>
+              EXECUTIVE INTELLIGENCE
+            </Text>
+
+            <View style={styles.heroRule} />
+
+            <Text
+              style={[
+                styles.heroTitle,
+                compact && styles.heroTitleCompact,
+              ]}
+            >
+              Turn messy notes into
+              {'\n'}
+              <Text style={styles.heroTitleAccent}>
+                clear decisions.
+              </Text>
+            </Text>
+
+            <Text style={styles.heroDescription}>
+              Transform rough thoughts, meetings, messages
+              and ideas into structured briefs with clear
+              priorities and next actions.
+            </Text>
+
+            <View style={styles.heroMeta}>
+              <Text style={styles.heroMetaText}>
+                Fast synthesis
+              </Text>
+
+              <View style={styles.metaSeparator} />
+
+              <Text style={styles.heroMetaText}>
+                Structured output
+              </Text>
+
+              <View style={styles.metaSeparator} />
+
+              <Text style={styles.heroMetaText}>
+                3K input
+              </Text>
+            </View>
+          </View>
         </ImageBackground>
       </View>
 
-      {/* BODY */}
+      {/* =========================================================
+          BODY
+      ========================================================= */}
       <View
         style={[
           styles.body,
@@ -286,69 +273,29 @@ export default function HomeScreen() {
         {/* METRICS */}
         <View style={styles.metrics}>
           <Metric
-            value={brief ? '1' : '0'}
-            label="CURRENT BRIEF"
+            value={brief ? '01' : '00'}
+            label="BRIEFS"
           />
 
           <View style={styles.metricDivider} />
 
           <Metric
             value="AI"
-            label="ENGINE STATUS"
+            label="ENGINE"
           />
 
           <View style={styles.metricDivider} />
 
           <Metric
             value="3K"
-            label="INPUT CAPACITY"
+            label="CAPACITY"
           />
-        </View>
-
-        {/* WORKSPACE */}
-        <View style={styles.workspace}>
-          <View style={styles.workspaceTop}>
-            <View style={styles.workspaceIdentity}>
-              <View style={styles.workspaceIcon}>
-                <Ionicons
-                  name="analytics-outline"
-                  size={16}
-                  color={colors.accent}
-                />
-              </View>
-
-              <View>
-                <Text style={styles.workspaceTitle}>
-                  Today's workspace
-                </Text>
-
-                <Text style={styles.workspaceSubtitle}>
-                  Keep the thinking moving.
-                </Text>
-              </View>
-            </View>
-
-            <Text style={styles.workspacePercent}>
-              {brief ? '100%' : '0%'}
-            </Text>
-          </View>
-
-          <View style={styles.workspaceTrack}>
-            <View
-              style={[
-                styles.workspaceProgress,
-                {
-                  width: brief ? '100%' : '7%',
-                },
-              ]}
-            />
-          </View>
         </View>
 
         {/* INPUT SECTION */}
         <View style={styles.sectionHeader}>
           <SectionTitle
-            eyebrow="01 / INPUT BUFFER"
+            eyebrow="01 / INPUT"
             title="Start with the raw version."
           />
 
@@ -356,30 +303,32 @@ export default function HomeScreen() {
             onPress={loadExample}
             hitSlop={8}
             style={({ pressed }) => [
-              styles.actionLink,
+              styles.exampleButton,
               pressed && styles.pressed,
             ]}
           >
-            <Text style={styles.actionLinkText}>
-              Example
-            </Text>
-
             <Ionicons
-              name="arrow-forward"
+              name="shuffle-outline"
               size={13}
               color={colors.accent}
             />
+
+            <Text style={styles.exampleText}>
+              Example
+            </Text>
           </Pressable>
         </View>
 
-        {/* EDITOR */}
+        {/* INPUT EDITOR */}
         <GlassCard style={styles.editorCard}>
           <View style={styles.editorHeader}>
-            <View style={styles.bufferIdentity}>
-              <View style={styles.bufferDot} />
-
-              <Text style={styles.bufferText}>
+            <View>
+              <Text style={styles.inputLabel}>
                 RAW INPUT
+              </Text>
+
+              <Text style={styles.inputCaption}>
+                Paste anything. SnapBrief structures it.
               </Text>
             </View>
 
@@ -398,7 +347,7 @@ export default function HomeScreen() {
 
                 <Ionicons
                   name="close-outline"
-                  size={14}
+                  size={13}
                   color={colors.dim}
                 />
               </Pressable>
@@ -428,7 +377,6 @@ export default function HomeScreen() {
             ]}
           />
 
-          {/* QUICK STARTS */}
           <View style={styles.quickRow}>
             <ScrollView
               horizontal
@@ -504,58 +452,52 @@ export default function HomeScreen() {
               styles.primaryButtonDisabled,
           ]}
         >
-          <View style={styles.primaryLeft}>
-            <View style={styles.primaryIcon}>
-              {loading ? (
-                <ActivityIndicator
-                  size="small"
-                  color={colors.bg}
-                />
-              ) : (
-                <Ionicons
-                  name="sparkles"
-                  size={17}
-                  color={colors.bg}
-                />
-              )}
-            </View>
+          <View style={styles.primaryIcon}>
+            {loading ? (
+              <ActivityIndicator
+                size="small"
+                color={colors.bg}
+              />
+            ) : (
+              <Ionicons
+                name="sparkles-outline"
+                size={18}
+                color={colors.bg}
+              />
+            )}
+          </View>
 
-            <View style={styles.primaryCopy}>
-              <Text style={styles.primaryTitle}>
-                {loading
-                  ? 'Synthesizing brief...'
-                  : 'Synthesize brief'}
-              </Text>
+          <View style={styles.primaryCopy}>
+            <Text style={styles.primaryTitle}>
+              {loading
+                ? 'Synthesizing brief...'
+                : 'Synthesize brief'}
+            </Text>
 
-              <Text style={styles.primarySubtitle}>
-                {loading
-                  ? 'Reading and structuring your input'
-                  : 'Turn raw thinking into useful signal'}
-              </Text>
-            </View>
+            <Text style={styles.primarySubtitle}>
+              {loading
+                ? 'Reading and structuring your input'
+                : 'Turn raw thinking into useful signal'}
+            </Text>
           </View>
 
           {!loading ? (
-            <View style={styles.primaryArrow}>
-              <Ionicons
-                name="arrow-forward"
-                size={17}
-                color={colors.bg}
-              />
-            </View>
+            <Ionicons
+              name="arrow-forward"
+              size={18}
+              color={colors.bg}
+            />
           ) : null}
         </Pressable>
 
         {/* ERROR */}
         {error ? (
           <View style={styles.errorCard}>
-            <View style={styles.errorIcon}>
-              <Ionicons
-                name="alert-circle-outline"
-                size={16}
-                color={colors.danger}
-              />
-            </View>
+            <Ionicons
+              name="alert-circle-outline"
+              size={17}
+              color={colors.danger}
+            />
 
             <View style={styles.errorBody}>
               <Text style={styles.errorTitle}>
@@ -577,17 +519,13 @@ export default function HomeScreen() {
               title={
                 brief
                   ? 'The signal is ready.'
-                  : 'Brief preview.'
+                  : 'See what SnapBrief creates.'
               }
             />
 
-            <View style={styles.outputStatus}>
-              <View style={styles.outputDot} />
-
-              <Text style={styles.outputStatusText}>
-                {brief ? 'LIVE' : 'READY'}
-              </Text>
-            </View>
+            <Text style={styles.outputStatus}>
+              {brief ? 'LIVE' : 'PREVIEW'}
+            </Text>
           </View>
 
           {brief ? (
@@ -617,7 +555,7 @@ export default function HomeScreen() {
               >
                 <Ionicons
                   name="add-outline"
-                  size={16}
+                  size={15}
                   color={colors.accent}
                 />
 
@@ -630,17 +568,15 @@ export default function HomeScreen() {
             <View style={styles.preview}>
               <View style={styles.previewAccent} />
 
-              <View style={styles.previewContent}>
+              <View style={styles.previewBody}>
                 <View style={styles.previewHeader}>
-                  <View style={styles.previewIdentity}>
-                    <Ionicons
-                      name="sparkles-outline"
-                      size={12}
-                      color={colors.accent}
-                    />
+                  <View>
+                    <Text style={styles.previewEyebrow}>
+                      SAMPLE OUTPUT
+                    </Text>
 
                     <Text style={styles.previewLabel}>
-                      SAMPLE OUTPUT
+                      Generated brief
                     </Text>
                   </View>
 
@@ -694,13 +630,11 @@ export default function HomeScreen() {
                       key={`${action}-${index}`}
                       style={styles.previewAction}
                     >
-                      <View style={styles.previewCheck}>
-                        <Ionicons
-                          name="checkmark"
-                          size={10}
-                          color={colors.bg}
-                        />
-                      </View>
+                      <Ionicons
+                        name="checkmark"
+                        size={12}
+                        color={colors.accent}
+                      />
 
                       <Text style={styles.previewText}>
                         {action}
@@ -750,9 +684,9 @@ const styles = StyleSheet.create({
     paddingBottom: 115,
   },
 
-  /* =========================
+  /* ============================================================
      HERO
-  ========================= */
+  ============================================================ */
 
   hero: {
     width: '100%',
@@ -770,63 +704,47 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 
-  heroGradient: {
-    flex: 1,
-    justifyContent: 'space-between',
-    paddingTop: 16,
-  },
-
-  heroHeader: {
+  navbar: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 18,
   },
 
-  brandRow: {
+  brandGroup: {
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  brandDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 999,
+  brandMark: {
+    width: 35,
+    height: 35,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors.accent,
-    marginRight: 7,
+    marginRight: 9,
   },
 
   brand: {
     color: colors.white,
     fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 1.6,
+    fontWeight: '900',
+    letterSpacing: 1.5,
   },
 
-  headerSubtitle: {
+  brandSubtitle: {
     color: 'rgba(243, 255, 254, 0.58)',
-    fontSize: 9,
-    marginTop: 6,
+    fontSize: 8,
+    marginTop: 3,
   },
 
-  heroHeaderActions: {
+  liveStatus: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
   },
 
-  statusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 9,
-    paddingVertical: 7,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(6, 17, 19, 0.54)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.10)',
-  },
-
-  statusDot: {
+  liveDot: {
     width: 5,
     height: 5,
     borderRadius: 999,
@@ -834,140 +752,110 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  statusText: {
-    color: 'rgba(243, 255, 254, 0.76)',
+  liveText: {
+    color: 'rgba(243, 255, 254, 0.74)',
     fontSize: 7,
     fontWeight: '800',
     letterSpacing: 0.9,
   },
 
-  heroIconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.48)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.10)',
-  },
-
-  heroBottom: {
+  heroContent: {
+    marginTop: 'auto',
     paddingHorizontal: 19,
-    paddingBottom: 23,
+    paddingBottom: 28,
   },
 
-  heroPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(6, 17, 19, 0.54)',
-    borderWidth: 1,
-    borderColor: 'rgba(146, 255, 247, 0.12)',
-    marginBottom: 12,
-  },
-
-  heroPillDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: colors.accent,
-    marginRight: 5,
-  },
-
-  heroPillText: {
+  heroEyebrow: {
     color: colors.accentSoft,
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 0.9,
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+
+  heroRule: {
+    width: 34,
+    height: 1,
+    backgroundColor: 'rgba(146, 255, 247, 0.32)',
+    marginTop: 8,
+    marginBottom: 12,
   },
 
   heroTitle: {
     color: colors.white,
-    fontSize: 35,
-    lineHeight: 38,
-    fontWeight: '800',
-    letterSpacing: -1.25,
+    fontSize: 36,
+    lineHeight: 40,
+    fontWeight: '900',
+    letterSpacing: -1.35,
   },
 
   heroTitleCompact: {
     fontSize: 30,
-    lineHeight: 33,
+    lineHeight: 34,
   },
 
-  heroAccent: {
+  heroTitleAccent: {
     color: colors.accent,
   },
 
   heroDescription: {
-    color: 'rgba(243, 255, 254, 0.78)',
+    color: 'rgba(243, 255, 254, 0.76)',
     fontSize: 12,
     lineHeight: 19,
     marginTop: 11,
-    maxWidth: 350,
+    maxWidth: 355,
   },
 
   heroMeta: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     alignItems: 'center',
-    gap: 12,
-    marginTop: 15,
+    marginTop: 16,
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.12)',
   },
 
-  heroMetaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
   heroMetaText: {
-    color: 'rgba(243, 255, 254, 0.62)',
+    color: 'rgba(243, 255, 254, 0.64)',
     fontSize: 8,
     fontWeight: '600',
-    marginLeft: 4,
   },
 
-  /* =========================
+  metaSeparator: {
+    width: 3,
+    height: 3,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginHorizontal: 9,
+  },
+
+  /* ============================================================
      BODY
-  ========================= */
+  ============================================================ */
 
   body: {
-    paddingTop: 18,
+    paddingTop: 21,
   },
 
-  /* =========================
+  /* ============================================================
      METRICS
-  ========================= */
+  ============================================================ */
 
   metrics: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 22,
+    marginBottom: 31,
   },
 
   metric: {
     flex: 1,
   },
 
-  metricDivider: {
-    width: 1,
-    height: 42,
-    backgroundColor: colors.border,
-    marginHorizontal: 12,
-  },
-
   metricValue: {
     color: colors.white,
     fontSize: 24,
     lineHeight: 28,
-    fontWeight: '800',
-    letterSpacing: -0.6,
+    fontWeight: '900',
+    letterSpacing: -0.7,
   },
 
   metricLabel: {
@@ -975,117 +863,67 @@ const styles = StyleSheet.create({
     fontSize: 7,
     fontWeight: '800',
     letterSpacing: 1,
-    marginTop: 3,
+    marginTop: 4,
   },
 
   metricLine: {
     width: 22,
-    height: 3,
-    borderRadius: 999,
+    height: 2,
+    borderRadius: 2,
     backgroundColor: colors.accent,
     marginTop: 7,
   },
 
-  /* =========================
-     WORKSPACE
-  ========================= */
-
-  workspace: {
-    marginBottom: 30,
+  metricDivider: {
+    width: 1,
+    height: 37,
+    backgroundColor: colors.border,
+    marginHorizontal: 13,
   },
 
-  workspaceTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  workspaceIdentity: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-
-  workspaceIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.07)',
-    borderWidth: 1,
-    borderColor: 'rgba(45, 225, 214, 0.10)',
-  },
-
-  workspaceTitle: {
-    color: colors.white,
-    fontSize: 11,
-    fontWeight: '800',
-    marginLeft: 9,
-  },
-
-  workspaceSubtitle: {
-    color: colors.dim,
-    fontSize: 8,
-    marginTop: 2,
-    marginLeft: 9,
-  },
-
-  workspacePercent: {
-    color: colors.accentSoft,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-
-  workspaceTrack: {
-    height: 4,
-    borderRadius: 999,
-    overflow: 'hidden',
-    backgroundColor: colors.surface2,
-    marginTop: 11,
-  },
-
-  workspaceProgress: {
-    height: '100%',
-    borderRadius: 999,
-    backgroundColor: colors.accent,
-  },
-
-  /* =========================
-     SECTIONS
-  ========================= */
+  /* ============================================================
+     SECTION HEADER
+  ============================================================ */
 
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     gap: 8,
-    marginBottom: 11,
+    marginBottom: 12,
   },
 
-  actionLink: {
+  exampleButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingBottom: 2,
   },
 
-  actionLinkText: {
+  exampleText: {
     color: colors.accent,
     fontSize: 8,
     fontWeight: '800',
-    marginRight: 5,
+    marginLeft: 5,
   },
 
   pressed: {
-    opacity: 0.62,
+    opacity: 0.60,
   },
 
-  /* =========================
+  outputStatus: {
+    color: colors.accentSoft,
+    fontSize: 7,
+    fontWeight: '800',
+    letterSpacing: 0.9,
+    paddingBottom: 3,
+  },
+
+  /* ============================================================
      EDITOR
-  ========================= */
+  ============================================================ */
 
   editorCard: {
-    padding: 14,
+    padding: 15,
     borderRadius: radius.xl,
   },
 
@@ -1095,24 +933,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  bufferIdentity: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  bufferDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: colors.accent,
-    marginRight: 6,
-  },
-
-  bufferText: {
+  inputLabel: {
     color: colors.accentSoft,
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 1.1,
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 1.25,
+  },
+
+  inputCaption: {
+    color: colors.dim,
+    fontSize: 8,
+    marginTop: 3,
   },
 
   clearButton: {
@@ -1128,18 +959,18 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    minHeight: 150,
+    minHeight: 158,
     maxHeight: 285,
     color: colors.white,
     fontSize: 14,
     lineHeight: 22,
     fontWeight: '500',
-    paddingTop: 13,
+    paddingTop: 15,
     paddingBottom: 10,
   },
 
   inputCompact: {
-    minHeight: 140,
+    minHeight: 145,
     fontSize: 13,
     lineHeight: 21,
   },
@@ -1160,7 +991,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 9,
     paddingVertical: 6,
-    borderRadius: radius.pill,
+    borderRadius: 11,
     backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
@@ -1179,7 +1010,7 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 8,
     fontWeight: '700',
-    marginLeft: 4,
+    marginLeft: 5,
   },
 
   quickChipTextActive: {
@@ -1195,30 +1026,29 @@ const styles = StyleSheet.create({
 
   inputProgress: {
     height: 2,
-    borderRadius: radius.pill,
+    borderRadius: 2,
     overflow: 'hidden',
     backgroundColor: colors.surface2,
-    marginTop: 9,
+    marginTop: 10,
   },
 
   inputProgressValue: {
     height: '100%',
     backgroundColor: colors.accent,
-    borderRadius: radius.pill,
+    borderRadius: 2,
   },
 
-  /* =========================
-     PRIMARY ACTION
-  ========================= */
+  /* ============================================================
+     PRIMARY CTA
+  ============================================================ */
 
   primaryButton: {
     minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     marginTop: 12,
-    borderRadius: radius.xl,
+    borderRadius: 18,
     backgroundColor: colors.accent,
   },
 
@@ -1228,78 +1058,54 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonDisabled: {
-    opacity: 0.4,
-  },
-
-  primaryLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+    opacity: 0.38,
   },
 
   primaryIcon: {
     width: 40,
     height: 40,
-    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(6, 17, 19, 0.10)',
-    marginRight: 10,
+    borderRadius: 12,
   },
 
   primaryCopy: {
     flex: 1,
+    marginLeft: 10,
   },
 
   primaryTitle: {
     color: colors.bg,
-    fontSize: 13,
-    fontWeight: '800',
+    fontSize: 14,
+    fontWeight: '900',
   },
 
   primarySubtitle: {
-    color: 'rgba(6, 17, 19, 0.58)',
+    color: 'rgba(6, 17, 19, 0.56)',
     fontSize: 8,
     fontWeight: '600',
     marginTop: 2,
   },
 
-  primaryArrow: {
-    width: 39,
-    height: 39,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(6, 17, 19, 0.10)',
-  },
-
-  /* =========================
+  /* ============================================================
      ERROR
-  ========================= */
+  ============================================================ */
 
   errorCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginTop: 11,
     padding: 11,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     backgroundColor: 'rgba(255, 124, 135, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(255, 124, 135, 0.15)',
   },
 
-  errorIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 124, 135, 0.06)',
-    marginRight: 8,
-  },
-
   errorBody: {
     flex: 1,
+    marginLeft: 8,
   },
 
   errorTitle: {
@@ -1315,41 +1121,19 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
 
-  /* =========================
+  /* ============================================================
      OUTPUT
-  ========================= */
+  ============================================================ */
 
   outputSection: {
-    marginTop: 32,
+    marginTop: 34,
   },
 
-  outputStatus: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 3,
-  },
-
-  outputDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: colors.accent,
-    marginRight: 5,
-  },
-
-  outputStatusText: {
-    color: colors.accentSoft,
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-  },
-
-  /* =========================
-     SAMPLE PREVIEW
-  ========================= */
+  /* ============================================================
+     PREVIEW
+  ============================================================ */
 
   preview: {
-    position: 'relative',
     flexDirection: 'row',
     overflow: 'hidden',
     backgroundColor: 'rgba(11, 24, 27, 0.58)',
@@ -1363,7 +1147,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
 
-  previewContent: {
+  previewBody: {
     flex: 1,
     padding: 16,
   },
@@ -1374,23 +1158,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  previewIdentity: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  previewEyebrow: {
+    color: colors.accentSoft,
+    fontSize: 7,
+    fontWeight: '900',
+    letterSpacing: 1.2,
   },
 
   previewLabel: {
-    color: colors.accentSoft,
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 0.9,
-    marginLeft: 5,
+    color: colors.dim,
+    fontSize: 9,
+    marginTop: 2,
   },
 
   previewPriority: {
     color: colors.accent,
     fontSize: 7,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 1,
   },
 
@@ -1398,9 +1182,9 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 21,
     lineHeight: 26,
-    fontWeight: '800',
-    letterSpacing: -0.5,
-    marginTop: 14,
+    fontWeight: '900',
+    letterSpacing: -0.55,
+    marginTop: 15,
   },
 
   previewSummary: {
@@ -1413,7 +1197,7 @@ const styles = StyleSheet.create({
   previewDivider: {
     height: 1,
     backgroundColor: colors.border,
-    marginVertical: 15,
+    marginVertical: 16,
   },
 
   previewSectionLabel: {
@@ -1431,16 +1215,16 @@ const styles = StyleSheet.create({
   previewRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 9,
   },
 
   previewBullet: {
     width: 5,
     height: 5,
-    borderRadius: 999,
+    borderRadius: 3,
     backgroundColor: colors.accent,
     marginTop: 5,
-    marginRight: 8,
+    marginRight: 9,
   },
 
   previewText: {
@@ -1459,20 +1243,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface2,
     marginBottom: 6,
   },
-
-  previewCheck: {
-    width: 19,
-    height: 19,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accent,
-    marginRight: 8,
-  },
-
-  /* =========================
-     RESULT
-  ========================= */
 
   disclaimer: {
     flexDirection: 'row',
@@ -1493,10 +1263,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
     marginTop: 13,
-    borderRadius: radius.pill,
+    borderRadius: 12,
     backgroundColor: 'rgba(45, 225, 214, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(45, 225, 214, 0.12)',
