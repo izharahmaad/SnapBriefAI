@@ -74,7 +74,9 @@ export default function HomeScreen() {
 
   const compact = width < 380;
   const horizontalPadding = compact ? 16 : 20;
-  const heroHeight = compact ? 455 : 495;
+
+  // Taller hero so the image becomes the main visual identity.
+  const heroHeight = compact ? 505 : 555;
 
   const [text, setText] = useState(examples[0] ?? '');
   const [brief, setBrief] = useState<Brief | null>(null);
@@ -166,21 +168,22 @@ export default function HomeScreen() {
         >
           <LinearGradient
             colors={[
-              'rgba(6, 17, 19, 0.08)',
               'rgba(6, 17, 19, 0.10)',
-              'rgba(6, 17, 19, 0.42)',
-              'rgba(6, 17, 19, 0.97)',
+              'rgba(6, 17, 19, 0.08)',
+              'rgba(6, 17, 19, 0.24)',
+              'rgba(6, 17, 19, 0.66)',
+              'rgba(6, 17, 19, 0.98)',
             ]}
-            locations={[0, 0.32, 0.62, 1]}
+            locations={[0, 0.27, 0.48, 0.74, 1]}
             style={StyleSheet.absoluteFill}
           />
 
-          {/* HERO NAVBAR */}
+          {/* TOP NAV */}
           <View
             style={[
               styles.navbar,
               {
-                paddingTop: Math.max(insets.top + 5, 18),
+                paddingTop: Math.max(insets.top + 6, 18),
               },
             ]}
           >
@@ -199,7 +202,7 @@ export default function HomeScreen() {
                 </Text>
 
                 <Text style={styles.brandSubtitle}>
-                  From raw notes to clear action
+                  Clarity for everything you capture
                 </Text>
               </View>
             </View>
@@ -213,10 +216,10 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* HERO CONTENT */}
+          {/* HERO COPY */}
           <View style={styles.heroContent}>
             <Text style={styles.heroEyebrow}>
-              EXECUTIVE INTELLIGENCE
+              AI-POWERED BRIEFING
             </Text>
 
             <View style={styles.heroRule} />
@@ -227,42 +230,67 @@ export default function HomeScreen() {
                 compact && styles.heroTitleCompact,
               ]}
             >
-              Turn messy notes into
+              Turn scattered thoughts
               {'\n'}
-              <Text style={styles.heroTitleAccent}>
-                clear decisions.
+              into{' '}
+              <Text style={styles.heroAccent}>
+                clear direction.
               </Text>
             </Text>
 
             <Text style={styles.heroDescription}>
-              Transform rough thoughts, meetings, messages
-              and ideas into structured briefs with clear
+              Capture notes, meetings, ideas and transcripts.
+              SnapBrief turns them into structured briefs,
               priorities and next actions.
             </Text>
 
             <View style={styles.heroMeta}>
-              <Text style={styles.heroMetaText}>
-                Fast synthesis
-              </Text>
+              <View style={styles.heroMetaItem}>
+                <Ionicons
+                  name="flash-outline"
+                  size={11}
+                  color={colors.accent}
+                />
 
-              <View style={styles.metaSeparator} />
+                <Text style={styles.heroMetaText}>
+                  Fast synthesis
+                </Text>
+              </View>
 
-              <Text style={styles.heroMetaText}>
-                Structured output
-              </Text>
+              <View style={styles.metaDivider} />
 
-              <View style={styles.metaSeparator} />
+              <View style={styles.heroMetaItem}>
+                <Ionicons
+                  name="layers-outline"
+                  size={11}
+                  color={colors.accent}
+                />
 
-              <Text style={styles.heroMetaText}>
-                3K input
-              </Text>
+                <Text style={styles.heroMetaText}>
+                  Structured output
+                </Text>
+              </View>
+
+              <View style={styles.metaDivider} />
+
+              <View style={styles.heroMetaItem}>
+                <Ionicons
+                  name="text-outline"
+                  size={11}
+                  color={colors.accent}
+                />
+
+                <Text style={styles.heroMetaText}>
+                  3K input
+                </Text>
+              </View>
             </View>
           </View>
         </ImageBackground>
       </View>
 
       {/* =========================================================
-          BODY
+          PAGE CONTENT
       ========================================================= */}
       <View
         style={[
@@ -292,7 +320,9 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* INPUT SECTION */}
+        {/* =======================================================
+            INPUT
+        ======================================================= */}
         <View style={styles.sectionHeader}>
           <SectionTitle
             eyebrow="01 / INPUT"
@@ -319,7 +349,6 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        {/* INPUT EDITOR */}
         <GlassCard style={styles.editorCard}>
           <View style={styles.editorHeader}>
             <View>
@@ -439,7 +468,9 @@ export default function HomeScreen() {
           </View>
         </GlassCard>
 
-        {/* PRIMARY ACTION */}
+        {/* =======================================================
+            SYNTHESIZE
+        ======================================================= */}
         <Pressable
           onPress={createBrief}
           disabled={loading || !text.trim()}
@@ -482,11 +513,13 @@ export default function HomeScreen() {
           </View>
 
           {!loading ? (
-            <Ionicons
-              name="arrow-forward"
-              size={18}
-              color={colors.bg}
-            />
+            <View style={styles.primaryArrow}>
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color={colors.bg}
+              />
+            </View>
           ) : null}
         </Pressable>
 
@@ -511,7 +544,9 @@ export default function HomeScreen() {
           </View>
         ) : null}
 
-        {/* OUTPUT */}
+        {/* =======================================================
+            OUTPUT
+        ======================================================= */}
         <View style={styles.outputSection}>
           <View style={styles.sectionHeader}>
             <SectionTitle
@@ -702,6 +737,7 @@ const styles = StyleSheet.create({
   heroImageStyle: {
     width: '100%',
     height: '100%',
+    transform: [{ scale: 1.035 }],
   },
 
   navbar: {
@@ -742,6 +778,7 @@ const styles = StyleSheet.create({
   liveStatus: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingBottom: 2,
   },
 
   liveDot: {
@@ -761,8 +798,8 @@ const styles = StyleSheet.create({
 
   heroContent: {
     marginTop: 'auto',
-    paddingHorizontal: 19,
-    paddingBottom: 28,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
 
   heroEyebrow: {
@@ -775,25 +812,25 @@ const styles = StyleSheet.create({
   heroRule: {
     width: 34,
     height: 1,
-    backgroundColor: 'rgba(146, 255, 247, 0.32)',
+    backgroundColor: 'rgba(146, 255, 247, 0.28)',
     marginTop: 8,
-    marginBottom: 12,
+    marginBottom: 13,
   },
 
   heroTitle: {
     color: colors.white,
-    fontSize: 36,
-    lineHeight: 40,
+    fontSize: 37,
+    lineHeight: 41,
     fontWeight: '900',
-    letterSpacing: -1.35,
+    letterSpacing: -1.4,
   },
 
   heroTitleCompact: {
-    fontSize: 30,
-    lineHeight: 34,
+    fontSize: 31,
+    lineHeight: 35,
   },
 
-  heroTitleAccent: {
+  heroAccent: {
     color: colors.accent,
   },
 
@@ -801,26 +838,32 @@ const styles = StyleSheet.create({
     color: 'rgba(243, 255, 254, 0.76)',
     fontSize: 12,
     lineHeight: 19,
-    marginTop: 11,
-    maxWidth: 355,
+    marginTop: 12,
+    maxWidth: 365,
   },
 
   heroMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 17,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.12)',
+    borderTopColor: 'rgba(255, 255, 255, 0.11)',
+  },
+
+  heroMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   heroMetaText: {
     color: 'rgba(243, 255, 254, 0.64)',
     fontSize: 8,
     fontWeight: '600',
+    marginLeft: 4,
   },
 
-  metaSeparator: {
+  metaDivider: {
     width: 3,
     height: 3,
     borderRadius: 999,
@@ -833,7 +876,7 @@ const styles = StyleSheet.create({
   ============================================================ */
 
   body: {
-    paddingTop: 21,
+    paddingTop: spacing.xl,
   },
 
   /* ============================================================
@@ -843,7 +886,7 @@ const styles = StyleSheet.create({
   metrics: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 31,
+    marginBottom: 30,
   },
 
   metric: {
@@ -869,14 +912,14 @@ const styles = StyleSheet.create({
   metricLine: {
     width: 22,
     height: 2,
-    borderRadius: 2,
+    borderRadius: 999,
     backgroundColor: colors.accent,
     marginTop: 7,
   },
 
   metricDivider: {
     width: 1,
-    height: 37,
+    height: 38,
     backgroundColor: colors.border,
     marginHorizontal: 13,
   },
@@ -907,7 +950,7 @@ const styles = StyleSheet.create({
   },
 
   pressed: {
-    opacity: 0.60,
+    opacity: 0.6,
   },
 
   outputStatus: {
@@ -919,7 +962,7 @@ const styles = StyleSheet.create({
   },
 
   /* ============================================================
-     EDITOR
+     INPUT
   ============================================================ */
 
   editorCard: {
@@ -937,7 +980,7 @@ const styles = StyleSheet.create({
     color: colors.accentSoft,
     fontSize: 8,
     fontWeight: '900',
-    letterSpacing: 1.25,
+    letterSpacing: 1.2,
   },
 
   inputCaption: {
@@ -991,7 +1034,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 9,
     paddingVertical: 6,
-    borderRadius: 11,
+    borderRadius: radius.pill,
     backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
@@ -1026,7 +1069,7 @@ const styles = StyleSheet.create({
 
   inputProgress: {
     height: 2,
-    borderRadius: 2,
+    borderRadius: 999,
     overflow: 'hidden',
     backgroundColor: colors.surface2,
     marginTop: 10,
@@ -1035,7 +1078,7 @@ const styles = StyleSheet.create({
   inputProgressValue: {
     height: '100%',
     backgroundColor: colors.accent,
-    borderRadius: 2,
+    borderRadius: 999,
   },
 
   /* ============================================================
@@ -1046,9 +1089,9 @@ const styles = StyleSheet.create({
     minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     marginTop: 12,
-    borderRadius: 18,
+    borderRadius: radius.pill,
     backgroundColor: colors.accent,
   },
 
@@ -1062,12 +1105,12 @@ const styles = StyleSheet.create({
   },
 
   primaryIcon: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(6, 17, 19, 0.10)',
-    borderRadius: 12,
   },
 
   primaryCopy: {
@@ -1086,6 +1129,15 @@ const styles = StyleSheet.create({
     fontSize: 8,
     fontWeight: '600',
     marginTop: 2,
+  },
+
+  primaryArrow: {
+    width: 48,
+    height: 48,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(6, 17, 19, 0.10)',
   },
 
   /* ============================================================
@@ -1128,10 +1180,6 @@ const styles = StyleSheet.create({
   outputSection: {
     marginTop: 34,
   },
-
-  /* ============================================================
-     PREVIEW
-  ============================================================ */
 
   preview: {
     flexDirection: 'row',
@@ -1221,7 +1269,7 @@ const styles = StyleSheet.create({
   previewBullet: {
     width: 5,
     height: 5,
-    borderRadius: 3,
+    borderRadius: 999,
     backgroundColor: colors.accent,
     marginTop: 5,
     marginRight: 9,
@@ -1266,7 +1314,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     paddingVertical: 8,
     marginTop: 13,
-    borderRadius: 12,
+    borderRadius: radius.pill,
     backgroundColor: 'rgba(45, 225, 214, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(45, 225, 214, 0.12)',
