@@ -11,9 +11,8 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius } from '@/theme';
 
 const ONBOARDING_KEY =
   'snapbrief_onboarding_complete';
@@ -22,13 +21,12 @@ const API_URL =
   process.env.EXPO_PUBLIC_API_URL || 'Not configured';
 
 export default function SettingsScreen() {
-  const insets = useSafeAreaInsets();
-
   const [localOnly, setLocalOnly] = useState(true);
   const [onboardingComplete, setOnboardingComplete] =
     useState(true);
-  const [apiOnline, setApiOnline] =
-    useState<boolean | null>(null);
+  const [apiOnline, setApiOnline] = useState<boolean | null>(
+    null
+  );
 
   useEffect(() => {
     loadSettings();
@@ -36,7 +34,7 @@ export default function SettingsScreen() {
 
   async function loadSettings() {
     const completed = await AsyncStorage.getItem(
-      ONBOARDING_KEY,
+      ONBOARDING_KEY
     );
 
     setOnboardingComplete(Boolean(completed));
@@ -46,9 +44,7 @@ export default function SettingsScreen() {
     try {
       setApiOnline(null);
 
-      const response = await fetch(
-        `${API_URL}/health`,
-      );
+      const response = await fetch(`${API_URL}/health`);
 
       setApiOnline(response.ok);
     } catch {
@@ -59,7 +55,7 @@ export default function SettingsScreen() {
   function resetOnboarding() {
     Alert.alert(
       'Show onboarding again?',
-      'The introduction screens will appear the next time the app starts.',
+      'This will restart the introductory flow the next time the app starts.',
       [
         {
           text: 'Cancel',
@@ -70,61 +66,49 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: async () => {
             await AsyncStorage.removeItem(
-              ONBOARDING_KEY,
+              ONBOARDING_KEY
             );
 
             setOnboardingComplete(false);
           },
         },
-      ],
+      ]
     );
   }
 
   function openRepository() {
     Linking.openURL(
-      'https://github.com/izharahmaad/SnapBriefAI',
+      'https://github.com/izharahmaad/SnapBriefAI'
     );
   }
 
   return (
     <ScrollView
       style={styles.page}
-      contentContainerStyle={[
-        styles.content,
-        {
-          paddingTop: Math.max(insets.top + 18, 28),
-        },
-      ]}
+      contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
-      {/* =========================================================
-          HEADER
-      ========================================================= */}
+      {/* Header */}
       <View style={styles.header}>
-        <View style={styles.eyebrowRow}>
-          <View style={styles.eyebrowDot} />
-
-          <Text style={styles.eyebrow}>
-            04 / SETTINGS
-          </Text>
-        </View>
+        <Text style={styles.eyebrow}>
+          04 / SETTINGS
+        </Text>
 
         <Text style={styles.title}>
-          Settings
+          Control your workspace.
         </Text>
 
         <Text style={styles.subtitle}>
-          Keep your workspace simple, private and ready.
+          SnapBrief stays simple by keeping the important
+          controls in one place.
         </Text>
       </View>
 
-      {/* =========================================================
-          SYSTEM STATUS
-      ========================================================= */}
-      <View style={styles.statusPanel}>
-        <View style={styles.statusTop}>
-          <View style={styles.statusCopy}>
-            <Text style={styles.sectionEyebrow}>
+      {/* Status */}
+      <View style={styles.statusCard}>
+        <View style={styles.statusHeader}>
+          <View>
+            <Text style={styles.cardLabel}>
               SYSTEM STATUS
             </Text>
 
@@ -133,33 +117,33 @@ export default function SettingsScreen() {
             </Text>
           </View>
 
-          <View style={styles.readyStatus}>
-            <View style={styles.readyDot} />
+          <View style={styles.statusIndicator}>
+            <View style={styles.statusDot} />
 
-            <Text style={styles.readyText}>
+            <Text style={styles.statusText}>
               LOCAL
             </Text>
           </View>
         </View>
 
-        <View style={styles.statusList}>
+        <View style={styles.statusRows}>
           <StatusRow
             icon="phone-portrait-outline"
-            label="Workspace"
+            label="Local workspace"
             value="Active"
             positive
           />
 
           <StatusRow
             icon="lock-closed-outline"
-            label="Result storage"
+            label="Local result storage"
             value="Enabled"
             positive
           />
 
           <StatusRow
             icon="cloud-outline"
-            label="AI connection"
+            label="AI API"
             value={
               apiOnline === null
                 ? 'Not checked'
@@ -180,171 +164,143 @@ export default function SettingsScreen() {
         >
           <Ionicons
             name="pulse-outline"
-            size={13}
+            size={14}
             color={colors.accent}
           />
 
           <Text style={styles.checkButtonText}>
-            Check connection
+            Check API connection
           </Text>
         </Pressable>
       </View>
 
-      {/* =========================================================
+      {/* Privacy */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>
           PRIVACY
-      ========================================================= */}
-      <SettingsSection label="PRIVACY">
-        <View style={styles.settingRow}>
-          <View style={styles.rowIcon}>
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={16}
-              color={colors.accent}
+        </Text>
+
+        <View style={styles.settingsCard}>
+          <View style={styles.settingRow}>
+            <View style={styles.settingIcon}>
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={17}
+                color={colors.accent}
+              />
+            </View>
+
+            <View style={styles.settingCopy}>
+              <Text style={styles.settingTitle}>
+                Local result storage
+              </Text>
+
+              <Text style={styles.settingDescription}>
+                Keep generated briefs stored on this device.
+              </Text>
+            </View>
+
+            <Switch
+              value={localOnly}
+              onValueChange={setLocalOnly}
+              trackColor={{
+                false: colors.surface2,
+                true: 'rgba(45, 225, 214, 0.28)',
+              }}
+              thumbColor={
+                localOnly
+                  ? colors.accent
+                  : colors.dim
+              }
             />
           </View>
+        </View>
+      </View>
 
-          <View style={styles.rowContent}>
-            <Text style={styles.rowTitle}>
-              Local result storage
-            </Text>
+      {/* Workspace */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>
+          WORKSPACE
+        </Text>
 
-            <Text style={styles.rowDescription}>
-              Keep generated briefs on this device.
-            </Text>
-          </View>
-
-          <Switch
-            value={localOnly}
-            onValueChange={setLocalOnly}
-            trackColor={{
-              false: colors.surface2,
-              true: 'rgba(45, 225, 214, 0.28)',
-            }}
-            thumbColor={
-              localOnly
-                ? colors.accent
-                : colors.dim
+        <View style={styles.settingsCard}>
+          <ActionRow
+            icon="refresh-outline"
+            title="Restart onboarding"
+            description={
+              onboardingComplete
+                ? 'Review the introduction screens again.'
+                : 'Onboarding will appear on next launch.'
             }
-            ios_backgroundColor={colors.surface2}
+            onPress={resetOnboarding}
+          />
+
+          <View style={styles.separator} />
+
+          <ActionRow
+            icon="logo-github"
+            title="SnapBrief on GitHub"
+            description="Open the project repository."
+            onPress={openRepository}
           />
         </View>
-      </SettingsSection>
+      </View>
 
-      {/* =========================================================
-          WORKSPACE
-      ========================================================= */}
-      <SettingsSection label="WORKSPACE">
-        <ActionRow
-          icon="refresh-outline"
-          title="Restart onboarding"
-          description={
-            onboardingComplete
-              ? 'Review the introduction screens again.'
-              : 'Onboarding will appear on next launch.'
-          }
-          onPress={resetOnboarding}
-        />
-
-        <View style={styles.separator} />
-
-        <ActionRow
-          icon="logo-github"
-          title="SnapBrief on GitHub"
-          description="Open the project repository."
-          onPress={openRepository}
-        />
-      </SettingsSection>
-
-      {/* =========================================================
+      {/* API */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>
           CONNECTION
-      ========================================================= */}
-      <SettingsSection label="CONNECTION">
-        <View style={styles.connectionRow}>
-          <View style={styles.rowIcon}>
+        </Text>
+
+        <View style={styles.apiCard}>
+          <View style={styles.apiIcon}>
             <Ionicons
               name="server-outline"
-              size={16}
+              size={17}
               color={colors.accent}
             />
           </View>
 
-          <View style={styles.rowContent}>
-            <Text style={styles.rowTitle}>
+          <View style={styles.apiCopy}>
+            <Text style={styles.apiTitle}>
               API endpoint
             </Text>
 
             <Text
-              style={styles.endpoint}
+              style={styles.apiValue}
               numberOfLines={1}
             >
               {API_URL}
             </Text>
           </View>
-
-          <View
-            style={[
-              styles.connectionState,
-              apiOnline === true &&
-                styles.connectionStateOnline,
-              apiOnline === false &&
-                styles.connectionStateOffline,
-            ]}
-          >
-            <Text
-              style={[
-                styles.connectionStateText,
-                apiOnline === true &&
-                  styles.connectionStateTextOnline,
-                apiOnline === false &&
-                  styles.connectionStateTextOffline,
-              ]}
-            >
-              {apiOnline === null
-                ? 'READY'
-                : apiOnline
-                  ? 'ONLINE'
-                  : 'OFFLINE'}
-            </Text>
-          </View>
         </View>
-      </SettingsSection>
+      </View>
 
-      {/* =========================================================
-          ABOUT
-      ========================================================= */}
-      <View style={styles.about}>
-        <View style={styles.aboutTop}>
-          <View style={styles.aboutBrand}>
-            <View style={styles.aboutMark}>
-              <Ionicons
-                name="document-text-outline"
-                size={17}
-                color={colors.bg}
-              />
-            </View>
+      {/* App info */}
+      <View style={styles.aboutCard}>
+        <View style={styles.aboutLogo}>
+          <Ionicons
+            name="sparkles"
+            size={18}
+            color={colors.bg}
+          />
+        </View>
 
-            <View>
-              <Text style={styles.aboutTitle}>
-                SNAPBRIEF AI
-              </Text>
+        <View style={styles.aboutCopy}>
+          <Text style={styles.aboutTitle}>
+            SNAPBRIEF AI
+          </Text>
 
-              <Text style={styles.aboutVersion}>
-                Version 1.0.0
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.build}>
-            BUILD 01
+          <Text style={styles.aboutVersion}>
+            Version 1.0.0
           </Text>
         </View>
 
-        <View style={styles.aboutDivider} />
-
-        <Text style={styles.aboutText}>
-          Turn raw notes into clear, structured
-          briefs and actionable next steps.
-        </Text>
+        <View style={styles.aboutBadge}>
+          <Text style={styles.aboutBadgeText}>
+            BUILD 01
+          </Text>
+        </View>
       </View>
 
       <Text style={styles.footer}>
@@ -353,26 +309,6 @@ export default function SettingsScreen() {
 
       <View style={styles.bottomSpace} />
     </ScrollView>
-  );
-}
-
-function SettingsSection({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <View style={styles.section}>
-      <Text style={styles.sectionLabel}>
-        {label}
-      </Text>
-
-      <View style={styles.sectionCard}>
-        {children}
-      </View>
-    </View>
   );
 }
 
@@ -399,25 +335,14 @@ function StatusRow({
         {label}
       </Text>
 
-      <View style={styles.statusValue}>
-        <View
-          style={[
-            styles.statusValueDot,
-            positive &&
-              styles.statusValueDotPositive,
-          ]}
-        />
-
-        <Text
-          style={[
-            styles.statusRowValue,
-            positive &&
-              styles.statusRowValuePositive,
-          ]}
-        >
-          {value}
-        </Text>
-      </View>
+      <Text
+        style={[
+          styles.statusRowValue,
+          positive && styles.statusRowValuePositive,
+        ]}
+      >
+        {value}
+      </Text>
     </View>
   );
 }
@@ -441,27 +366,27 @@ function ActionRow({
         pressed && styles.pressed,
       ]}
     >
-      <View style={styles.rowIcon}>
+      <View style={styles.settingIcon}>
         <Ionicons
           name={icon}
-          size={16}
+          size={17}
           color={colors.accent}
         />
       </View>
 
-      <View style={styles.rowContent}>
-        <Text style={styles.rowTitle}>
+      <View style={styles.settingCopy}>
+        <Text style={styles.settingTitle}>
           {title}
         </Text>
 
-        <Text style={styles.rowDescription}>
+        <Text style={styles.settingDescription}>
           {description}
         </Text>
       </View>
 
       <Ionicons
         name="chevron-forward"
-        size={14}
+        size={15}
         color={colors.dim}
       />
     </Pressable>
@@ -475,117 +400,97 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: spacing.xl,
-    paddingBottom: 120,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 110,
   },
-
-  /* ============================================================
-     HEADER
-  ============================================================ */
 
   header: {
-    marginBottom: 28,
-  },
-
-  eyebrowRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  eyebrowDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: colors.accent,
-    marginRight: 7,
+    marginBottom: 22,
   },
 
   eyebrow: {
-    color: colors.accentSoft,
+    color: colors.accent,
     fontSize: 8,
-    fontWeight: '900',
-    letterSpacing: 1.5,
+    fontWeight: '800',
+    letterSpacing: 1.4,
   },
 
   title: {
     color: colors.white,
-    fontSize: 31,
-    lineHeight: 36,
-    fontWeight: '900',
-    letterSpacing: -0.9,
-    marginTop: 6,
+    fontSize: 25,
+    lineHeight: 29,
+    fontWeight: '800',
+    letterSpacing: -0.6,
+    marginTop: 7,
   },
 
   subtitle: {
-    color: colors.dim,
+    color: colors.muted,
     fontSize: 10,
     lineHeight: 16,
-    marginTop: 5,
-    maxWidth: 330,
+    marginTop: 6,
+    maxWidth: 350,
   },
 
-  /* ============================================================
-     STATUS
-  ============================================================ */
-
-  statusPanel: {
-    padding: 16,
-    borderRadius: radius.xl,
+  statusCard: {
+    padding: 15,
+    borderRadius: 20,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 27,
+    marginBottom: 24,
   },
 
-  statusTop: {
+  statusHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
 
-  statusCopy: {
-    flex: 1,
-  },
-
-  sectionEyebrow: {
+  cardLabel: {
     color: colors.dim,
     fontSize: 7,
-    fontWeight: '900',
-    letterSpacing: 1.3,
+    fontWeight: '800',
+    letterSpacing: 1.2,
   },
 
   statusTitle: {
     color: colors.white,
-    fontSize: 17,
-    lineHeight: 21,
-    fontWeight: '900',
-    marginTop: 5,
+    fontSize: 16,
+    fontWeight: '800',
+    marginTop: 4,
   },
 
-  readyStatus: {
+  statusIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 
-  readyDot: {
+  statusDot: {
     width: 5,
     height: 5,
-    borderRadius: 999,
+    borderRadius: 3,
     backgroundColor: colors.accent,
     marginRight: 5,
   },
 
-  readyText: {
+  statusText: {
     color: colors.accentSoft,
     fontSize: 7,
-    fontWeight: '900',
-    letterSpacing: 0.9,
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
 
-  statusList: {
-    marginTop: 17,
-    gap: 13,
+  statusRows: {
+    marginTop: 15,
+    gap: 12,
   },
 
   statusRow: {
@@ -597,29 +502,12 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.muted,
     fontSize: 9,
-    marginLeft: 9,
-  },
-
-  statusValue: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  statusValueDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 999,
-    backgroundColor: colors.dim,
-    marginRight: 5,
-  },
-
-  statusValueDotPositive: {
-    backgroundColor: colors.accent,
+    marginLeft: 8,
   },
 
   statusRowValue: {
     color: colors.dim,
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: '700',
   },
 
@@ -631,89 +519,75 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 11,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: radius.pill,
     backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
-    marginTop: 17,
+    marginTop: 15,
   },
 
   checkButtonText: {
     color: colors.accentSoft,
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: '800',
     marginLeft: 5,
   },
 
-  /* ============================================================
-     SETTINGS SECTIONS
-  ============================================================ */
-
   section: {
-    marginBottom: 23,
+    marginBottom: 22,
   },
 
   sectionLabel: {
     color: colors.dim,
     fontSize: 7,
-    fontWeight: '900',
-    letterSpacing: 1.3,
+    fontWeight: '800',
+    letterSpacing: 1.2,
     marginBottom: 9,
   },
 
-  sectionCard: {
+  settingsCard: {
     overflow: 'hidden',
-    borderRadius: radius.xl,
+    borderRadius: 19,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  /* ============================================================
-     ROWS
-  ============================================================ */
-
   settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    padding: 13,
   },
 
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    padding: 13,
   },
 
-  connectionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-  },
-
-  rowIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+  settingIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(45, 225, 214, 0.06)',
     marginRight: 10,
   },
 
-  rowContent: {
+  settingCopy: {
     flex: 1,
   },
 
-  rowTitle: {
+  settingTitle: {
     color: colors.white,
     fontSize: 10,
     fontWeight: '800',
   },
 
-  rowDescription: {
+  settingDescription: {
     color: colors.muted,
     fontSize: 8,
     lineHeight: 14,
@@ -723,91 +597,74 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: colors.border,
-    marginLeft: 56,
+    marginLeft: 57,
   },
 
-  /* ============================================================
-     CONNECTION
-  ============================================================ */
+  apiCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 13,
+    borderRadius: 18,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
 
-  endpoint: {
+  apiIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    marginRight: 10,
+  },
+
+  apiCopy: {
+    flex: 1,
+  },
+
+  apiTitle: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+
+  apiValue: {
     color: colors.dim,
     fontSize: 8,
     marginTop: 3,
   },
 
-  connectionState: {
-    paddingHorizontal: 7,
-    paddingVertical: 5,
-    borderRadius: radius.pill,
-    backgroundColor: colors.bg,
+  aboutCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 13,
+    borderRadius: 18,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  connectionStateOnline: {
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
-    borderColor: 'rgba(45, 225, 214, 0.15)',
-  },
-
-  connectionStateOffline: {
-    backgroundColor: 'rgba(255, 124, 135, 0.06)',
-    borderColor: 'rgba(255, 124, 135, 0.14)',
-  },
-
-  connectionStateText: {
-    color: colors.dim,
-    fontSize: 6.5,
-    fontWeight: '900',
-    letterSpacing: 0.7,
-  },
-
-  connectionStateTextOnline: {
-    color: colors.accentSoft,
-  },
-
-  connectionStateTextOffline: {
-    color: colors.danger,
-  },
-
-  /* ============================================================
-     ABOUT
-  ============================================================ */
-
-  about: {
-    padding: 15,
-    borderRadius: radius.xl,
-    backgroundColor: 'rgba(11, 24, 27, 0.58)',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  aboutTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  aboutBrand: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  aboutMark: {
-    width: 35,
-    height: 35,
-    borderRadius: 10,
+  aboutLogo: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.accent,
-    marginRight: 9,
+  },
+
+  aboutCopy: {
+    flex: 1,
+    marginLeft: 10,
   },
 
   aboutTitle: {
     color: colors.white,
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 1.4,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
   },
 
   aboutVersion: {
@@ -816,38 +673,29 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
 
-  build: {
+  aboutBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 5,
+    borderRadius: radius.pill,
+    backgroundColor: colors.bg,
+  },
+
+  aboutBadgeText: {
     color: colors.accentSoft,
-    fontSize: 6.5,
-    fontWeight: '900',
-    letterSpacing: 0.8,
+    fontSize: 6,
+    fontWeight: '800',
+    letterSpacing: 0.7,
   },
-
-  aboutDivider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: 13,
-  },
-
-  aboutText: {
-    color: colors.dim,
-    fontSize: 9,
-    lineHeight: 15,
-  },
-
-  /* ============================================================
-     FOOTER
-  ============================================================ */
 
   footer: {
     color: colors.dim,
     textAlign: 'center',
     fontSize: 8,
-    marginTop: 17,
+    marginTop: 18,
   },
 
   pressed: {
-    opacity: 0.6,
+    opacity: 0.65,
   },
 
   bottomSpace: {
