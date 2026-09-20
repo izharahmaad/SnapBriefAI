@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Alert,
@@ -35,15 +35,11 @@ export default function SettingsScreen() {
   }, []);
 
   async function loadSettings() {
-    try {
-      const completed = await AsyncStorage.getItem(
-        ONBOARDING_KEY,
-      );
+    const completed = await AsyncStorage.getItem(
+      ONBOARDING_KEY,
+    );
 
-      setOnboardingComplete(Boolean(completed));
-    } catch {
-      setOnboardingComplete(false);
-    }
+    setOnboardingComplete(Boolean(completed));
   }
 
   async function checkApi() {
@@ -90,13 +86,6 @@ export default function SettingsScreen() {
     );
   }
 
-  const connectionLabel =
-    apiOnline === null
-      ? 'Not checked'
-      : apiOnline
-        ? 'Online'
-        : 'Offline';
-
   return (
     <ScrollView
       style={styles.page}
@@ -125,31 +114,30 @@ export default function SettingsScreen() {
         </Text>
 
         <Text style={styles.subtitle}>
-          Everything you need to keep SnapBrief
-          simple, private and connected.
+          Keep your workspace simple, private and ready.
         </Text>
       </View>
 
       {/* =========================================================
-          SYSTEM
+          SYSTEM STATUS
       ========================================================= */}
-      <View style={styles.systemSection}>
-        <View style={styles.systemHeader}>
-          <View>
+      <View style={styles.statusPanel}>
+        <View style={styles.statusTop}>
+          <View style={styles.statusCopy}>
             <Text style={styles.sectionEyebrow}>
-              SYSTEM
+              SYSTEM STATUS
             </Text>
 
-            <Text style={styles.systemTitle}>
-              Workspace status
+            <Text style={styles.statusTitle}>
+              SnapBrief is ready.
             </Text>
           </View>
 
-          <View style={styles.readyState}>
+          <View style={styles.readyStatus}>
             <View style={styles.readyDot} />
 
             <Text style={styles.readyText}>
-              READY
+              LOCAL
             </Text>
           </View>
         </View>
@@ -164,7 +152,7 @@ export default function SettingsScreen() {
 
           <StatusRow
             icon="lock-closed-outline"
-            label="Local storage"
+            label="Result storage"
             value="Enabled"
             positive
           />
@@ -172,7 +160,13 @@ export default function SettingsScreen() {
           <StatusRow
             icon="cloud-outline"
             label="AI connection"
-            value={connectionLabel}
+            value={
+              apiOnline === null
+                ? 'Not checked'
+                : apiOnline
+                  ? 'Online'
+                  : 'Offline'
+            }
             positive={apiOnline === true}
           />
         </View>
@@ -186,14 +180,12 @@ export default function SettingsScreen() {
         >
           <Ionicons
             name="pulse-outline"
-            size={14}
+            size={13}
             color={colors.accent}
           />
 
           <Text style={styles.checkButtonText}>
-            {apiOnline === null
-              ? 'Check connection'
-              : 'Check again'}
+            Check connection
           </Text>
         </Pressable>
       </View>
@@ -202,8 +194,14 @@ export default function SettingsScreen() {
           PRIVACY
       ========================================================= */}
       <SettingsSection label="PRIVACY">
-        <View style={styles.row}>
-          <SettingIcon icon="shield-checkmark-outline" />
+        <View style={styles.settingRow}>
+          <View style={styles.rowIcon}>
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={16}
+              color={colors.accent}
+            />
+          </View>
 
           <View style={styles.rowContent}>
             <Text style={styles.rowTitle}>
@@ -211,7 +209,7 @@ export default function SettingsScreen() {
             </Text>
 
             <Text style={styles.rowDescription}>
-              Keep generated briefs available on this device.
+              Keep generated briefs on this device.
             </Text>
           </View>
 
@@ -252,7 +250,7 @@ export default function SettingsScreen() {
         <ActionRow
           icon="logo-github"
           title="SnapBrief on GitHub"
-          description="View the project repository."
+          description="Open the project repository."
           onPress={openRepository}
         />
       </SettingsSection>
@@ -261,8 +259,14 @@ export default function SettingsScreen() {
           CONNECTION
       ========================================================= */}
       <SettingsSection label="CONNECTION">
-        <View style={styles.row}>
-          <SettingIcon icon="server-outline" />
+        <View style={styles.connectionRow}>
+          <View style={styles.rowIcon}>
+            <Ionicons
+              name="server-outline"
+              size={16}
+              color={colors.accent}
+            />
+          </View>
 
           <View style={styles.rowContent}>
             <Text style={styles.rowTitle}>
@@ -277,17 +281,39 @@ export default function SettingsScreen() {
             </Text>
           </View>
 
-          <ConnectionBadge
-            online={apiOnline}
-          />
+          <View
+            style={[
+              styles.connectionState,
+              apiOnline === true &&
+                styles.connectionStateOnline,
+              apiOnline === false &&
+                styles.connectionStateOffline,
+            ]}
+          >
+            <Text
+              style={[
+                styles.connectionStateText,
+                apiOnline === true &&
+                  styles.connectionStateTextOnline,
+                apiOnline === false &&
+                  styles.connectionStateTextOffline,
+              ]}
+            >
+              {apiOnline === null
+                ? 'READY'
+                : apiOnline
+                  ? 'ONLINE'
+                  : 'OFFLINE'}
+            </Text>
+          </View>
         </View>
       </SettingsSection>
 
       {/* =========================================================
           ABOUT
       ========================================================= */}
-      <View style={styles.aboutSection}>
-        <View style={styles.aboutHeader}>
+      <View style={styles.about}>
+        <View style={styles.aboutTop}>
           <View style={styles.aboutBrand}>
             <View style={styles.aboutMark}>
               <Ionicons
@@ -316,8 +342,8 @@ export default function SettingsScreen() {
         <View style={styles.aboutDivider} />
 
         <Text style={styles.aboutText}>
-          Turn raw notes into clear briefs,
-          useful priorities and actionable next steps.
+          Turn raw notes into clear, structured
+          briefs and actionable next steps.
         </Text>
       </View>
 
@@ -335,7 +361,7 @@ function SettingsSection({
   children,
 }: {
   label: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <View style={styles.section}>
@@ -346,22 +372,6 @@ function SettingsSection({
       <View style={styles.sectionCard}>
         {children}
       </View>
-    </View>
-  );
-}
-
-function SettingIcon({
-  icon,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-}) {
-  return (
-    <View style={styles.settingIcon}>
-      <Ionicons
-        name={icon}
-        size={16}
-        color={colors.accent}
-      />
     </View>
   );
 }
@@ -385,22 +395,24 @@ function StatusRow({
         color={colors.dim}
       />
 
-      <Text style={styles.statusLabel}>
+      <Text style={styles.statusRowLabel}>
         {label}
       </Text>
 
       <View style={styles.statusValue}>
         <View
           style={[
-            styles.statusDot,
-            positive && styles.statusDotPositive,
+            styles.statusValueDot,
+            positive &&
+              styles.statusValueDotPositive,
           ]}
         />
 
         <Text
           style={[
-            styles.statusText,
-            positive && styles.statusTextPositive,
+            styles.statusRowValue,
+            positive &&
+              styles.statusRowValuePositive,
           ]}
         >
           {value}
@@ -429,7 +441,13 @@ function ActionRow({
         pressed && styles.pressed,
       ]}
     >
-      <SettingIcon icon={icon} />
+      <View style={styles.rowIcon}>
+        <Ionicons
+          name={icon}
+          size={16}
+          color={colors.accent}
+        />
+      </View>
 
       <View style={styles.rowContent}>
         <Text style={styles.rowTitle}>
@@ -450,43 +468,6 @@ function ActionRow({
   );
 }
 
-function ConnectionBadge({
-  online,
-}: {
-  online: boolean | null;
-}) {
-  const label =
-    online === null
-      ? 'READY'
-      : online
-        ? 'ONLINE'
-        : 'OFFLINE';
-
-  return (
-    <View
-      style={[
-        styles.connectionBadge,
-        online === true &&
-          styles.connectionBadgeOnline,
-        online === false &&
-          styles.connectionBadgeOffline,
-      ]}
-    >
-      <Text
-        style={[
-          styles.connectionBadgeText,
-          online === true &&
-            styles.connectionBadgeTextOnline,
-          online === false &&
-            styles.connectionBadgeTextOffline,
-        ]}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -503,7 +484,7 @@ const styles = StyleSheet.create({
   ============================================================ */
 
   header: {
-    marginBottom: 29,
+    marginBottom: 28,
   },
 
   eyebrowRow: {
@@ -539,30 +520,30 @@ const styles = StyleSheet.create({
     color: colors.dim,
     fontSize: 10,
     lineHeight: 16,
-    maxWidth: 330,
     marginTop: 5,
+    maxWidth: 330,
   },
 
   /* ============================================================
-     SYSTEM
+     STATUS
   ============================================================ */
 
-  systemSection: {
+  statusPanel: {
     padding: 16,
     borderRadius: radius.xl,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 28,
+    marginBottom: 27,
   },
 
-  systemHeader: {
+  statusTop: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
 
-  systemHeaderCopy: {
+  statusCopy: {
     flex: 1,
   },
 
@@ -573,7 +554,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.3,
   },
 
-  systemTitle: {
+  statusTitle: {
     color: colors.white,
     fontSize: 17,
     lineHeight: 21,
@@ -581,7 +562,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-  readyState: {
+  readyStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingTop: 2,
@@ -603,7 +584,7 @@ const styles = StyleSheet.create({
   },
 
   statusList: {
-    marginTop: 18,
+    marginTop: 17,
     gap: 13,
   },
 
@@ -612,7 +593,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  statusLabel: {
+  statusRowLabel: {
     flex: 1,
     color: colors.muted,
     fontSize: 9,
@@ -624,7 +605,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  statusDot: {
+  statusValueDot: {
     width: 4,
     height: 4,
     borderRadius: 999,
@@ -632,17 +613,17 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  statusDotPositive: {
+  statusValueDotPositive: {
     backgroundColor: colors.accent,
   },
 
-  statusText: {
+  statusRowValue: {
     color: colors.dim,
     fontSize: 8,
     fontWeight: '700',
   },
 
-  statusTextPositive: {
+  statusRowValuePositive: {
     color: colors.accentSoft,
   },
 
@@ -656,7 +637,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
-    marginTop: 18,
+    marginTop: 17,
   },
 
   checkButtonText: {
@@ -667,7 +648,7 @@ const styles = StyleSheet.create({
   },
 
   /* ============================================================
-     SECTIONS
+     SETTINGS SECTIONS
   ============================================================ */
 
   section: {
@@ -684,17 +665,17 @@ const styles = StyleSheet.create({
 
   sectionCard: {
     overflow: 'hidden',
+    borderRadius: radius.xl,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: radius.xl,
   },
 
   /* ============================================================
      ROWS
   ============================================================ */
 
-  row: {
+  settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 14,
@@ -706,7 +687,13 @@ const styles = StyleSheet.create({
     padding: 14,
   },
 
-  settingIcon: {
+  connectionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+  },
+
+  rowIcon: {
     width: 32,
     height: 32,
     borderRadius: 10,
@@ -739,17 +726,17 @@ const styles = StyleSheet.create({
     marginLeft: 56,
   },
 
+  /* ============================================================
+     CONNECTION
+  ============================================================ */
+
   endpoint: {
     color: colors.dim,
     fontSize: 8,
     marginTop: 3,
   },
 
-  /* ============================================================
-     CONNECTION
-  ============================================================ */
-
-  connectionBadge: {
+  connectionState: {
     paddingHorizontal: 7,
     paddingVertical: 5,
     borderRadius: radius.pill,
@@ -758,28 +745,28 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
 
-  connectionBadgeOnline: {
+  connectionStateOnline: {
     backgroundColor: 'rgba(45, 225, 214, 0.06)',
     borderColor: 'rgba(45, 225, 214, 0.15)',
   },
 
-  connectionBadgeOffline: {
+  connectionStateOffline: {
     backgroundColor: 'rgba(255, 124, 135, 0.06)',
     borderColor: 'rgba(255, 124, 135, 0.14)',
   },
 
-  connectionBadgeText: {
+  connectionStateText: {
     color: colors.dim,
     fontSize: 6.5,
     fontWeight: '900',
     letterSpacing: 0.7,
   },
 
-  connectionBadgeTextOnline: {
+  connectionStateTextOnline: {
     color: colors.accentSoft,
   },
 
-  connectionBadgeTextOffline: {
+  connectionStateTextOffline: {
     color: colors.danger,
   },
 
@@ -787,7 +774,7 @@ const styles = StyleSheet.create({
      ABOUT
   ============================================================ */
 
-  aboutSection: {
+  about: {
     padding: 15,
     borderRadius: radius.xl,
     backgroundColor: 'rgba(11, 24, 27, 0.58)',
@@ -795,7 +782,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
 
-  aboutHeader: {
+  aboutTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
