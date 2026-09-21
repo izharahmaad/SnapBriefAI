@@ -123,11 +123,3 @@ Response:
   "due_date": "tomorrow"
 }
 ```
-
-## Security note
-
-For production, keep the AI credential only on the backend. Do not ship a provider key inside the Expo bundle.
-
-## GitHub description
-
-**A polished AI mobile workspace that turns messy notes into clear briefs using React Native, TypeScript, FastAPI, Python, and LLMs.**
