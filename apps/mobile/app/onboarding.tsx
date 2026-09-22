@@ -12,28 +12,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
-const COLORS = {
-  background: '#061113',
-  surface: '#0B181B',
-  surfaceElevated: '#102326',
-  surfaceMuted: '#132B2E',
-
-  primary: '#2DE1D6',
-  primarySoft: '#92FFF7',
-  primaryDark: '#12AAA4',
-
-  white: '#F3FFFE',
-  text: '#D7E8E7',
-  muted: '#87A6A5',
-  subtle: '#5D7778',
-
-  border: '#1B383A',
-  borderStrong: '#2A5558',
-};
+import { colors, radius, spacing } from '@/theme';
 
 type Slide = {
   eyebrow: string;
@@ -44,347 +26,257 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     eyebrow: 'WELCOME TO SNAPBRIEF',
-    title: 'Turn messy thoughts\ninto clear briefs.',
+    title: 'Turn scattered thoughts\ninto clear direction.',
     description:
-      'Drop in rough notes, ideas, or meeting details. SnapBrief uses AI to turn them into something clear, useful, and ready to act on.',
+      'Capture notes, ideas, meetings, or transcripts. SnapBrief turns them into structured briefs you can actually use.',
   },
   {
-    eyebrow: 'LET AI DO THE SORTING',
-    title: 'Less formatting.\nMore clarity.',
+    eyebrow: 'SMART STRUCTURE',
+    title: 'Less organizing.\nMore clarity.',
     description:
-      'SnapBrief finds the important details, summarizes the context, and turns scattered information into focused next steps.',
+      'SnapBrief finds the important details and turns raw information into summaries, priorities, tags, and next actions.',
   },
   {
-    eyebrow: 'READY WHEN YOU ARE',
+    eyebrow: 'READY TO CREATE',
     title: 'Capture it.\nStructure it.\nMove forward.',
     description:
-      'Get a clean summary, action items, priority, due dates, and tags in seconds — without manually organizing everything.',
+      'Create a clear brief in seconds and keep your important thoughts ready to revisit whenever you need them.',
   },
 ];
 
-function BrandMark({ size = 42 }: { size?: number }) {
+function BrandMark({ size = 38 }: { size?: number }) {
   return (
     <View
       style={[
-        styles.brandMarkShadow,
+        styles.brandMark,
         {
           width: size,
           height: size,
-          borderRadius: size * 0.34,
+          borderRadius: size * 0.3,
         },
       ]}
     >
-      <LinearGradient
-        colors={[
-          COLORS.primarySoft,
-          COLORS.primary,
-          COLORS.primaryDark,
-        ]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[
-          styles.brandMark,
-          {
-            borderRadius: size * 0.34,
-          },
-        ]}
-      >
-        <Ionicons
-          name="flash"
-          size={size * 0.52}
-          color={COLORS.background}
-        />
-      </LinearGradient>
+      <Ionicons
+        name="document-text-outline"
+        size={size * 0.48}
+        color={colors.bg}
+      />
     </View>
   );
 }
 
-function Glow({
-  size,
-  top,
-  left,
-  opacity,
-}: {
-  size: number;
-  top: number;
-  left: number;
-  opacity: number;
-}) {
-  return (
-    <View
-      pointerEvents="none"
-      style={[
-        styles.glow,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          top,
-          left,
-          opacity,
-        },
-      ]}
-    />
-  );
-}
-
-function FirstVisual({ cardWidth }: { cardWidth: number }) {
-  const rawWidth = Math.min(cardWidth * 0.72, 245);
-  const resultWidth = Math.min(cardWidth * 0.68, 230);
+function VisualOne({ width }: { width: number }) {
+  const cardWidth = Math.min(width - 42, 330);
 
   return (
-    <View style={styles.visualArea}>
-      <Glow
-        size={Math.min(cardWidth * 0.65, 210)}
-        top={40}
-        left={cardWidth * 0.17}
-        opacity={0.065}
-      />
+    <View style={styles.visual}>
+      <View style={[styles.flowCard, { width: cardWidth }]}>
+        <View style={styles.cardTop}>
+          <View style={styles.iconSmall}>
+            <Ionicons
+              name="create-outline"
+              size={14}
+              color={colors.accent}
+            />
+          </View>
 
-      <Glow
-        size={95}
-        top={185}
-        left={cardWidth * 0.62}
-        opacity={0.045}
-      />
-
-      <View
-        style={[
-          styles.rawCard,
-          {
-            width: rawWidth,
-            left: Math.max(0, cardWidth * 0.01),
-          },
-        ]}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.statusDot} />
-          <Text style={styles.microLabel}>RAW NOTES</Text>
+          <Text style={styles.cardLabel}>RAW INPUT</Text>
         </View>
 
-        <Text style={styles.rawText}>
-          client meeting friday 3pm{'\n'}
-          redesign homepage{'\n'}
-          budget around 120k{'\n'}
-          discuss payment terms
-        </Text>
+        <Text style={styles.rawTitle}>Friday client meeting</Text>
 
-        <View style={styles.fakeLineShort} />
-        <View style={styles.fakeLineLong} />
+        <View style={styles.rawLines}>
+          <View style={[styles.rawLine, { width: '92%' }]} />
+          <View style={[styles.rawLine, { width: '75%' }]} />
+          <View style={[styles.rawLine, { width: '84%' }]} />
+        </View>
       </View>
 
-      <View
-        style={[
-          styles.magicButton,
-          {
-            left: cardWidth / 2 - 23,
-          },
-        ]}
-      >
-        <Ionicons
-          name="sparkles"
-          size={20}
-          color={COLORS.background}
-        />
+      <View style={styles.transform}>
+        <View style={styles.transformLine} />
+
+        <View style={styles.transformIcon}>
+          <Ionicons
+            name="sparkles"
+            size={13}
+            color={colors.bg}
+          />
+        </View>
+
+        <View style={styles.transformLine} />
       </View>
 
-      <View
-        style={[
-          styles.resultCard,
-          {
-            width: resultWidth,
-            right: Math.max(0, cardWidth * 0.01),
-          },
-        ]}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.resultIcon}>
+      <View style={[styles.flowCard, styles.resultCard, { width: cardWidth }]}>
+        <View style={styles.cardTop}>
+          <View style={styles.iconSmallActive}>
             <Ionicons
               name="checkmark"
-              size={12}
-              color={COLORS.background}
+              size={13}
+              color={colors.bg}
             />
           </View>
 
-          <Text style={styles.resultLabel}>AI BRIEF</Text>
+          <Text style={styles.cardLabelActive}>STRUCTURED BRIEF</Text>
         </View>
 
-        <Text style={styles.resultTitle}>Website Redesign</Text>
+        <Text style={styles.resultTitle}>Website redesign</Text>
 
-        <View style={styles.infoRow}>
+        <View style={styles.resultMeta}>
           <Ionicons
             name="calendar-outline"
-            size={14}
-            color={COLORS.primary}
+            size={13}
+            color={colors.accent}
           />
-          <Text style={styles.infoText}>Friday · 3:00 PM</Text>
+
+          <Text style={styles.resultMetaText}>
+            Friday · 3:00 PM
+          </Text>
         </View>
 
-        <View style={styles.infoRow}>
+        <View style={styles.resultMeta}>
           <Ionicons
             name="flag-outline"
-            size={14}
-            color={COLORS.primary}
+            size={13}
+            color={colors.accent}
           />
-          <Text style={styles.infoText}>High priority</Text>
+
+          <Text style={styles.resultMetaText}>
+            High priority
+          </Text>
         </View>
       </View>
     </View>
   );
 }
 
-function SecondVisual({ cardWidth }: { cardWidth: number }) {
-  const flowWidth = Math.min(cardWidth * 0.69, 225);
+function VisualTwo({ width }: { width: number }) {
+  const cardWidth = Math.min(width - 42, 335);
 
   return (
-    <View style={styles.visualArea}>
-      <Glow
-        size={Math.min(cardWidth * 0.65, 210)}
-        top={48}
-        left={cardWidth * 0.16}
-        opacity={0.06}
-      />
-
-      <View
-        style={[
-          styles.transformCard,
-          styles.transformBack,
-          {
-            width: flowWidth,
-          },
-        ]}
-      >
-        <Text style={styles.transformLabel}>RAW</Text>
-        <Text style={styles.transformTitle}>Notes</Text>
-
-        <View style={styles.stackLines}>
-          <View style={[styles.stackLine, { width: '86%' }]} />
-          <View style={[styles.stackLine, { width: '69%' }]} />
-          <View style={[styles.stackLine, { width: '78%' }]} />
-          <View style={[styles.stackLine, { width: '58%' }]} />
-        </View>
-      </View>
-
-      <View
-        style={[
-          styles.arrowCircle,
-          {
-            left: cardWidth / 2 - 21,
-          },
-        ]}
-      >
-        <Ionicons
-          name="arrow-forward"
-          size={17}
-          color={COLORS.primary}
-        />
-      </View>
-
-      <View
-        style={[
-          styles.transformCard,
-          styles.transformFront,
-          {
-            width: flowWidth,
-          },
-        ]}
-      >
-        <View style={styles.aiHeader}>
-          <View style={styles.aiDot}>
-            <Ionicons
-              name="sparkles"
-              size={10}
-              color={COLORS.background}
-            />
+    <View style={styles.visual}>
+      <View style={[styles.structureCard, { width: cardWidth }]}>
+        <View style={styles.structureHeader}>
+          <View>
+            <Text style={styles.cardLabelActive}>AI STRUCTURE</Text>
+            <Text style={styles.structureTitle}>
+              One input. Clear output.
+            </Text>
           </View>
 
-          <Text style={styles.transformLabel}>AI</Text>
-        </View>
-
-        <Text style={styles.transformTitle}>Clarity</Text>
-
-        <View style={styles.tag}>
-          <Ionicons
-            name="document-text-outline"
-            size={12}
-            color={COLORS.primary}
-          />
-          <Text style={styles.tagText}>Summary</Text>
-        </View>
-
-        <View style={styles.tag}>
-          <Ionicons
-            name="checkmark-circle-outline"
-            size={12}
-            color={COLORS.primary}
-          />
-          <Text style={styles.tagText}>Actions</Text>
-        </View>
-
-        <View style={styles.tag}>
-          <Ionicons
-            name="flag-outline"
-            size={12}
-            color={COLORS.primary}
-          />
-          <Text style={styles.tagText}>Priority</Text>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function ThirdVisual({ cardWidth }: { cardWidth: number }) {
-  const width = Math.min(cardWidth * 0.92, 335);
-
-  return (
-    <View style={styles.visualArea}>
-      <Glow
-        size={Math.min(cardWidth * 0.65, 210)}
-        top={42}
-        left={cardWidth * 0.17}
-        opacity={0.07}
-      />
-
-      <View style={[styles.readyCard, { width }]}>
-        <View style={styles.readyHeader}>
-          <View style={styles.readyTitleBlock}>
-            <Text style={styles.readyEyebrow}>YOUR BRIEF</Text>
-            <Text style={styles.readyTitle}>Ready to act</Text>
-          </View>
-
-          <View style={styles.readySpark}>
+          <View style={styles.activeIcon}>
             <Ionicons
               name="sparkles"
               size={14}
-              color={COLORS.background}
+              color={colors.bg}
+            />
+          </View>
+        </View>
+
+        <StructureRow
+          icon="document-text-outline"
+          title="Summary"
+          text="The main context, reduced to what matters."
+        />
+
+        <StructureRow
+          icon="checkmark-circle-outline"
+          title="Actions"
+          text="Clear next steps extracted from the input."
+        />
+
+        <StructureRow
+          icon="flag-outline"
+          title="Priority"
+          text="Important items surfaced for attention."
+        />
+
+        <StructureRow
+          icon="pricetag-outline"
+          title="Tags"
+          text="Useful labels for finding it later."
+          last
+        />
+      </View>
+    </View>
+  );
+}
+
+function StructureRow({
+  icon,
+  title,
+  text,
+  last = false,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  text: string;
+  last?: boolean;
+}) {
+  return (
+    <View
+      style={[
+        styles.structureRow,
+        !last && styles.structureRowBorder,
+      ]}
+    >
+      <View style={styles.rowIcon}>
+        <Ionicons
+          name={icon}
+          size={14}
+          color={colors.accent}
+        />
+      </View>
+
+      <View style={styles.rowCopy}>
+        <Text style={styles.rowTitle}>{title}</Text>
+        <Text style={styles.rowText}>{text}</Text>
+      </View>
+
+      <Ionicons
+        name="chevron-forward"
+        size={13}
+        color={colors.dim}
+      />
+    </View>
+  );
+}
+
+function VisualThree({ width }: { width: number }) {
+  const cardWidth = Math.min(width - 42, 340);
+
+  return (
+    <View style={styles.visual}>
+      <View style={[styles.readyCard, { width: cardWidth }]}>
+        <View style={styles.readyHeader}>
+          <View>
+            <Text style={styles.cardLabelActive}>YOUR BRIEF</Text>
+
+            <Text style={styles.readyTitle}>
+              Ready to act
+            </Text>
+          </View>
+
+          <View style={styles.activeIcon}>
+            <Ionicons
+              name="arrow-forward"
+              size={14}
+              color={colors.bg}
             />
           </View>
         </View>
 
         <View style={styles.stats}>
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>04</Text>
-            <Text style={styles.statLabel}>POINTS</Text>
-          </View>
-
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>03</Text>
-            <Text style={styles.statLabel}>ACTIONS</Text>
-          </View>
-
-          <View style={styles.stat}>
-            <Text style={styles.statNumber}>01</Text>
-            <Text style={styles.statLabel}>PRIORITY</Text>
-          </View>
+          <Stat value="04" label="POINTS" />
+          <Stat value="03" label="ACTIONS" />
+          <Stat value="01" label="PRIORITY" />
         </View>
 
         <View style={styles.actionRow}>
-          <View style={styles.actionCircle}>
+          <View style={styles.actionIcon}>
             <Ionicons
               name="arrow-forward"
               size={11}
-              color={COLORS.background}
+              color={colors.bg}
             />
           </View>
 
@@ -394,11 +286,11 @@ function ThirdVisual({ cardWidth }: { cardWidth: number }) {
         </View>
 
         <View style={styles.actionRow}>
-          <View style={styles.actionCircle}>
+          <View style={styles.actionIcon}>
             <Ionicons
               name="arrow-forward"
               size={11}
-              color={COLORS.background}
+              color={colors.bg}
             />
           </View>
 
@@ -407,13 +299,29 @@ function ThirdVisual({ cardWidth }: { cardWidth: number }) {
           </Text>
         </View>
 
-        <View style={styles.priorityStrip}>
+        <View style={styles.priorityRow}>
           <View style={styles.priorityDot} />
+
           <Text style={styles.priorityText}>
             HIGH PRIORITY
           </Text>
         </View>
       </View>
+    </View>
+  );
+}
+
+function Stat({
+  value,
+  label,
+}: {
+  value: string;
+  label: string;
+}) {
+  return (
+    <View style={styles.stat}>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
@@ -426,14 +334,14 @@ function SlideVisual({
   width: number;
 }) {
   if (index === 0) {
-    return <FirstVisual cardWidth={width} />;
+    return <VisualOne width={width} />;
   }
 
   if (index === 1) {
-    return <SecondVisual cardWidth={width} />;
+    return <VisualTwo width={width} />;
   }
 
-  return <ThirdVisual cardWidth={width} />;
+  return <VisualThree width={width} />;
 }
 
 export default function OnboardingScreen() {
@@ -445,13 +353,13 @@ export default function OnboardingScreen() {
   const contentWidth = Math.min(width - 32, 520);
 
   const visualHeight = isSmallPhone
-    ? Math.min(height * 0.34, 265)
+    ? 245
     : isLargeScreen
-      ? Math.min(height * 0.4, 390)
-      : Math.min(height * 0.42, 340);
+      ? 350
+      : 285;
 
   const titleSize = isLargeScreen
-    ? 43
+    ? 42
     : isSmallPhone
       ? 29
       : 34;
@@ -460,7 +368,7 @@ export default function OnboardingScreen() {
     ? 48
     : isSmallPhone
       ? 34
-      : 39;
+      : 40;
 
   const descriptionSize = isLargeScreen ? 16 : 14;
 
@@ -479,7 +387,7 @@ export default function OnboardingScreen() {
     try {
       await AsyncStorage.setItem(
         'snapbrief_onboarding_complete',
-        'true'
+        'true',
       );
 
       requestAnimationFrame(() => {
@@ -505,10 +413,10 @@ export default function OnboardingScreen() {
   };
 
   const handleScrollEnd = (
-    event: NativeSyntheticEvent<NativeScrollEvent>
+    event: NativeSyntheticEvent<NativeScrollEvent>,
   ) => {
     const nextIndex = Math.round(
-      event.nativeEvent.contentOffset.x / width
+      event.nativeEvent.contentOffset.x / width,
     );
 
     if (
@@ -523,39 +431,24 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={COLORS.background}
-      />
+      <StatusBar barStyle="light-content" />
 
       <SafeAreaView
-        style={[
-          styles.safeArea,
-          {
-            paddingHorizontal: isLargeScreen ? 34 : 16,
-          },
-        ]}
+        style={styles.safeArea}
         edges={['top', 'bottom']}
       >
-        <View
-          style={[
-            styles.screenContent,
-            {
-              width: contentWidth,
-              alignSelf: 'center',
-            },
-          ]}
-        >
+        <View style={styles.topBarWrap}>
           <View
             style={[
               styles.topBar,
               {
-                height: isSmallPhone ? 64 : 72,
+                width: contentWidth,
+                height: isSmallPhone ? 60 : 68,
               },
             ]}
           >
             <View style={styles.brand}>
-              <BrandMark size={isSmallPhone ? 38 : 42} />
+              <BrandMark size={isSmallPhone ? 36 : 40} />
 
               <View>
                 <Text
@@ -578,163 +471,161 @@ export default function OnboardingScreen() {
                 onPress={finishOnboarding}
                 disabled={finishing}
                 hitSlop={12}
-                style={styles.skipButton}
+                style={({ pressed }) => [
+                  styles.skipButton,
+                  pressed && styles.skipPressed,
+                ]}
               >
-                <Text style={styles.skipText}>Skip</Text>
+                <Text style={styles.skipText}>
+                  Skip
+                </Text>
               </Pressable>
             )}
           </View>
+        </View>
 
-          <View style={styles.contentArea}>
-            <ScrollView
-              ref={scrollRef}
-              horizontal
-              pagingEnabled
-              bounces={false}
-              showsHorizontalScrollIndicator={false}
-              scrollEventThrottle={16}
-              onMomentumScrollEnd={handleScrollEnd}
-              decelerationRate="fast"
-            >
-              {SLIDES.map((item, index) => (
+        <View style={styles.contentArea}>
+          <ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onMomentumScrollEnd={handleScrollEnd}
+            decelerationRate="fast"
+          >
+            {SLIDES.map((item, index) => (
+              <View
+                key={item.eyebrow}
+                style={[
+                  styles.slide,
+                  {
+                    width,
+                  },
+                ]}
+              >
                 <View
                   style={[
-                    styles.slide,
+                    styles.visualWrap,
                     {
-                      width,
+                      height: visualHeight,
                     },
                   ]}
-                  key={item.eyebrow}
                 >
-                  <View
+                  <SlideVisual
+                    index={index}
+                    width={contentWidth}
+                  />
+                </View>
+
+                <View
+                  style={[
+                    styles.copy,
+                    {
+                      width: contentWidth,
+                    },
+                  ]}
+                >
+                  <View style={styles.eyebrowRow}>
+                    <View style={styles.eyebrowDot} />
+
+                    <Text style={styles.eyebrow}>
+                      {item.eyebrow}
+                    </Text>
+                  </View>
+
+                  <Text
                     style={[
-                      styles.visualWrap,
+                      styles.title,
                       {
-                        height: visualHeight,
+                        fontSize: titleSize,
+                        lineHeight: titleLineHeight,
                       },
                     ]}
                   >
-                    <SlideVisual
-                      index={index}
-                      width={contentWidth}
-                    />
-                  </View>
+                    {item.title}
+                  </Text>
 
-                  <View style={styles.copy}>
-                    <View style={styles.eyebrowRow}>
-                      <View style={styles.eyebrowLine} />
-
-                      <Text style={styles.eyebrow}>
-                        {item.eyebrow}
-                      </Text>
-                    </View>
-
-                    <Text
-                      style={[
-                        styles.title,
-                        {
-                          fontSize: titleSize,
-                          lineHeight: titleLineHeight,
-                        },
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-
-                    <Text
-                      style={[
-                        styles.description,
-                        {
-                          fontSize: descriptionSize,
-                          lineHeight: descriptionSize * 1.55,
-                        },
-                      ]}
-                    >
-                      {item.description}
-                    </Text>
-                  </View>
+                  <Text
+                    style={[
+                      styles.description,
+                      {
+                        fontSize: descriptionSize,
+                        lineHeight: descriptionSize * 1.55,
+                      },
+                    ]}
+                  >
+                    {item.description}
+                  </Text>
                 </View>
-              ))}
-            </ScrollView>
-          </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
 
-          <View
-            style={[
-              styles.bottom,
-              {
-                paddingBottom: isSmallPhone ? 8 : 14,
-              },
-            ]}
-          >
-            <View style={styles.indicatorRow}>
-              {SLIDES.map((_, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.indicator,
-                    index === currentIndex &&
-                      styles.indicatorActive,
-                  ]}
-                />
-              ))}
+        <View
+          style={[
+            styles.bottom,
+            {
+              width: contentWidth,
+              paddingBottom: isSmallPhone ? 7 : 12,
+            },
+          ]}
+        >
+          <View style={styles.progressRow}>
+            <View style={styles.progressTrack}>
+              <View
+                style={[
+                  styles.progressActive,
+                  {
+                    width: `${((currentIndex + 1) / SLIDES.length) * 100}%`,
+                  },
+                ]}
+              />
             </View>
 
-            <Pressable
-              onPress={goNext}
-              disabled={finishing}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                {
-                  height: isSmallPhone ? 52 : 58,
-                },
-                pressed && styles.buttonPressed,
-                finishing && styles.buttonDisabled,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.primaryButtonText,
-                  isLargeScreen &&
-                    styles.primaryButtonTextLarge,
-                ]}
-              >
-                {finishing
-                  ? 'Opening…'
-                  : currentIndex === SLIDES.length - 1
-                    ? 'Start creating'
-                    : 'Continue'}
-              </Text>
-
-              {!finishing && (
-                <View
-                  style={[
-                    styles.buttonIcon,
-                    {
-                      width: isSmallPhone ? 39 : 44,
-                      height: isSmallPhone ? 39 : 44,
-                      borderRadius: isSmallPhone ? 20 : 22,
-                    },
-                  ]}
-                >
-                  <Ionicons
-                    name="arrow-forward"
-                    size={17}
-                    color={COLORS.background}
-                  />
-                </View>
-              )}
-            </Pressable>
-
-            <Text
-              style={[
-                styles.footerText,
-                isLargeScreen && styles.footerTextLarge,
-              ]}
-            >
-              Your notes stay yours. SnapBrief only structures
-              what you choose to provide.
+            <Text style={styles.progressText}>
+              {String(currentIndex + 1).padStart(2, '0')} /{' '}
+              {String(SLIDES.length).padStart(2, '0')}
             </Text>
           </View>
+
+          <Pressable
+            onPress={goNext}
+            disabled={finishing}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              {
+                height: isSmallPhone ? 52 : 56,
+              },
+              pressed && styles.buttonPressed,
+              finishing && styles.buttonDisabled,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>
+              {finishing
+                ? 'Opening…'
+                : currentIndex === SLIDES.length - 1
+                  ? 'Start creating'
+                  : 'Continue'}
+            </Text>
+
+            {!finishing && (
+              <View style={styles.buttonIcon}>
+                <Ionicons
+                  name="arrow-forward"
+                  size={17}
+                  color={colors.bg}
+                />
+              </View>
+            )}
+          </Pressable>
+
+          <Text style={styles.footerText}>
+            Your notes stay yours. SnapBrief only structures
+            what you choose to provide.
+          </Text>
         </View>
       </SafeAreaView>
     </View>
@@ -744,19 +635,19 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.bg,
   },
 
   safeArea: {
     flex: 1,
   },
 
-  screenContent: {
-    flex: 1,
+  topBarWrap: {
+    width: '100%',
+    alignItems: 'center',
   },
 
   topBar: {
-    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -765,30 +656,19 @@ const styles = StyleSheet.create({
   brand: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-  },
-
-  brandMarkShadow: {
-    overflow: 'hidden',
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.24,
-    shadowRadius: 15,
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    elevation: 8,
   },
 
   brandMark: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.accent,
+    marginRight: 10,
   },
 
   brandName: {
-    color: COLORS.white,
+    color: colors.white,
     fontSize: 16,
+    lineHeight: 19,
     fontWeight: '800',
     letterSpacing: -0.45,
   },
@@ -798,31 +678,35 @@ const styles = StyleSheet.create({
   },
 
   brandCaption: {
-    color: COLORS.subtle,
-    fontSize: 7.5,
+    color: colors.dim,
+    fontSize: 7,
+    lineHeight: 9,
     fontWeight: '800',
-    letterSpacing: 1.15,
+    letterSpacing: 1.05,
     marginTop: 2,
   },
 
   skipButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingVertical: 9,
+    paddingHorizontal: 4,
+  },
+
+  skipPressed: {
+    opacity: 0.55,
   },
 
   skipText: {
-    color: COLORS.muted,
-    fontSize: 14,
+    color: colors.muted,
+    fontSize: 13,
     fontWeight: '600',
   },
 
   contentArea: {
     flex: 1,
-    overflow: 'hidden',
   },
 
   slide: {
-    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
 
   visualWrap: {
@@ -831,465 +715,389 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  visualArea: {
+  visual: {
     width: '100%',
     height: '100%',
-    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  glow: {
-    position: 'absolute',
-    backgroundColor: COLORS.primary,
-  },
-
-  rawCard: {
-    position: 'absolute',
-    minHeight: 153,
-    top: '11%',
+  flowCard: {
     padding: 16,
-    borderRadius: 21,
-    backgroundColor: COLORS.surface,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    transform: [{ rotate: '-5deg' }],
-    shadowColor: '#000',
-    shadowOpacity: 0.23,
-    shadowRadius: 20,
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    elevation: 7,
+    borderColor: colors.border,
   },
 
   resultCard: {
-    position: 'absolute',
-    minHeight: 178,
-    bottom: '7%',
-    padding: 17,
-    borderRadius: 21,
-    backgroundColor: COLORS.surfaceElevated,
-    borderWidth: 1,
-    borderColor: COLORS.borderStrong,
-    transform: [{ rotate: '4.5deg' }],
-    shadowColor: '#000',
-    shadowOpacity: 0.28,
-    shadowRadius: 21,
-    shadowOffset: {
-      width: 0,
-      height: 13,
-    },
-    elevation: 10,
+    backgroundColor: colors.surface2,
+    borderColor: 'rgba(45, 225, 214, 0.18)',
   },
 
-  cardHeader: {
+  cardTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
-    marginBottom: 12,
-  },
-
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.primary,
-  },
-
-  microLabel: {
-    color: COLORS.muted,
-    fontSize: 8.5,
-    fontWeight: '800',
-    letterSpacing: 1.1,
-  },
-
-  rawText: {
-    color: '#B4C9C8',
-    fontSize: 11.8,
-    lineHeight: 20,
-  },
-
-  fakeLineShort: {
-    width: '41%',
-    height: 4,
-    borderRadius: 4,
-    backgroundColor: '#21383A',
-    marginTop: 12,
-  },
-
-  fakeLineLong: {
-    width: '68%',
-    height: 4,
-    borderRadius: 4,
-    backgroundColor: '#1B3032',
-    marginTop: 6,
-  },
-
-  magicButton: {
-    position: 'absolute',
-    width: 46,
-    height: 46,
-    borderRadius: 16,
-    top: '37%',
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 5,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.34,
-    shadowRadius: 18,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    elevation: 10,
-  },
-
-  resultIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-  },
-
-  resultLabel: {
-    color: COLORS.primarySoft,
-    fontSize: 8.5,
-    fontWeight: '800',
-    letterSpacing: 1.05,
-  },
-
-  resultTitle: {
-    color: COLORS.white,
-    fontSize: 18,
-    fontWeight: '800',
-    letterSpacing: -0.6,
     marginBottom: 14,
   },
 
-  infoRow: {
-    flexDirection: 'row',
+  iconSmall: {
+    width: 27,
+    height: 27,
+    borderRadius: 9,
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 10,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(45, 225, 214, 0.07)',
+    marginRight: 8,
   },
 
-  infoText: {
-    color: COLORS.text,
-    fontSize: 11.8,
-    fontWeight: '600',
+  iconSmallActive: {
+    width: 27,
+    height: 27,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.accent,
+    marginRight: 8,
   },
 
-  transformCard: {
-    position: 'absolute',
-    height: 200,
-    padding: 19,
-    borderRadius: 22,
-    borderWidth: 1,
-  },
-
-  transformBack: {
-    left: 0,
-    top: '15%',
-    backgroundColor: COLORS.surface,
-    borderColor: COLORS.border,
-    transform: [{ rotate: '-5.5deg' }],
-  },
-
-  transformFront: {
-    right: 0,
-    bottom: '9%',
-    backgroundColor: COLORS.surfaceElevated,
-    borderColor: COLORS.borderStrong,
-    transform: [{ rotate: '4.5deg' }],
-  },
-
-  transformLabel: {
-    color: COLORS.muted,
-    fontSize: 8,
-    fontWeight: '800',
+  cardLabel: {
+    color: colors.dim,
+    fontSize: 7,
+    fontWeight: '900',
     letterSpacing: 1.15,
   },
 
-  transformTitle: {
-    color: COLORS.white,
-    fontSize: 27,
+  cardLabelActive: {
+    color: colors.accentSoft,
+    fontSize: 7,
+    fontWeight: '900',
+    letterSpacing: 1.15,
+  },
+
+  rawTitle: {
+    color: colors.white,
+    fontSize: 17,
+    lineHeight: 22,
     fontWeight: '800',
-    letterSpacing: -1,
-    marginTop: 9,
+    letterSpacing: -0.35,
   },
 
-  stackLines: {
-    marginTop: 21,
-    gap: 9,
+  rawLines: {
+    marginTop: 14,
   },
 
-  stackLine: {
-    height: 6,
-    borderRadius: 5,
-    backgroundColor: '#253C3E',
+  rawLine: {
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: colors.border,
+    marginTop: 6,
   },
 
-  arrowCircle: {
-    position: 'absolute',
-    width: 43,
-    height: 43,
-    borderRadius: 15,
-    top: '39%',
-    zIndex: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
-  },
-
-  aiHeader: {
+  transform: {
+    height: 42,
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-
-  aiDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 7,
-    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  tag: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    marginTop: 9,
-    borderRadius: 9,
-    backgroundColor: '#173437',
-    borderWidth: 1,
-    borderColor: '#275255',
+  transformLine: {
+    width: 50,
+    height: 1,
+    backgroundColor: colors.border,
   },
 
-  tagText: {
-    color: COLORS.primarySoft,
-    fontSize: 9,
-    fontWeight: '700',
+  transformIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.accent,
+    marginHorizontal: 8,
+  },
+
+  resultTitle: {
+    color: colors.white,
+    fontSize: 20,
+    lineHeight: 25,
+    fontWeight: '800',
+    letterSpacing: -0.55,
+    marginBottom: 13,
+  },
+
+  resultMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 7,
+  },
+
+  resultMetaText: {
+    color: colors.text,
+    fontSize: 10,
+    fontWeight: '600',
+    marginLeft: 7,
+  },
+
+  structureCard: {
+    overflow: 'hidden',
+    borderRadius: radius.xl,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+
+  structureHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    padding: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+
+  structureTitle: {
+    color: colors.white,
+    fontSize: 19,
+    lineHeight: 24,
+    fontWeight: '800',
+    letterSpacing: -0.45,
+    marginTop: 5,
+  },
+
+  activeIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.accent,
+  },
+
+  structureRow: {
+    minHeight: 63,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+
+  structureRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+
+  rowIcon: {
+    width: 31,
+    height: 31,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(45, 225, 214, 0.055)',
+    marginRight: 10,
+  },
+
+  rowCopy: {
+    flex: 1,
+    paddingRight: 10,
+  },
+
+  rowTitle: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+
+  rowText: {
+    color: colors.dim,
+    fontSize: 8,
+    lineHeight: 13,
+    marginTop: 3,
   },
 
   readyCard: {
-    minHeight: 258,
-    padding: 21,
-    borderRadius: 25,
-    backgroundColor: COLORS.surfaceElevated,
+    padding: 18,
+    borderRadius: radius.xl,
+    backgroundColor: colors.surface2,
     borderWidth: 1,
-    borderColor: COLORS.borderStrong,
-    shadowColor: '#000',
-    shadowOpacity: 0.27,
-    shadowRadius: 25,
-    shadowOffset: {
-      width: 0,
-      height: 15,
-    },
-    elevation: 10,
+    borderColor: 'rgba(45, 225, 214, 0.16)',
   },
 
   readyHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 19,
-  },
-
-  readyTitleBlock: {
-    flex: 1,
-    paddingRight: 12,
-  },
-
-  readyEyebrow: {
-    color: COLORS.primary,
-    fontSize: 8,
-    fontWeight: '900',
-    letterSpacing: 1.25,
+    marginBottom: 18,
   },
 
   readyTitle: {
-    color: COLORS.white,
-    fontSize: 25,
+    color: colors.white,
+    fontSize: 24,
+    lineHeight: 29,
     fontWeight: '800',
-    letterSpacing: -0.7,
-    marginTop: 4,
-  },
-
-  readySpark: {
-    width: 34,
-    height: 34,
-    borderRadius: 11,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    letterSpacing: -0.65,
+    marginTop: 5,
   },
 
   stats: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 18,
+    marginBottom: 17,
   },
 
   stat: {
     flex: 1,
-    alignItems: 'center',
     paddingVertical: 10,
-    borderRadius: 14,
-    backgroundColor: '#0B191B',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
+    marginRight: 7,
+    borderRadius: 12,
   },
 
-  statNumber: {
-    color: COLORS.white,
-    fontSize: 17,
-    fontWeight: '800',
+  statValue: {
+    color: colors.white,
+    fontSize: 16,
+    lineHeight: 19,
+    fontWeight: '900',
   },
 
   statLabel: {
-    color: COLORS.subtle,
-    fontSize: 7.5,
+    color: colors.dim,
+    fontSize: 6.5,
+    lineHeight: 8,
     fontWeight: '800',
-    letterSpacing: 0.65,
-    marginTop: 2,
+    letterSpacing: 0.7,
+    marginTop: 3,
   },
 
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 9,
     marginBottom: 10,
   },
 
-  actionCircle: {
+  actionIcon: {
     width: 20,
     height: 20,
     borderRadius: 7,
-    backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.accent,
+    marginRight: 9,
   },
 
   actionText: {
     flex: 1,
-    color: COLORS.text,
-    fontSize: 11.5,
+    color: colors.text,
+    fontSize: 10,
+    lineHeight: 15,
     fontWeight: '600',
   },
 
-  priorityStrip: {
+  priorityRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
-    marginTop: 2,
-    paddingTop: 11,
+    marginTop: 4,
+    paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: colors.border,
   },
 
   priorityDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.primary,
+    width: 5,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginRight: 6,
   },
 
   priorityText: {
-    color: COLORS.primarySoft,
-    fontSize: 8,
-    fontWeight: '800',
+    color: colors.accentSoft,
+    fontSize: 7,
+    fontWeight: '900',
     letterSpacing: 1,
   },
 
   copy: {
-    paddingTop: 4,
-    paddingBottom: 4,
+    paddingTop: 8,
   },
 
   eyebrowRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 11,
+    marginBottom: 10,
   },
 
-  eyebrowLine: {
-    width: 22,
-    height: 2,
-    borderRadius: 2,
-    backgroundColor: COLORS.primary,
+  eyebrowDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginRight: 7,
   },
 
   eyebrow: {
-    color: COLORS.primary,
-    fontSize: 9,
+    color: colors.accent,
+    fontSize: 8,
+    lineHeight: 10,
     fontWeight: '900',
-    letterSpacing: 1.4,
+    letterSpacing: 1.35,
   },
 
   title: {
-    color: COLORS.white,
+    color: colors.white,
     fontWeight: '900',
-    letterSpacing: -1.25,
+    letterSpacing: -1.15,
   },
 
   description: {
-    color: COLORS.muted,
-    marginTop: 13,
+    color: colors.muted,
     maxWidth: 470,
+    marginTop: 12,
   },
 
   bottom: {
-    paddingTop: 10,
+    alignSelf: 'center',
+    paddingTop: 8,
   },
 
-  indicatorRow: {
+  progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 14,
+    marginBottom: 12,
   },
 
-  indicator: {
-    width: 5,
-    height: 5,
-    borderRadius: 5,
-    backgroundColor: '#294345',
+  progressTrack: {
+    flex: 1,
+    height: 3,
+    overflow: 'hidden',
+    borderRadius: 999,
+    backgroundColor: colors.border,
+    marginRight: 10,
   },
 
-  indicatorActive: {
-    width: 26,
-    backgroundColor: COLORS.primary,
+  progressActive: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+  },
+
+  progressText: {
+    color: colors.dim,
+    fontSize: 7,
+    lineHeight: 9,
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
 
   primaryButton: {
     width: '100%',
-    borderRadius: 999,
-    backgroundColor: COLORS.primary,
+    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    elevation: 5,
   },
 
   buttonPressed: {
@@ -1298,39 +1106,33 @@ const styles = StyleSheet.create({
   },
 
   buttonDisabled: {
-    opacity: 0.65,
+    opacity: 0.6,
   },
 
   primaryButtonText: {
-    color: COLORS.background,
-    fontSize: 15,
+    color: colors.bg,
+    fontSize: 14,
+    lineHeight: 18,
     fontWeight: '900',
-    letterSpacing: -0.1,
-  },
-
-  primaryButtonTextLarge: {
-    fontSize: 16,
   },
 
   buttonIcon: {
     position: 'absolute',
     right: 7,
-    top: 7,
-    backgroundColor: 'rgba(6,17,19,0.10)',
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(6, 17, 19, 0.10)',
   },
 
   footerText: {
-    color: '#527071',
+    color: colors.dim,
     textAlign: 'center',
-    fontSize: 9.5,
-    lineHeight: 14,
-    marginTop: 9,
+    fontSize: 8.5,
+    lineHeight: 13,
+    marginTop: 8,
     paddingHorizontal: 10,
-  },
-
-  footerTextLarge: {
-    fontSize: 10.5,
   },
 });
