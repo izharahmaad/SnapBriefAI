@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import {
+  ActivityIndicator,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -37,7 +38,7 @@ export default function SynthesisScreen() {
     useCallback(() => {
       let active = true;
 
-      async function refresh() {
+      const refresh = async () => {
         try {
           const briefs = await getBriefs();
 
@@ -51,13 +52,11 @@ export default function SynthesisScreen() {
             setLoading(false);
           }
         }
-      }
+      };
 
       refresh();
 
-      const interval = setInterval(() => {
-        refresh();
-      }, 5000);
+      const interval = setInterval(refresh, 5000);
 
       return () => {
         active = false;
@@ -110,8 +109,7 @@ export default function SynthesisScreen() {
     );
 
     const highPriority = items.filter(
-      (item) =>
-        item.priority?.toLowerCase() === 'high',
+      (item) => item.priority?.toLowerCase() === 'high',
     ).length;
 
     return {
@@ -129,6 +127,7 @@ export default function SynthesisScreen() {
         styles.content,
         {
           paddingTop: Math.max(insets.top + 18, 28),
+          paddingBottom: insets.bottom + 108,
         },
       ]}
       refreshControl={
@@ -142,25 +141,18 @@ export default function SynthesisScreen() {
       }
       showsVerticalScrollIndicator={false}
     >
-      {/* =========================================================
-          HEADER
-      ========================================================= */}
       <View style={styles.header}>
         <View style={styles.eyebrowRow}>
-          <View style={styles.eyebrowDot} />
+          <View style={styles.eyebrowMark} />
 
-          <Text style={styles.eyebrow}>
-            02 / SYNTHESIS
-          </Text>
+          <Text style={styles.eyebrow}>02 / SYNTHESIS</Text>
         </View>
 
-        <Text style={styles.title}>
-          Synthesis
-        </Text>
+        <Text style={styles.title}>Synthesis</Text>
 
         <Text style={styles.subtitle}>
-          See the signal across everything you've turned
-          into a brief.
+          A clear view of what your briefs contain, what needs attention,
+          and what comes next.
         </Text>
       </View>
 
@@ -170,249 +162,224 @@ export default function SynthesisScreen() {
         <EmptyState />
       ) : (
         <>
-          {/* =====================================================
-              OVERVIEW
-          ===================================================== */}
-          <View style={styles.overview}>
-            <SynthesisMetric
+          <View style={styles.metrics}>
+            <Metric
               value={String(stats.total)}
               label="BRIEFS"
+              accent
             />
 
-            <View style={styles.overviewDivider} />
+            <View style={styles.metricDivider} />
 
-            <SynthesisMetric
+            <Metric
               value={String(stats.today)}
               label="TODAY"
             />
 
-            <View style={styles.overviewDivider} />
+            <View style={styles.metricDivider} />
 
-            <SynthesisMetric
+            <Metric
               value={String(stats.actions)}
               label="ACTIONS"
             />
           </View>
 
-          {/* =====================================================
-              LATEST SYNTHESIS
-          ===================================================== */}
           {latest ? (
-            <View style={styles.latestSection}>
-              <View style={styles.sectionHeader}>
-                <View>
-                  <Text style={styles.sectionLabel}>
-                    LATEST SYNTHESIS
-                  </Text>
-
-                  <Text style={styles.sectionTitle}>
-                    Your newest signal
-                  </Text>
-                </View>
-
-                <View style={styles.liveStatus}>
-                  <View style={styles.liveDot} />
-
-                  <Text style={styles.liveText}>
-                    LIVE
-                  </Text>
-                </View>
-              </View>
+            <View style={styles.section}>
+              <SectionHeading
+                eyebrow="LATEST"
+                title="Your newest brief"
+                trailing={
+                  <View style={styles.syncStatus}>
+                    <View style={styles.syncDot} />
+                    <Text style={styles.syncText}>AUTO-SYNC</Text>
+                  </View>
+                }
+              />
 
               <GlassCard style={styles.latestCard}>
-                <View style={styles.latestHeader}>
-                  <View style={styles.latestMeta}>
-                    <Text style={styles.latestDate}>
+                <View style={styles.metaRow}>
+                  <View style={styles.dateGroup}>
+                    <Text style={styles.date}>
                       {formatDate(latest.created_at)}
                     </Text>
 
-                    <View style={styles.metaSeparator} />
+                    <View style={styles.dateDot} />
 
-                    <Text style={styles.latestTime}>
+                    <Text style={styles.time}>
                       {formatTime(latest.created_at)}
                     </Text>
                   </View>
 
-                  <PriorityLabel
-                    priority={latest.priority}
-                  />
+                  <PriorityLabel priority={latest.priority} />
                 </View>
 
-                <Text
-                  style={styles.latestTitle}
-                  numberOfLines={3}
-                >
+                <Text style={styles.latestTitle} numberOfLines={3}>
                   {latest.title}
                 </Text>
 
-                <Text
-                  style={styles.latestSummary}
-                  numberOfLines={4}
-                >
+                <Text style={styles.latestSummary} numberOfLines={4}>
                   {latest.summary}
                 </Text>
 
-                <View style={styles.latestDivider} />
+                <View style={styles.divider} />
 
-                <View style={styles.signalRow}>
-                  <SignalItem
+                <View style={styles.signalGrid}>
+                  <Signal
                     icon="list-outline"
-                    value={String(
-                      latest.key_points?.length ?? 0,
-                    )}
-                    label="key points"
+                    value={String(latest.key_points?.length ?? 0)}
+                    label="POINTS"
                   />
 
-                  <SignalItem
+                  <Signal
                     icon="arrow-forward-outline"
-                    value={String(
-                      latest.actions?.length ?? 0,
-                    )}
-                    label="actions"
+                    value={String(latest.actions?.length ?? 0)}
+                    label="ACTIONS"
                   />
 
-                  <SignalItem
+                  <Signal
                     icon="pricetag-outline"
-                    value={String(
-                      latest.tags?.length ?? 0,
-                    )}
-                    label="tags"
+                    value={String(latest.tags?.length ?? 0)}
+                    label="TAGS"
                   />
                 </View>
 
                 {latest.actions?.length ? (
-                  <View style={styles.actionPreview}>
-                    <Text style={styles.actionPreviewLabel}>
-                      NEXT ACTION
-                    </Text>
+                  <View style={styles.nextAction}>
+                    <View style={styles.nextActionHeader}>
+                      <Ionicons
+                        name="arrow-forward-circle-outline"
+                        size={13}
+                        color={colors.accent}
+                      />
 
-                    <View style={styles.actionPreviewRow}>
-                      <View style={styles.actionMarker}>
-                        <Ionicons
-                          name="arrow-forward"
-                          size={10}
-                          color={colors.bg}
-                        />
-                      </View>
-
-                      <Text
-                        style={styles.actionPreviewText}
-                        numberOfLines={2}
-                      >
-                        {latest.actions[0]}
+                      <Text style={styles.nextActionLabel}>
+                        NEXT ACTION
                       </Text>
                     </View>
+
+                    <Text style={styles.nextActionText} numberOfLines={2}>
+                      {latest.actions[0]}
+                    </Text>
                   </View>
                 ) : null}
               </GlassCard>
             </View>
           ) : null}
 
-          {/* =====================================================
-              SIGNAL BREAKDOWN
-          ===================================================== */}
-          <View style={styles.breakdownSection}>
-            <View style={styles.sectionHeader}>
-              <View>
-                <Text style={styles.sectionLabel}>
-                  SIGNAL BREAKDOWN
-                </Text>
-
-                <Text style={styles.sectionTitle}>
-                  What's being produced
-                </Text>
-              </View>
-            </View>
+          <View style={styles.section}>
+            <SectionHeading
+              eyebrow="BREAKDOWN"
+              title="What's being produced"
+            />
 
             <View style={styles.breakdown}>
               <BreakdownRow
                 icon="layers-outline"
                 title="Structured briefs"
-                value={`${stats.total}`}
-                description="Generated from your raw input"
+                description="Generated from raw input"
+                value={String(stats.total)}
               />
 
-              <View style={styles.rowDivider} />
+              <RowDivider />
 
               <BreakdownRow
                 icon="alert-circle-outline"
                 title="High priority"
-                value={`${stats.highPriority}`}
                 description="Briefs marked for closer attention"
+                value={String(stats.highPriority)}
                 accent={stats.highPriority > 0}
               />
 
-              <View style={styles.rowDivider} />
+              <RowDivider />
 
               <BreakdownRow
                 icon="checkmark-done-outline"
                 title="Action items"
-                value={`${stats.actions}`}
                 description="Next steps identified across briefs"
+                value={String(stats.actions)}
               />
             </View>
           </View>
 
-          {/* =====================================================
-              RECENT ACTIVITY
-          ===================================================== */}
           {sortedItems.length > 1 ? (
-            <View style={styles.recentSection}>
-              <View style={styles.sectionHeader}>
-                <View>
-                  <Text style={styles.sectionLabel}>
-                    RECENT ACTIVITY
+            <View style={styles.section}>
+              <SectionHeading
+                eyebrow="RECENT"
+                title="Earlier briefs"
+                trailing={
+                  <Text style={styles.countText}>
+                    {sortedItems.length - 1}
                   </Text>
-
-                  <Text style={styles.sectionTitle}>
-                    Earlier briefs
-                  </Text>
-                </View>
-
-                <Text style={styles.recentCount}>
-                  {sortedItems.length - 1}
-                </Text>
-              </View>
+                }
+              />
 
               <View style={styles.recentList}>
-                {sortedItems
-                  .slice(1, 5)
-                  .map((item, index) => (
-                    <RecentBrief
-                      key={item.id}
-                      item={item}
-                      index={index}
-                    />
-                  ))}
+                {sortedItems.slice(1, 5).map((item, index) => (
+                  <RecentBrief
+                    key={item.id}
+                    item={item}
+                    index={index}
+                  />
+                ))}
               </View>
             </View>
           ) : null}
         </>
       )}
-
-      <View style={styles.bottomSpace} />
     </ScrollView>
   );
 }
 
-function SynthesisMetric({
+function Metric({
   value,
   label,
+  accent = false,
 }: {
   value: string;
   label: string;
+  accent?: boolean;
 }) {
   return (
     <View style={styles.metric}>
-      <Text style={styles.metricValue}>
+      <Text
+        style={[
+          styles.metricValue,
+          accent && styles.metricValueAccent,
+        ]}
+      >
         {value}
       </Text>
 
-      <Text style={styles.metricLabel}>
-        {label}
-      </Text>
+      <Text style={styles.metricLabel}>{label}</Text>
 
-      <View style={styles.metricAccent} />
+      <View
+        style={[
+          styles.metricLine,
+          accent && styles.metricLineActive,
+        ]}
+      />
+    </View>
+  );
+}
+
+function SectionHeading({
+  eyebrow,
+  title,
+  trailing,
+}: {
+  eyebrow: string;
+  title: string;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <View style={styles.sectionHeading}>
+      <View>
+        <Text style={styles.sectionEyebrow}>{eyebrow}</Text>
+        <Text style={styles.sectionTitle}>{title}</Text>
+      </View>
+
+      {trailing}
     </View>
   );
 }
@@ -422,24 +389,22 @@ function PriorityLabel({
 }: {
   priority?: string;
 }) {
-  const value =
-    priority?.toLowerCase() || 'normal';
-
-  const high = value === 'high';
+  const value = priority?.toLowerCase() || 'normal';
+  const isHigh = value === 'high';
 
   return (
     <View style={styles.priority}>
       <View
         style={[
           styles.priorityDot,
-          high && styles.priorityDotHigh,
+          isHigh && styles.priorityDotHigh,
         ]}
       />
 
       <Text
         style={[
           styles.priorityText,
-          high && styles.priorityTextHigh,
+          isHigh && styles.priorityTextHigh,
         ]}
       >
         {value.toUpperCase()}
@@ -448,7 +413,7 @@ function PriorityLabel({
   );
 }
 
-function SignalItem({
+function Signal({
   icon,
   value,
   label,
@@ -458,20 +423,17 @@ function SignalItem({
   label: string;
 }) {
   return (
-    <View style={styles.signalItem}>
+    <View style={styles.signal}>
       <Ionicons
         name={icon}
         size={13}
         color={colors.accent}
       />
 
-      <Text style={styles.signalValue}>
-        {value}
-      </Text>
-
-      <Text style={styles.signalLabel}>
-        {label}
-      </Text>
+      <View style={styles.signalCopy}>
+        <Text style={styles.signalValue}>{value}</Text>
+        <Text style={styles.signalLabel}>{label}</Text>
+      </View>
     </View>
   );
 }
@@ -479,14 +441,14 @@ function SignalItem({
 function BreakdownRow({
   icon,
   title,
-  value,
   description,
+  value,
   accent = false,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
-  value: string;
   description: string;
+  value: string;
   accent?: boolean;
 }) {
   return (
@@ -495,14 +457,12 @@ function BreakdownRow({
         <Ionicons
           name={icon}
           size={15}
-          color={accent ? colors.accent : colors.dim}
+          color={accent ? colors.accent : colors.muted}
         />
       </View>
 
       <View style={styles.breakdownCopy}>
-        <Text style={styles.breakdownTitle}>
-          {title}
-        </Text>
+        <Text style={styles.breakdownTitle}>{title}</Text>
 
         <Text style={styles.breakdownDescription}>
           {description}
@@ -521,6 +481,10 @@ function BreakdownRow({
   );
 }
 
+function RowDivider() {
+  return <View style={styles.rowDivider} />;
+}
+
 function RecentBrief({
   item,
   index,
@@ -530,11 +494,9 @@ function RecentBrief({
 }) {
   return (
     <View style={styles.recentItem}>
-      <View style={styles.recentIndex}>
-        <Text style={styles.recentIndexText}>
-          {String(index + 1).padStart(2, '0')}
-        </Text>
-      </View>
+      <Text style={styles.recentIndex}>
+        {String(index + 1).padStart(2, '0')}
+      </Text>
 
       <View style={styles.recentCopy}>
         <Text
@@ -556,14 +518,17 @@ function RecentBrief({
 
 function LoadingState() {
   return (
-    <View style={styles.emptyState}>
-      <View style={styles.emptyLine} />
+    <View style={styles.state}>
+      <ActivityIndicator
+        size="small"
+        color={colors.accent}
+      />
 
-      <Text style={styles.emptyTitle}>
-        Loading your synthesis
+      <Text style={styles.stateTitle}>
+        Loading synthesis
       </Text>
 
-      <Text style={styles.emptyText}>
+      <Text style={styles.stateText}>
         Reading your saved briefs.
       </Text>
     </View>
@@ -572,22 +537,22 @@ function LoadingState() {
 
 function EmptyState() {
   return (
-    <View style={styles.emptyState}>
+    <View style={styles.state}>
       <View style={styles.emptyIcon}>
         <Ionicons
           name="layers-outline"
-          size={23}
+          size={22}
           color={colors.accent}
         />
       </View>
 
-      <Text style={styles.emptyTitle}>
+      <Text style={styles.stateTitle}>
         Nothing to synthesize yet
       </Text>
 
-      <Text style={styles.emptyText}>
-        Create your first brief from the Home screen.
-        Your latest signal will appear here.
+      <Text style={styles.stateText}>
+        Create your first brief from Home and your latest
+        synthesis will appear here.
       </Text>
     </View>
   );
@@ -628,12 +593,7 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: 120,
   },
-
-  /* ============================================================
-     HEADER
-  ============================================================ */
 
   header: {
     marginBottom: 28,
@@ -644,7 +604,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  eyebrowDot: {
+  eyebrowMark: {
     width: 5,
     height: 5,
     borderRadius: 999,
@@ -655,6 +615,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: colors.accentSoft,
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: '900',
     letterSpacing: 1.5,
   },
@@ -672,18 +633,14 @@ const styles = StyleSheet.create({
     color: colors.dim,
     fontSize: 10,
     lineHeight: 16,
-    maxWidth: 330,
-    marginTop: 5,
+    maxWidth: 335,
+    marginTop: 6,
   },
 
-  /* ============================================================
-     OVERVIEW
-  ============================================================ */
-
-  overview: {
+  metrics: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 31,
+    marginBottom: 32,
   },
 
   metric: {
@@ -695,47 +652,57 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 28,
     fontWeight: '900',
-    letterSpacing: -0.6,
+    letterSpacing: -0.5,
+  },
+
+  metricValueAccent: {
+    color: colors.accentSoft,
   },
 
   metricLabel: {
     color: colors.dim,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '800',
     letterSpacing: 1,
     marginTop: 4,
   },
 
-  metricAccent: {
-    width: 19,
+  metricLine: {
+    width: 16,
     height: 2,
     borderRadius: 999,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.border,
     marginTop: 7,
   },
 
-  overviewDivider: {
-    width: 1,
-    height: 37,
-    backgroundColor: colors.border,
-    marginHorizontal: 13,
+  metricLineActive: {
+    backgroundColor: colors.accent,
+    width: 20,
   },
 
-  /* ============================================================
-     SECTION HEADERS
-  ============================================================ */
+  metricDivider: {
+    width: 1,
+    height: 34,
+    backgroundColor: colors.border,
+    marginHorizontal: 14,
+  },
 
-  sectionHeader: {
+  section: {
+    marginBottom: 30,
+  },
+
+  sectionHeading: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    gap: 12,
     marginBottom: 11,
   },
 
-  sectionLabel: {
+  sectionEyebrow: {
     color: colors.dim,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '900',
     letterSpacing: 1.3,
   },
@@ -743,73 +710,77 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: colors.white,
     fontSize: 14,
+    lineHeight: 18,
     fontWeight: '900',
     marginTop: 4,
   },
 
-  liveStatus: {
+  syncStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingBottom: 2,
   },
 
-  liveDot: {
-    width: 5,
-    height: 5,
+  syncDot: {
+    width: 4,
+    height: 4,
     borderRadius: 999,
     backgroundColor: colors.accent,
     marginRight: 5,
   },
 
-  liveText: {
+  syncText: {
     color: colors.accentSoft,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '900',
     letterSpacing: 0.8,
   },
 
-  /* ============================================================
-     LATEST
-  ============================================================ */
-
-  latestSection: {
-    marginBottom: 30,
+  countText: {
+    color: colors.accentSoft,
+    fontSize: 9,
+    lineHeight: 12,
+    fontWeight: '800',
+    paddingBottom: 2,
   },
 
   latestCard: {
-    padding: 16,
+    padding: 17,
     borderRadius: radius.xl,
   },
 
-  latestHeader: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
 
-  latestMeta: {
+  dateGroup: {
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  latestDate: {
+  date: {
     color: colors.dim,
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: '700',
   },
 
-  latestTime: {
-    color: colors.dim,
-    fontSize: 8,
-    fontWeight: '700',
-  },
-
-  metaSeparator: {
+  dateDot: {
     width: 3,
     height: 3,
     borderRadius: 999,
     backgroundColor: colors.border,
     marginHorizontal: 7,
+  },
+
+  time: {
+    color: colors.dim,
+    fontSize: 8,
+    lineHeight: 10,
+    fontWeight: '700',
   },
 
   priority: {
@@ -832,6 +803,7 @@ const styles = StyleSheet.create({
   priorityText: {
     color: colors.muted,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '900',
     letterSpacing: 0.8,
   },
@@ -856,86 +828,75 @@ const styles = StyleSheet.create({
     marginTop: 7,
   },
 
-  latestDivider: {
+  divider: {
     height: 1,
     backgroundColor: colors.border,
-    marginVertical: 15,
+    marginVertical: 16,
   },
 
-  signalRow: {
+  signalGrid: {
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  signalItem: {
+  signal: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 14,
+    flex: 1,
+  },
+
+  signalCopy: {
+    marginLeft: 6,
   },
 
   signalValue: {
     color: colors.white,
     fontSize: 10,
-    fontWeight: '800',
-    marginLeft: 5,
+    lineHeight: 12,
+    fontWeight: '900',
   },
 
   signalLabel: {
     color: colors.dim,
-    fontSize: 8,
-    marginLeft: 3,
+    fontSize: 7,
+    lineHeight: 9,
+    fontWeight: '700',
+    letterSpacing: 0.7,
+    marginTop: 2,
   },
 
-  actionPreview: {
+  nextAction: {
     marginTop: 16,
-    paddingTop: 13,
+    paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
 
-  actionPreviewLabel: {
+  nextActionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 7,
+  },
+
+  nextActionLabel: {
     color: colors.accent,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '900',
     letterSpacing: 1.1,
-    marginBottom: 8,
+    marginLeft: 6,
   },
 
-  actionPreviewRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-
-  actionMarker: {
-    width: 20,
-    height: 20,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accent,
-    marginRight: 8,
-    marginTop: 1,
-  },
-
-  actionPreviewText: {
-    flex: 1,
+  nextActionText: {
     color: colors.text,
     fontSize: 10,
     lineHeight: 16,
   },
 
-  /* ============================================================
-     BREAKDOWN
-  ============================================================ */
-
-  breakdownSection: {
-    marginBottom: 30,
-  },
-
   breakdown: {
     overflow: 'hidden',
-    borderRadius: radius.xl,
     backgroundColor: colors.surface,
+    borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -943,7 +904,8 @@ const styles = StyleSheet.create({
   breakdownRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    minHeight: 66,
+    paddingHorizontal: 14,
   },
 
   breakdownIcon: {
@@ -952,17 +914,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor: 'rgba(45, 225, 214, 0.055)',
     marginRight: 10,
   },
 
   breakdownCopy: {
     flex: 1,
+    paddingRight: 10,
   },
 
   breakdownTitle: {
     color: colors.white,
     fontSize: 10,
+    lineHeight: 13,
     fontWeight: '800',
   },
 
@@ -975,7 +939,8 @@ const styles = StyleSheet.create({
 
   breakdownValue: {
     color: colors.muted,
-    fontSize: 14,
+    fontSize: 15,
+    lineHeight: 18,
     fontWeight: '900',
   },
 
@@ -989,43 +954,25 @@ const styles = StyleSheet.create({
     marginLeft: 56,
   },
 
-  /* ============================================================
-     RECENT
-  ============================================================ */
-
-  recentSection: {
-    marginBottom: 20,
-  },
-
-  recentCount: {
-    color: colors.accentSoft,
-    fontSize: 8,
-    fontWeight: '800',
-    paddingBottom: 3,
-  },
-
   recentList: {
-    overflow: 'hidden',
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: colors.border,
   },
 
   recentItem: {
+    minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 64,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
 
   recentIndex: {
     width: 30,
-  },
-
-  recentIndexText: {
     color: colors.accent,
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: '900',
   },
 
@@ -1037,20 +984,18 @@ const styles = StyleSheet.create({
   recentTitle: {
     color: colors.white,
     fontSize: 10,
+    lineHeight: 13,
     fontWeight: '800',
   },
 
   recentDate: {
     color: colors.dim,
     fontSize: 8,
+    lineHeight: 10,
     marginTop: 3,
   },
 
-  /* ============================================================
-     EMPTY / LOADING
-  ============================================================ */
-
-  emptyState: {
+  state: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 110,
@@ -1058,42 +1003,32 @@ const styles = StyleSheet.create({
   },
 
   emptyIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
+    width: 50,
+    height: 50,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor: 'rgba(45, 225, 214, 0.055)',
     borderWidth: 1,
-    borderColor: 'rgba(45, 225, 214, 0.12)',
+    borderColor: 'rgba(45, 225, 214, 0.11)',
     marginBottom: 15,
   },
 
-  emptyLine: {
-    width: 22,
-    height: 2,
-    borderRadius: 999,
-    backgroundColor: colors.accent,
-    marginBottom: 18,
-  },
-
-  emptyTitle: {
+  stateTitle: {
     color: colors.white,
     fontSize: 17,
+    lineHeight: 21,
     fontWeight: '900',
     textAlign: 'center',
+    marginTop: 14,
   },
 
-  emptyText: {
+  stateText: {
     color: colors.dim,
     fontSize: 10,
     lineHeight: 17,
     textAlign: 'center',
-    marginTop: 6,
     maxWidth: 285,
-  },
-
-  bottomSpace: {
-    height: 20,
+    marginTop: 6,
   },
 });
