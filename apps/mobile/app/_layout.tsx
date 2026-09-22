@@ -1,6 +1,8 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { colors } from '@/theme';
+
 export default function RootLayout() {
   return (
     <>
@@ -11,15 +13,15 @@ export default function RootLayout() {
         screenOptions={{
           headerShown: false,
           contentStyle: {
-            backgroundColor: '#061113',
+            backgroundColor: colors.bg,
           },
           animation: 'fade',
+          gestureEnabled: false,
         }}
       >
         <Stack.Screen
           name="splash"
           options={{
-            gestureEnabled: false,
             animation: 'none',
           }}
         />
@@ -27,14 +29,14 @@ export default function RootLayout() {
         <Stack.Screen
           name="onboarding"
           options={{
-            gestureEnabled: false,
+            animation: 'fade',
           }}
         />
 
         <Stack.Screen
           name="(tabs)"
           options={{
-            gestureEnabled: false,
+            animation: 'fade',
           }}
         />
       </Stack>
