@@ -8,22 +8,16 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 
-const COLORS = {
-  bg: '#061113',
-  aqua: '#2DE1D6',
-  aquaSoft: '#92FFF7',
-  white: '#F3FFFE',
-  muted: '#6F8C8C',
-};
+import { colors } from '@/theme';
 
 export default function SplashScreen() {
-  const markScale = useRef(new Animated.Value(0.72)).current;
+  const markScale = useRef(new Animated.Value(0.88)).current;
   const markOpacity = useRef(new Animated.Value(0)).current;
-  const textOpacity = useRef(new Animated.Value(0)).current;
-  const taglineOpacity = useRef(new Animated.Value(0)).current;
-  const lineWidth = useRef(new Animated.Value(0)).current;
+  const contentOpacity = useRef(new Animated.Value(0)).current;
+  const lineProgress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     let mounted = true;
@@ -32,60 +26,59 @@ export default function SplashScreen() {
       Animated.parallel([
         Animated.timing(markOpacity, {
           toValue: 1,
-          duration: 500,
+          duration: 400,
           easing: Easing.out(Easing.ease),
           useNativeDriver: true,
         }),
+
         Animated.spring(markScale, {
           toValue: 1,
           friction: 7,
-          tension: 60,
+          tension: 70,
           useNativeDriver: true,
         }),
       ]),
 
-      Animated.timing(textOpacity, {
+      Animated.timing(contentOpacity, {
         toValue: 1,
         duration: 350,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
 
-      Animated.timing(taglineOpacity, {
+      Animated.timing(lineProgress, {
         toValue: 1,
-        duration: 350,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-
-      Animated.timing(lineWidth, {
-        toValue: 1,
-        duration: 550,
+        duration: 650,
         easing: Easing.out(Easing.ease),
         useNativeDriver: false,
       }),
     ]).start();
 
     const timer = setTimeout(async () => {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       try {
         const completed = await AsyncStorage.getItem(
-          'snapbrief_onboarding_complete'
+          'snapbrief_onboarding_complete',
         );
 
-        if (!mounted) return;
-
-        if (completed) {
-          router.replace('/(tabs)');
-        } else {
-          router.replace('/onboarding');
+        if (!mounted) {
+          return;
         }
+
+        router.replace(
+          completed ? '/(tabs)' : '/onboarding',
+        );
       } catch {
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
+
         router.replace('/onboarding');
       }
-    }, 1800);
+    }, 1750);
 
     return () => {
       mounted = false;
@@ -94,9 +87,8 @@ export default function SplashScreen() {
   }, [
     markScale,
     markOpacity,
-    textOpacity,
-    taglineOpacity,
-    lineWidth,
+    contentOpacity,
+    lineProgress,
   ]);
 
   return (
@@ -113,56 +105,55 @@ export default function SplashScreen() {
             },
           ]}
         >
-          <Text style={styles.markSymbol}>✦</Text>
+          <Ionicons
+            name="document-text-outline"
+            size={30}
+            color={colors.bg}
+          />
         </Animated.View>
-
-        <Animated.Text
-          style={[
-            styles.title,
-            {
-              opacity: textOpacity,
-            },
-          ]}
-        >
-          SNAPBRIEF
-        </Animated.Text>
-
-        <Animated.Text
-          style={[
-            styles.aiText,
-            {
-              opacity: textOpacity,
-            },
-          ]}
-        >
-          AI
-        </Animated.Text>
-
-        <Animated.Text
-          style={[
-            styles.tagline,
-            {
-              opacity: taglineOpacity,
-            },
-          ]}
-        >
-          Turn noise into clarity.
-        </Animated.Text>
 
         <Animated.View
           style={[
-            styles.line,
+            styles.content,
             {
-              width: lineWidth.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '42%'],
-              }),
+              opacity: contentOpacity,
             },
           ]}
-        />
+        >
+          <Text style={styles.wordmark}>
+            SnapBrief
+          </Text>
+
+          <Text style={styles.tagline}>
+            Turn noise into clarity.
+          </Text>
+
+          <View style={styles.lineTrack}>
+            <Animated.View
+              style={[
+                styles.lineActive,
+                {
+                  width: lineProgress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0%', '100%'],
+                  }),
+                },
+              ]}
+            />
+          </View>
+        </Animated.View>
       </View>
 
-      <Text style={styles.bottomText}>Simple. Clear. Actionable.</Text>
+      <Animated.Text
+        style={[
+          styles.bottomText,
+          {
+            opacity: contentOpacity,
+          },
+        ]}
+      >
+        AI NOTES · MADE USEFUL
+      </Animated.Text>
     </View>
   );
 }
@@ -170,77 +161,78 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: colors.bg,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   center: {
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 32,
   },
 
   mark: {
-    width: 68,
-    height: 68,
-    borderRadius: 22,
+    width: 64,
+    height: 64,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.aqua,
-    marginBottom: 20,
-
-    shadowColor: COLORS.aqua,
+    backgroundColor: colors.accent,
+    shadowColor: colors.accent,
     shadowOffset: {
       width: 0,
-      height: 0,
+      height: 7,
     },
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    elevation: 8,
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
+    elevation: 7,
+    marginBottom: 18,
   },
 
-  markSymbol: {
-    color: COLORS.bg,
-    fontSize: 30,
-    fontWeight: '800',
-    marginTop: -2,
+  content: {
+    alignItems: 'center',
   },
 
-  title: {
-    color: COLORS.white,
-    fontSize: 25,
+  wordmark: {
+    color: colors.white,
+    fontSize: 27,
+    lineHeight: 32,
     fontWeight: '800',
-    letterSpacing: 4,
-  },
-
-  aiText: {
-    color: COLORS.aqua,
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 4,
-    marginTop: 5,
+    letterSpacing: -0.7,
   },
 
   tagline: {
-    color: COLORS.muted,
-    fontSize: 12,
+    color: colors.muted,
+    fontSize: 11,
+    lineHeight: 16,
     fontWeight: '500',
-    marginTop: 18,
-    letterSpacing: 0.2,
+    marginTop: 7,
   },
 
-  line: {
+  lineTrack: {
+    width: 86,
     height: 2,
-    borderRadius: 10,
-    backgroundColor: COLORS.aqua,
-    marginTop: 22,
+    overflow: 'hidden',
+    borderRadius: 999,
+    backgroundColor: colors.border,
+    marginTop: 20,
+  },
+
+  lineActive: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: colors.accent,
   },
 
   bottomText: {
     position: 'absolute',
-    bottom: 34,
-    color: COLORS.muted,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    bottom: 30,
+    color: colors.dim,
+    fontSize: 7,
+    lineHeight: 9,
+    fontWeight: '800',
+    letterSpacing: 1.2,
   },
 });
