@@ -1,4 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -10,19 +15,24 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, radius } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import { Brief } from '@/types/brief';
 import { getBriefs } from '@/lib/storage';
 
 type Filter = 'all' | 'high' | 'recent';
 
 export default function VaultScreen() {
+  const insets = useSafeAreaInsets();
+
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] =
+    useState<Filter>('all');
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] =
+    useState(false);
 
   const loadBriefs = useCallback(async () => {
     try {
@@ -31,10 +41,12 @@ export default function VaultScreen() {
       const ordered = [...stored].sort(
         (a, b) =>
           new Date(b.created_at).getTime() -
-          new Date(a.created_at).getTime()
+          new Date(a.created_at).getTime(),
       );
 
       setBriefs(ordered);
+    } catch {
+      setBriefs([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -46,7 +58,9 @@ export default function VaultScreen() {
   }, [loadBriefs]);
 
   useEffect(() => {
-    const interval = setInterval(loadBriefs, 5000);
+    const interval = setInterval(() => {
+      loadBriefs();
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [loadBriefs]);
@@ -57,10 +71,14 @@ export default function VaultScreen() {
     return briefs.filter((brief) => {
       const matchesSearch =
         !query ||
-        brief.title.toLowerCase().includes(query) ||
-        brief.summary.toLowerCase().includes(query) ||
+        brief.title
+          .toLowerCase()
+          .includes(query) ||
+        brief.summary
+          .toLowerCase()
+          .includes(query) ||
         brief.tags?.some((tag) =>
-          tag.toLowerCase().includes(query)
+          tag.toLowerCase().includes(query),
         );
 
       const matchesFilter =
@@ -69,55 +87,130 @@ export default function VaultScreen() {
           brief.priority?.toLowerCase() === 'high') ||
         (filter === 'recent' &&
           Date.now() -
-            new Date(brief.created_at).getTime() <
+            new Date(
+              brief.created_at,
+            ).getTime() <
             7 * 24 * 60 * 60 * 1000);
 
-      return matchesSearch && matchesFilter;
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
     });
   }, [briefs, filter, search]);
 
-  function refresh() {
+  const highPriorityCount = useMemo(
+    () =>
+      briefs.filter(
+        (brief) =>
+          brief.priority?.toLowerCase() ===
+          'high',
+      ).length,
+    [briefs],
+  );
+
+  const recentCount = useMemo(
+    () =>
+      briefs.filter(
+        (brief) =>
+          Date.now() -
+            new Date(
+              brief.created_at,
+            ).getTime() <
+          7 * 24 * 60 * 60 * 1000,
+      ).length,
+    [briefs],
+  );
+
+  async function refresh() {
     setRefreshing(true);
-    loadBriefs();
+    await loadBriefs();
   }
 
   return (
     <ScrollView
       style={styles.page}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[
+        styles.content,
+        {
+          paddingTop: Math.max(
+            insets.top + 18,
+            28,
+          ),
+        },
+      ]}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={refresh}
           tintColor={colors.accent}
+          colors={[colors.accent]}
+          progressBackgroundColor={
+            colors.surface
+          }
         />
       }
       showsVerticalScrollIndicator={false}
     >
+      {/* =======================================================
+          HEADER
+      ======================================================= */}
       <View style={styles.header}>
         <View style={styles.headerCopy}>
-          <Text style={styles.eyebrow}>
-            03 / VAULT
-          </Text>
+          <View style={styles.eyebrowRow}>
+            <View style={styles.eyebrowDot} />
+
+            <Text style={styles.eyebrow}>
+              03 / VAULT
+            </Text>
+          </View>
 
           <Text style={styles.title}>
-            Your intelligence archive.
+            Your brief archive.
           </Text>
 
           <Text style={styles.subtitle}>
-            Every generated brief, kept on this device.
+            Everything you've synthesized, kept
+            ready to revisit.
           </Text>
         </View>
 
-        <View style={styles.countBadge}>
-          <Text style={styles.countValue}>
-            {briefs.length}
-          </Text>
-          <Text style={styles.countLabel}>SAVED</Text>
+        <View style={styles.archiveMark}>
+          <Ionicons
+            name="archive-outline"
+            size={19}
+            color={colors.accent}
+          />
         </View>
       </View>
 
-      {/* Search */}
+      {/* =======================================================
+          OVERVIEW
+      ======================================================= */}
+      <View style={styles.overview}>
+        <VaultMetric
+          value={String(briefs.length)}
+          label="SAVED"
+        />
+
+        <View style={styles.overviewDivider} />
+
+        <VaultMetric
+          value={String(highPriorityCount)}
+          label="HIGH"
+        />
+
+        <View style={styles.overviewDivider} />
+
+        <VaultMetric
+          value={String(recentCount)}
+          label="7 DAYS"
+        />
+      </View>
+
+      {/* =======================================================
+          SEARCH
+      ======================================================= */}
       <View style={styles.searchBox}>
         <Ionicons
           name="search-outline"
@@ -128,111 +221,120 @@ export default function VaultScreen() {
         <TextInput
           value={search}
           onChangeText={setSearch}
-          placeholder="Search briefs, tags, summaries..."
+          placeholder="Search your briefs..."
           placeholderTextColor={colors.dim}
           style={styles.searchInput}
           autoCorrect={false}
+          autoCapitalize="none"
+          returnKeyType="search"
         />
 
         {search.length > 0 ? (
           <Pressable
             onPress={() => setSearch('')}
             hitSlop={8}
+            style={({ pressed }) => [
+              styles.clearSearch,
+              pressed && styles.pressed,
+            ]}
           >
             <Ionicons
-              name="close-circle"
-              size={17}
+              name="close"
+              size={14}
               color={colors.dim}
             />
           </Pressable>
         ) : null}
       </View>
 
-      {/* Filters */}
+      {/* =======================================================
+          FILTERS
+      ======================================================= */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filtersRow}
+        contentContainerStyle={styles.filters}
       >
         <FilterButton
-          label="All"
+          label="All briefs"
+          count={briefs.length}
           active={filter === 'all'}
           onPress={() => setFilter('all')}
         />
 
         <FilterButton
           label="High priority"
+          count={highPriorityCount}
           active={filter === 'high'}
           onPress={() => setFilter('high')}
         />
 
         <FilterButton
           label="Last 7 days"
+          count={recentCount}
           active={filter === 'recent'}
           onPress={() => setFilter('recent')}
         />
       </ScrollView>
 
-      <View style={styles.sectionHeader}>
+      {/* =======================================================
+          LIST HEADER
+      ======================================================= */}
+      <View style={styles.listHeader}>
         <View>
-          <Text style={styles.sectionLabel}>
+          <Text style={styles.listLabel}>
             SAVED BRIEFS
           </Text>
 
-          <Text style={styles.sectionTitle}>
-            {filteredBriefs.length} available
+          <Text style={styles.listTitle}>
+            {filteredBriefs.length}{' '}
+            {filteredBriefs.length === 1
+              ? 'brief'
+              : 'briefs'}
           </Text>
         </View>
 
-        <Ionicons
-          name="archive-outline"
-          size={18}
-          color={colors.accent}
-        />
+        {search || filter !== 'all' ? (
+          <Text style={styles.filterStatus}>
+            FILTERED
+          </Text>
+        ) : (
+          <Ionicons
+            name="layers-outline"
+            size={17}
+            color={colors.accent}
+          />
+        )}
       </View>
 
+      {/* =======================================================
+          CONTENT
+      ======================================================= */}
       {loading ? (
-        <View style={styles.loadingBox}>
+        <View style={styles.loading}>
           <ActivityIndicator
             size="small"
             color={colors.accent}
           />
 
           <Text style={styles.loadingText}>
-            Loading vault...
+            Loading your archive...
           </Text>
         </View>
       ) : filteredBriefs.length > 0 ? (
         <View style={styles.list}>
-          {filteredBriefs.map((brief) => (
-            <VaultCard
+          {filteredBriefs.map((brief, index) => (
+            <VaultItem
               key={brief.id}
               brief={brief}
+              index={index}
             />
           ))}
         </View>
       ) : (
-        <View style={styles.empty}>
-          <View style={styles.emptyIcon}>
-            <Ionicons
-              name="archive-outline"
-              size={20}
-              color={colors.accent}
-            />
-          </View>
-
-          <Text style={styles.emptyTitle}>
-            {briefs.length > 0
-              ? 'Nothing matches your search.'
-              : 'Your vault is empty.'}
-          </Text>
-
-          <Text style={styles.emptyText}>
-            {briefs.length > 0
-              ? 'Try another search or filter.'
-              : 'Generated briefs will automatically appear here.'}
-          </Text>
-        </View>
+        <EmptyVault
+          hasBriefs={briefs.length > 0}
+        />
       )}
 
       <View style={styles.bottomSpace} />
@@ -240,12 +342,36 @@ export default function VaultScreen() {
   );
 }
 
+function VaultMetric({
+  value,
+  label,
+}: {
+  value: string;
+  label: string;
+}) {
+  return (
+    <View style={styles.metric}>
+      <Text style={styles.metricValue}>
+        {value}
+      </Text>
+
+      <Text style={styles.metricLabel}>
+        {label}
+      </Text>
+
+      <View style={styles.metricAccent} />
+    </View>
+  );
+}
+
 function FilterButton({
   label,
+  count,
   active,
   onPress,
 }: {
   label: string;
+  count: number;
   active: boolean;
   onPress: () => void;
 }) {
@@ -266,63 +392,162 @@ function FilterButton({
       >
         {label}
       </Text>
+
+      <Text
+        style={[
+          styles.filterCount,
+          active && styles.filterCountActive,
+        ]}
+      >
+        {count}
+      </Text>
     </Pressable>
   );
 }
 
-function VaultCard({ brief }: { brief: Brief }) {
-  return (
-    <View style={styles.card}>
-      <View style={styles.cardTop}>
-        <View style={styles.cardBadge}>
-          <Ionicons
-            name="sparkles"
-            size={10}
-            color={colors.accent}
-          />
+function VaultItem({
+  brief,
+  index,
+}: {
+  brief: Brief;
+  index: number;
+}) {
+  const priority =
+    brief.priority?.toLowerCase() ||
+    'normal';
 
-          <Text style={styles.cardBadgeText}>
-            BRIEF
+  const isHigh = priority === 'high';
+
+  return (
+    <View style={styles.item}>
+      {/* Top metadata */}
+      <View style={styles.itemTop}>
+        <View style={styles.itemMeta}>
+          <Text style={styles.itemIndex}>
+            {String(index + 1).padStart(2, '0')}
+          </Text>
+
+          <View style={styles.itemDivider} />
+
+          <Text style={styles.itemDate}>
+            {formatDate(brief.created_at)}
           </Text>
         </View>
 
-        <Text style={styles.cardDate}>
-          {formatDate(brief.created_at)}
-        </Text>
+        <View style={styles.priority}>
+          <View
+            style={[
+              styles.priorityDot,
+              isHigh &&
+                styles.priorityDotHigh,
+            ]}
+          />
+
+          <Text
+            style={[
+              styles.priorityText,
+              isHigh &&
+                styles.priorityTextHigh,
+            ]}
+          >
+            {priority.toUpperCase()}
+          </Text>
+        </View>
       </View>
 
-      <Text style={styles.cardTitle} numberOfLines={2}>
+      {/* Main content */}
+      <Text
+        style={styles.itemTitle}
+        numberOfLines={2}
+      >
         {brief.title}
       </Text>
 
       <Text
-        style={styles.cardSummary}
-        numberOfLines={2}
+        style={styles.itemSummary}
+        numberOfLines={3}
       >
         {brief.summary}
       </Text>
 
-      <View style={styles.cardBottom}>
-        <View style={styles.priority}>
-          <View style={styles.priorityDot} />
+      {/* Footer */}
+      <View style={styles.itemFooter}>
+        <View style={styles.stat}>
+          <Ionicons
+            name="list-outline"
+            size={12}
+            color={colors.dim}
+          />
 
-          <Text style={styles.priorityText}>
-            {(brief.priority || 'normal').toUpperCase()}
+          <Text style={styles.statText}>
+            {brief.key_points?.length ?? 0}{' '}
+            points
           </Text>
         </View>
 
-        <View style={styles.cardStats}>
-          <Text style={styles.cardStat}>
-            {brief.actions?.length ?? 0} actions
-          </Text>
+        <View style={styles.statDivider} />
 
-          <View style={styles.statSeparator} />
+        <View style={styles.stat}>
+          <Ionicons
+            name="arrow-forward-outline"
+            size={12}
+            color={colors.dim}
+          />
 
-          <Text style={styles.cardStat}>
-            {brief.key_points?.length ?? 0} points
+          <Text style={styles.statText}>
+            {brief.actions?.length ?? 0}{' '}
+            actions
           </Text>
         </View>
+
+        {brief.tags?.length ? (
+          <>
+            <View style={styles.statDivider} />
+
+            <View style={styles.stat}>
+              <Ionicons
+                name="pricetag-outline"
+                size={12}
+                color={colors.dim}
+              />
+
+              <Text style={styles.statText}>
+                {brief.tags.length}
+              </Text>
+            </View>
+          </>
+        ) : null}
       </View>
+    </View>
+  );
+}
+
+function EmptyVault({
+  hasBriefs,
+}: {
+  hasBriefs: boolean;
+}) {
+  return (
+    <View style={styles.empty}>
+      <View style={styles.emptyIcon}>
+        <Ionicons
+          name="archive-outline"
+          size={22}
+          color={colors.accent}
+        />
+      </View>
+
+      <Text style={styles.emptyTitle}>
+        {hasBriefs
+          ? 'Nothing matches'
+          : 'Your vault is empty'}
+      </Text>
+
+      <Text style={styles.emptyText}>
+        {hasBriefs
+          ? 'Try another search or switch to a different filter.'
+          : 'Create your first brief from Home and it will appear here automatically.'}
+      </Text>
     </View>
   );
 }
@@ -330,11 +555,18 @@ function VaultCard({ brief }: { brief: Brief }) {
 function formatDate(value: string) {
   const date = new Date(value);
 
-  return date.toLocaleDateString([], {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  if (Number.isNaN(date.getTime())) {
+    return 'Unknown date';
+  }
+
+  return date.toLocaleDateString(
+    undefined,
+    {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    },
+  );
 }
 
 const styles = StyleSheet.create({
@@ -344,77 +576,129 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 110,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: 120,
   },
+
+  /* ============================================================
+     HEADER
+  ============================================================ */
 
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    gap: 14,
+    marginBottom: 28,
   },
 
   headerCopy: {
     flex: 1,
-    paddingRight: 12,
+  },
+
+  eyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  eyebrowDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginRight: 7,
   },
 
   eyebrow: {
-    color: colors.accent,
+    color: colors.accentSoft,
     fontSize: 8,
-    fontWeight: '800',
-    letterSpacing: 1.4,
+    fontWeight: '900',
+    letterSpacing: 1.5,
   },
 
   title: {
     color: colors.white,
-    fontSize: 25,
-    lineHeight: 29,
-    fontWeight: '800',
-    letterSpacing: -0.6,
-    marginTop: 7,
-  },
-
-  subtitle: {
-    color: colors.muted,
-    fontSize: 10,
-    lineHeight: 16,
+    fontSize: 30,
+    lineHeight: 36,
+    fontWeight: '900',
+    letterSpacing: -0.9,
     marginTop: 6,
   },
 
-  countBadge: {
-    width: 54,
-    height: 54,
-    borderRadius: 17,
+  subtitle: {
+    color: colors.dim,
+    fontSize: 10,
+    lineHeight: 16,
+    maxWidth: 315,
+    marginTop: 5,
+  },
+
+  archiveMark: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surface,
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(45, 225, 214, 0.12)',
   },
 
-  countValue: {
-    color: colors.accentSoft,
-    fontSize: 17,
-    fontWeight: '800',
+  /* ============================================================
+     OVERVIEW
+  ============================================================ */
+
+  overview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 27,
   },
 
-  countLabel: {
+  metric: {
+    flex: 1,
+  },
+
+  metricValue: {
+    color: colors.white,
+    fontSize: 23,
+    lineHeight: 27,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+
+  metricLabel: {
     color: colors.dim,
-    fontSize: 6,
+    fontSize: 7,
     fontWeight: '800',
-    letterSpacing: 0.8,
-    marginTop: 1,
+    letterSpacing: 0.9,
+    marginTop: 4,
   },
+
+  metricAccent: {
+    width: 18,
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginTop: 7,
+  },
+
+  overviewDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: colors.border,
+    marginHorizontal: 12,
+  },
+
+  /* ============================================================
+     SEARCH
+  ============================================================ */
 
   searchBox: {
     minHeight: 47,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 13,
-    borderRadius: 16,
+    borderRadius: radius.lg,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
@@ -425,14 +709,27 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 11,
     marginLeft: 9,
+    paddingVertical: 10,
   },
 
-  filtersRow: {
+  clearSearch: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingLeft: 8,
+  },
+
+  /* ============================================================
+     FILTERS
+  ============================================================ */
+
+  filters: {
     gap: 7,
     paddingVertical: 12,
   },
 
   filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 11,
     paddingVertical: 8,
     borderRadius: radius.pill,
@@ -443,7 +740,7 @@ const styles = StyleSheet.create({
 
   filterButtonActive: {
     backgroundColor: 'rgba(45, 225, 214, 0.07)',
-    borderColor: colors.accent,
+    borderColor: 'rgba(45, 225, 214, 0.28)',
   },
 
   filterText: {
@@ -456,97 +753,100 @@ const styles = StyleSheet.create({
     color: colors.accentSoft,
   },
 
-  pressed: {
-    opacity: 0.65,
+  filterCount: {
+    color: colors.dim,
+    fontSize: 8,
+    fontWeight: '800',
+    marginLeft: 6,
   },
 
-  sectionHeader: {
+  filterCountActive: {
+    color: colors.accent,
+  },
+
+  pressed: {
+    opacity: 0.62,
+  },
+
+  /* ============================================================
+     LIST HEADER
+  ============================================================ */
+
+  listHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    marginTop: 14,
-    marginBottom: 10,
+    marginTop: 11,
+    marginBottom: 11,
   },
 
-  sectionLabel: {
+  listLabel: {
     color: colors.dim,
     fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 1.2,
+    fontWeight: '900',
+    letterSpacing: 1.3,
   },
 
-  sectionTitle: {
+  listTitle: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '900',
     marginTop: 4,
   },
 
-  list: {
-    gap: 9,
-  },
-
-  card: {
-    padding: 14,
-    borderRadius: 19,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  cardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-
-  cardBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 7,
-    paddingVertical: 5,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  cardBadgeText: {
+  filterStatus: {
     color: colors.accentSoft,
     fontSize: 7,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.8,
-    marginLeft: 4,
+    paddingBottom: 3,
   },
 
-  cardDate: {
-    color: colors.dim,
-    fontSize: 8,
+  /* ============================================================
+     LIST
+  ============================================================ */
+
+  list: {
+    gap: 0,
   },
 
-  cardTitle: {
-    color: colors.white,
-    fontSize: 17,
-    lineHeight: 21,
-    fontWeight: '800',
-    marginTop: 13,
+  item: {
+    paddingVertical: 17,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
 
-  cardSummary: {
-    color: colors.muted,
-    fontSize: 10,
-    lineHeight: 16,
-    marginTop: 6,
-  },
-
-  cardBottom: {
+  itemTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 13,
-    paddingTop: 11,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+    gap: 10,
+  },
+
+  itemMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+
+  itemIndex: {
+    color: colors.accent,
+    fontSize: 8,
+    fontWeight: '900',
+    letterSpacing: 0.7,
+  },
+
+  itemDivider: {
+    width: 1,
+    height: 11,
+    backgroundColor: colors.border,
+    marginHorizontal: 7,
+  },
+
+  itemDate: {
+    color: colors.dim,
+    fontSize: 8,
+    fontWeight: '700',
   },
 
   priority: {
@@ -557,44 +857,77 @@ const styles = StyleSheet.create({
   priorityDot: {
     width: 5,
     height: 5,
-    borderRadius: 3,
-    backgroundColor: colors.accent,
+    borderRadius: 999,
+    backgroundColor: colors.dim,
     marginRight: 5,
+  },
+
+  priorityDotHigh: {
+    backgroundColor: colors.accent,
   },
 
   priorityText: {
     color: colors.muted,
     fontSize: 7,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.8,
   },
 
-  cardStats: {
+  priorityTextHigh: {
+    color: colors.accentSoft,
+  },
+
+  itemTitle: {
+    color: colors.white,
+    fontSize: 18,
+    lineHeight: 23,
+    fontWeight: '900',
+    letterSpacing: -0.3,
+    marginTop: 14,
+  },
+
+  itemSummary: {
+    color: colors.muted,
+    fontSize: 10,
+    lineHeight: 17,
+    marginTop: 6,
+  },
+
+  itemFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginTop: 13,
+  },
+
+  stat: {
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  cardStat: {
+  statText: {
     color: colors.dim,
     fontSize: 8,
+    fontWeight: '700',
+    marginLeft: 4,
   },
 
-  statSeparator: {
+  statDivider: {
     width: 3,
     height: 3,
-    borderRadius: 2,
+    borderRadius: 999,
     backgroundColor: colors.border,
-    marginHorizontal: 7,
+    marginHorizontal: 8,
   },
 
-  loadingBox: {
+  /* ============================================================
+     LOADING
+  ============================================================ */
+
+  loading: {
+    minHeight: 180,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 180,
-    borderRadius: 19,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
 
   loadingText: {
@@ -603,39 +936,43 @@ const styles = StyleSheet.create({
     marginTop: 9,
   },
 
+  /* ============================================================
+     EMPTY
+  ============================================================ */
+
   empty: {
     alignItems: 'center',
-    padding: 26,
-    borderRadius: 19,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+    paddingTop: 85,
   },
 
   emptyIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(45, 225, 214, 0.06)',
-    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(45, 225, 214, 0.12)',
+    marginBottom: 15,
   },
 
   emptyTitle: {
     color: colors.white,
-    fontSize: 13,
-    fontWeight: '800',
+    fontSize: 17,
+    fontWeight: '900',
     textAlign: 'center',
   },
 
   emptyText: {
-    color: colors.muted,
+    color: colors.dim,
     fontSize: 10,
-    lineHeight: 16,
+    lineHeight: 17,
     textAlign: 'center',
     marginTop: 6,
-    maxWidth: 280,
+    maxWidth: 285,
   },
 
   bottomSpace: {
