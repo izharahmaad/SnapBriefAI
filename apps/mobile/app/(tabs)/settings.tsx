@@ -835,10 +835,6 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
 
-  /* ============================================================
-     FOOTER
-  ============================================================ */
-
   footer: {
     color: colors.dim,
     textAlign: 'center',
