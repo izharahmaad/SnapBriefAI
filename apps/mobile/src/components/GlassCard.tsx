@@ -24,23 +24,21 @@ export function GlassCard({
 
 const styles = StyleSheet.create({
   card: {
-    overflow: 'hidden',
-
-    backgroundColor: 'rgba(11, 24, 27, 0.82)',
+    backgroundColor: colors.surface,
 
     borderWidth: 1,
-    borderColor: 'rgba(146, 255, 247, 0.08)',
+    borderColor: colors.border,
 
     borderRadius: radius.xl,
 
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 4,
     },
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
 
-    elevation: 3,
+    elevation: 2,
   },
 });
