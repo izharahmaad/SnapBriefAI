@@ -1,5 +1,9 @@
+// ============================================================
+// SNAPBRIEF DESIGN SYSTEM
+// ============================================================
+
 export const colors = {
-  // Base
+  // Background
   bg: '#061113',
 
   // Surfaces
@@ -13,18 +17,20 @@ export const colors = {
   text: '#D7E8E7',
   muted: '#87A6A5',
   dim: '#5D7778',
+  white: '#F3FFFE',
 
-  // SnapBrief aqua brand
+  // Brand
   accent: '#2DE1D6',
   accentSoft: '#92FFF7',
   accentDeep: '#12AAA4',
 
   // Status
   danger: '#FF7C87',
+} as const;
 
-  // White
-  white: '#F3FFFE',
-};
+// ============================================================
+// SPACING
+// ============================================================
 
 export const spacing = {
   xs: 6,
@@ -33,7 +39,11 @@ export const spacing = {
   lg: 18,
   xl: 24,
   xxl: 32,
-};
+} as const;
+
+// ============================================================
+// RADIUS
+// ============================================================
 
 export const radius = {
   sm: 10,
@@ -41,4 +51,4 @@ export const radius = {
   lg: 20,
   xl: 24,
   pill: 999,
-};
+} as const;
