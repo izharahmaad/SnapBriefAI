@@ -76,8 +76,8 @@ export default function HomeScreen() {
 
   const horizontalPadding = compact ? 16 : 20;
 
-  // Taller hero so the artwork has more visual presence.
-  const heroHeight = compact ? 535 : 600;
+  // Taller hero so the artwork has stronger visual presence.
+  const heroHeight = compact ? 575 : 650;
 
   const [text, setText] = useState(examples[0] ?? '');
   const [brief, setBrief] = useState<Brief | null>(null);
@@ -182,17 +182,17 @@ export default function HomeScreen() {
         >
           <LinearGradient
             colors={[
-              'rgba(6, 17, 19, 0.02)',
-              'rgba(6, 17, 19, 0.10)',
-              'rgba(6, 17, 19, 0.26)',
-              'rgba(6, 17, 19, 0.78)',
+              'rgba(6, 17, 19, 0.01)',
+              'rgba(6, 17, 19, 0.08)',
+              'rgba(6, 17, 19, 0.22)',
+              'rgba(6, 17, 19, 0.72)',
               'rgba(6, 17, 19, 0.99)',
             ]}
             locations={[
               0,
               0.32,
               0.52,
-              0.78,
+              0.76,
               1,
             ]}
             style={StyleSheet.absoluteFill}
@@ -214,10 +214,11 @@ export default function HomeScreen() {
             ]}
           >
             <View style={styles.brandGroup}>
+              {/* Circular SnapBrief logo */}
               <View style={styles.brandLogo}>
                 <Ionicons
-                  name="document-text-outline"
-                  size={18}
+                  name="layers-outline"
+                  size={20}
                   color={colors.bg}
                 />
               </View>
@@ -900,14 +901,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  /* Circular logo */
   brandLogo: {
-    width: 38,
-    height: 38,
-    borderRadius: 11,
+    width: 42,
+    height: 42,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.accent,
-    marginRight: 9,
+    marginRight: 10,
+
+    shadowColor: colors.accent,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.14,
+    shadowRadius: 10,
+    elevation: 5,
   },
 
   brandCopy: {
@@ -986,7 +997,7 @@ const styles = StyleSheet.create({
   heroContent: {
     marginTop: 'auto',
     paddingHorizontal: 20,
-    paddingBottom: 31,
+    paddingBottom: 32,
   },
 
   heroEyebrow: {
@@ -1015,8 +1026,8 @@ const styles = StyleSheet.create({
   },
 
   heroTitleCompact: {
-    fontSize: 32,
-    lineHeight: 37,
+    fontSize: 31,
+    lineHeight: 36,
   },
 
   heroAccent: {
