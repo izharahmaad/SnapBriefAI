@@ -23,6 +23,8 @@ import { getBriefs } from '@/lib/storage';
 
 type Filter = 'all' | 'high' | 'recent';
 
+const RECENT_WINDOW = 7 * 24 * 60 * 60 * 1000;
+
 export default function VaultScreen() {
   const insets = useSafeAreaInsets();
 
@@ -49,7 +51,6 @@ export default function VaultScreen() {
       setBriefs([]);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, []);
 
@@ -62,70 +63,94 @@ export default function VaultScreen() {
       loadBriefs();
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [loadBriefs]);
 
   const filteredBriefs = useMemo(() => {
     const query = search.trim().toLowerCase();
+    const now = Date.now();
 
     return briefs.filter((brief) => {
       const matchesSearch =
         !query ||
-        brief.title
-          .toLowerCase()
-          .includes(query) ||
-        brief.summary
-          .toLowerCase()
-          .includes(query) ||
+        brief.title.toLowerCase().includes(query) ||
+        brief.summary.toLowerCase().includes(query) ||
         brief.tags?.some((tag) =>
           tag.toLowerCase().includes(query),
         );
 
-      const matchesFilter =
-        filter === 'all' ||
-        (filter === 'high' &&
-          brief.priority?.toLowerCase() === 'high') ||
-        (filter === 'recent' &&
-          Date.now() -
+      if (!matchesSearch) {
+        return false;
+      }
+
+      if (filter === 'high') {
+        return (
+          brief.priority?.toLowerCase() ===
+          'high'
+        );
+      }
+
+      if (filter === 'recent') {
+        return (
+          now -
             new Date(
               brief.created_at,
             ).getTime() <
-            7 * 24 * 60 * 60 * 1000);
+          RECENT_WINDOW
+        );
+      }
 
-      return (
-        matchesSearch &&
-        matchesFilter
-      );
+      return true;
     });
   }, [briefs, filter, search]);
 
-  const highPriorityCount = useMemo(
-    () =>
-      briefs.filter(
-        (brief) =>
-          brief.priority?.toLowerCase() ===
-          'high',
-      ).length,
-    [briefs],
-  );
+  const highPriorityCount = useMemo(() => {
+    return briefs.filter(
+      (brief) =>
+        brief.priority?.toLowerCase() ===
+        'high',
+    ).length;
+  }, [briefs]);
 
-  const recentCount = useMemo(
-    () =>
-      briefs.filter(
-        (brief) =>
-          Date.now() -
-            new Date(
-              brief.created_at,
-            ).getTime() <
-          7 * 24 * 60 * 60 * 1000,
-      ).length,
-    [briefs],
-  );
+  const recentCount = useMemo(() => {
+    const now = Date.now();
 
-  async function refresh() {
+    return briefs.filter(
+      (brief) =>
+        now -
+          new Date(
+            brief.created_at,
+          ).getTime() <
+        RECENT_WINDOW,
+    ).length;
+  }, [briefs]);
+
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
-    await loadBriefs();
-  }
+
+    try {
+      const stored = await getBriefs();
+
+      const ordered = [...stored].sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() -
+          new Date(a.created_at).getTime(),
+      );
+
+      setBriefs(ordered);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  const clearSearch = () => {
+    setSearch('');
+  };
+
+  const hasActiveFilter =
+    filter !== 'all' || search.trim().length > 0;
 
   return (
     <ScrollView
@@ -137,12 +162,14 @@ export default function VaultScreen() {
             insets.top + 18,
             28,
           ),
+          paddingBottom:
+            insets.bottom + 105,
         },
       ]}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
-          onRefresh={refresh}
+          onRefresh={handleRefresh}
           tintColor={colors.accent}
           colors={[colors.accent]}
           progressBackgroundColor={
@@ -150,11 +177,13 @@ export default function VaultScreen() {
           }
         />
       }
+      keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {/* =======================================================
+      {/* =========================================================
           HEADER
-      ======================================================= */}
+      ========================================================= */}
+
       <View style={styles.header}>
         <View style={styles.headerCopy}>
           <View style={styles.eyebrowRow}>
@@ -170,12 +199,12 @@ export default function VaultScreen() {
           </Text>
 
           <Text style={styles.subtitle}>
-            Everything you've synthesized, kept
+            Everything you've created, kept
             ready to revisit.
           </Text>
         </View>
 
-        <View style={styles.archiveMark}>
+        <View style={styles.headerIcon}>
           <Ionicons
             name="archive-outline"
             size={19}
@@ -184,33 +213,36 @@ export default function VaultScreen() {
         </View>
       </View>
 
-      {/* =======================================================
+      {/* =========================================================
           OVERVIEW
-      ======================================================= */}
+      ========================================================= */}
+
       <View style={styles.overview}>
-        <VaultMetric
+        <Metric
           value={String(briefs.length)}
           label="SAVED"
+          active
         />
 
-        <View style={styles.overviewDivider} />
+        <View style={styles.metricDivider} />
 
-        <VaultMetric
+        <Metric
           value={String(highPriorityCount)}
           label="HIGH"
         />
 
-        <View style={styles.overviewDivider} />
+        <View style={styles.metricDivider} />
 
-        <VaultMetric
+        <Metric
           value={String(recentCount)}
           label="7 DAYS"
         />
       </View>
 
-      {/* =======================================================
+      {/* =========================================================
           SEARCH
-      ======================================================= */}
+      ========================================================= */}
+
       <View style={styles.searchBox}>
         <Ionicons
           name="search-outline"
@@ -231,10 +263,10 @@ export default function VaultScreen() {
 
         {search.length > 0 ? (
           <Pressable
-            onPress={() => setSearch('')}
+            onPress={clearSearch}
             hitSlop={8}
             style={({ pressed }) => [
-              styles.clearSearch,
+              styles.searchClear,
               pressed && styles.pressed,
             ]}
           >
@@ -247,43 +279,53 @@ export default function VaultScreen() {
         ) : null}
       </View>
 
-      {/* =======================================================
+      {/* =========================================================
           FILTERS
-      ======================================================= */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filters}
-      >
-        <FilterButton
-          label="All briefs"
-          count={briefs.length}
-          active={filter === 'all'}
-          onPress={() => setFilter('all')}
-        />
+      ========================================================= */}
 
-        <FilterButton
-          label="High priority"
-          count={highPriorityCount}
-          active={filter === 'high'}
-          onPress={() => setFilter('high')}
-        />
+      <View style={styles.filterArea}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={
+            styles.filterContent
+          }
+        >
+          <FilterButton
+            label="All"
+            count={briefs.length}
+            active={filter === 'all'}
+            onPress={() => setFilter('all')}
+          />
 
-        <FilterButton
-          label="Last 7 days"
-          count={recentCount}
-          active={filter === 'recent'}
-          onPress={() => setFilter('recent')}
-        />
-      </ScrollView>
+          <FilterButton
+            label="High priority"
+            count={highPriorityCount}
+            active={filter === 'high'}
+            onPress={() =>
+              setFilter('high')
+            }
+          />
 
-      {/* =======================================================
+          <FilterButton
+            label="Last 7 days"
+            count={recentCount}
+            active={filter === 'recent'}
+            onPress={() =>
+              setFilter('recent')
+            }
+          />
+        </ScrollView>
+      </View>
+
+      {/* =========================================================
           LIST HEADER
-      ======================================================= */}
+      ========================================================= */}
+
       <View style={styles.listHeader}>
         <View>
-          <Text style={styles.listLabel}>
-            SAVED BRIEFS
+          <Text style={styles.listEyebrow}>
+            ARCHIVE
           </Text>
 
           <Text style={styles.listTitle}>
@@ -294,42 +336,57 @@ export default function VaultScreen() {
           </Text>
         </View>
 
-        {search || filter !== 'all' ? (
-          <Text style={styles.filterStatus}>
-            FILTERED
-          </Text>
+        {hasActiveFilter ? (
+          <Pressable
+            onPress={() => {
+              setSearch('');
+              setFilter('all');
+            }}
+            style={({ pressed }) => [
+              styles.resetButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.resetText}>
+              Reset
+            </Text>
+          </Pressable>
         ) : (
-          <Ionicons
-            name="layers-outline"
-            size={17}
-            color={colors.accent}
-          />
+          <View style={styles.archiveStatus}>
+            <View style={styles.archiveDot} />
+
+            <Text
+              style={
+                styles.archiveStatusText
+              }
+            >
+              SAVED LOCALLY
+            </Text>
+          </View>
         )}
       </View>
 
-      {/* =======================================================
+      {/* =========================================================
           CONTENT
-      ======================================================= */}
-      {loading ? (
-        <View style={styles.loading}>
-          <ActivityIndicator
-            size="small"
-            color={colors.accent}
-          />
+      ========================================================= */}
 
-          <Text style={styles.loadingText}>
-            Loading your archive...
-          </Text>
-        </View>
+      {loading ? (
+        <LoadingState />
       ) : filteredBriefs.length > 0 ? (
         <View style={styles.list}>
-          {filteredBriefs.map((brief, index) => (
-            <VaultItem
-              key={brief.id}
-              brief={brief}
-              index={index}
-            />
-          ))}
+          {filteredBriefs.map(
+            (brief, index) => (
+              <VaultItem
+                key={brief.id}
+                brief={brief}
+                index={index}
+                last={
+                  index ===
+                  filteredBriefs.length - 1
+                }
+              />
+            ),
+          )}
         </View>
       ) : (
         <EmptyVault
@@ -342,16 +399,24 @@ export default function VaultScreen() {
   );
 }
 
-function VaultMetric({
+function Metric({
   value,
   label,
+  active = false,
 }: {
   value: string;
   label: string;
+  active?: boolean;
 }) {
   return (
     <View style={styles.metric}>
-      <Text style={styles.metricValue}>
+      <Text
+        style={[
+          styles.metricValue,
+          active &&
+            styles.metricValueActive,
+        ]}
+      >
         {value}
       </Text>
 
@@ -359,7 +424,13 @@ function VaultMetric({
         {label}
       </Text>
 
-      <View style={styles.metricAccent} />
+      <View
+        style={[
+          styles.metricLine,
+          active &&
+            styles.metricLineActive,
+        ]}
+      />
     </View>
   );
 }
@@ -380,27 +451,38 @@ function FilterButton({
       onPress={onPress}
       style={({ pressed }) => [
         styles.filterButton,
-        active && styles.filterButtonActive,
+        active &&
+          styles.filterButtonActive,
         pressed && styles.pressed,
       ]}
     >
       <Text
         style={[
           styles.filterText,
-          active && styles.filterTextActive,
+          active &&
+            styles.filterTextActive,
         ]}
       >
         {label}
       </Text>
 
-      <Text
+      <View
         style={[
           styles.filterCount,
-          active && styles.filterCountActive,
+          active &&
+            styles.filterCountActive,
         ]}
       >
-        {count}
-      </Text>
+        <Text
+          style={[
+            styles.filterCountText,
+            active &&
+              styles.filterCountTextActive,
+          ]}
+        >
+          {count}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -408,9 +490,11 @@ function FilterButton({
 function VaultItem({
   brief,
   index,
+  last,
 }: {
   brief: Brief;
   index: number;
+  last: boolean;
 }) {
   const priority =
     brief.priority?.toLowerCase() ||
@@ -419,18 +503,29 @@ function VaultItem({
   const isHigh = priority === 'high';
 
   return (
-    <View style={styles.item}>
-      {/* Top metadata */}
-      <View style={styles.itemTop}>
+    <View
+      style={[
+        styles.item,
+        last && styles.itemLast,
+      ]}
+    >
+      {/* Meta */}
+
+      <View style={styles.itemMetaRow}>
         <View style={styles.itemMeta}>
           <Text style={styles.itemIndex}>
-            {String(index + 1).padStart(2, '0')}
+            {String(index + 1).padStart(
+              2,
+              '0',
+            )}
           </Text>
 
-          <View style={styles.itemDivider} />
+          <View style={styles.metaDivider} />
 
           <Text style={styles.itemDate}>
-            {formatDate(brief.created_at)}
+            {formatDate(
+              brief.created_at,
+            )}
           </Text>
         </View>
 
@@ -455,7 +550,8 @@ function VaultItem({
         </View>
       </View>
 
-      {/* Main content */}
+      {/* Content */}
+
       <Text
         style={styles.itemTitle}
         numberOfLines={2}
@@ -470,54 +566,84 @@ function VaultItem({
         {brief.summary}
       </Text>
 
-      {/* Footer */}
-      <View style={styles.itemFooter}>
-        <View style={styles.stat}>
-          <Ionicons
-            name="list-outline"
-            size={12}
-            color={colors.dim}
-          />
+      {/* Stats */}
 
-          <Text style={styles.statText}>
-            {brief.key_points?.length ?? 0}{' '}
-            points
-          </Text>
-        </View>
+      <View style={styles.itemFooter}>
+        <ItemStat
+          icon="list-outline"
+          value={
+            brief.key_points?.length ?? 0
+          }
+          label="points"
+        />
 
         <View style={styles.statDivider} />
 
-        <View style={styles.stat}>
-          <Ionicons
-            name="arrow-forward-outline"
-            size={12}
-            color={colors.dim}
-          />
-
-          <Text style={styles.statText}>
-            {brief.actions?.length ?? 0}{' '}
-            actions
-          </Text>
-        </View>
+        <ItemStat
+          icon="arrow-forward-outline"
+          value={
+            brief.actions?.length ?? 0
+          }
+          label="actions"
+        />
 
         {brief.tags?.length ? (
           <>
-            <View style={styles.statDivider} />
+            <View
+              style={styles.statDivider}
+            />
 
-            <View style={styles.stat}>
-              <Ionicons
-                name="pricetag-outline"
-                size={12}
-                color={colors.dim}
-              />
-
-              <Text style={styles.statText}>
-                {brief.tags.length}
-              </Text>
-            </View>
+            <ItemStat
+              icon="pricetag-outline"
+              value={brief.tags.length}
+              label="tags"
+            />
           </>
         ) : null}
       </View>
+    </View>
+  );
+}
+
+function ItemStat({
+  icon,
+  value,
+  label,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  value: number;
+  label: string;
+}) {
+  return (
+    <View style={styles.itemStat}>
+      <Ionicons
+        name={icon}
+        size={12}
+        color={colors.dim}
+      />
+
+      <Text style={styles.itemStatText}>
+        {value} {label}
+      </Text>
+    </View>
+  );
+}
+
+function LoadingState() {
+  return (
+    <View style={styles.loading}>
+      <ActivityIndicator
+        size="small"
+        color={colors.accent}
+      />
+
+      <Text style={styles.loadingTitle}>
+        Loading archive
+      </Text>
+
+      <Text style={styles.loadingText}>
+        Reading your saved briefs.
+      </Text>
     </View>
   );
 }
@@ -531,7 +657,11 @@ function EmptyVault({
     <View style={styles.empty}>
       <View style={styles.emptyIcon}>
         <Ionicons
-          name="archive-outline"
+          name={
+            hasBriefs
+              ? 'search-outline'
+              : 'archive-outline'
+          }
           size={22}
           color={colors.accent}
         />
@@ -570,6 +700,10 @@ function formatDate(value: string) {
 }
 
 const styles = StyleSheet.create({
+  /* ============================================================
+     SCREEN
+  ============================================================ */
+
   page: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -577,7 +711,10 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: 120,
+  },
+
+  pressed: {
+    opacity: 0.62,
   },
 
   /* ============================================================
@@ -588,8 +725,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: 14,
-    marginBottom: 28,
+    gap: spacing.md,
+    marginBottom: 29,
   },
 
   headerCopy: {
@@ -612,6 +749,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: colors.accentSoft,
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: '900',
     letterSpacing: 1.5,
   },
@@ -633,15 +771,17 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-  archiveMark: {
+  headerIcon: {
     width: 40,
     height: 40,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor:
+      'rgba(45, 225, 214, 0.055)',
     borderWidth: 1,
-    borderColor: 'rgba(45, 225, 214, 0.12)',
+    borderColor:
+      'rgba(45, 225, 214, 0.11)',
   },
 
   /* ============================================================
@@ -666,23 +806,33 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
 
+  metricValueActive: {
+    color: colors.accentSoft,
+  },
+
   metricLabel: {
     color: colors.dim,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '800',
     letterSpacing: 0.9,
     marginTop: 4,
   },
 
-  metricAccent: {
-    width: 18,
+  metricLine: {
+    width: 17,
     height: 2,
     borderRadius: 999,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.border,
     marginTop: 7,
   },
 
-  overviewDivider: {
+  metricLineActive: {
+    width: 21,
+    backgroundColor: colors.accent,
+  },
+
+  metricDivider: {
     width: 1,
     height: 36,
     backgroundColor: colors.border,
@@ -708,11 +858,12 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.white,
     fontSize: 11,
+    lineHeight: 15,
     marginLeft: 9,
     paddingVertical: 10,
   },
 
-  clearSearch: {
+  searchClear: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingLeft: 8,
@@ -722,7 +873,11 @@ const styles = StyleSheet.create({
      FILTERS
   ============================================================ */
 
-  filters: {
+  filterArea: {
+    marginTop: 2,
+  },
+
+  filterContent: {
     gap: 7,
     paddingVertical: 12,
   },
@@ -730,8 +885,9 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 11,
-    paddingVertical: 8,
+    minHeight: 34,
+    paddingLeft: 11,
+    paddingRight: 6,
     borderRadius: radius.pill,
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -739,13 +895,16 @@ const styles = StyleSheet.create({
   },
 
   filterButtonActive: {
-    backgroundColor: 'rgba(45, 225, 214, 0.07)',
-    borderColor: 'rgba(45, 225, 214, 0.28)',
+    backgroundColor:
+      'rgba(45, 225, 214, 0.065)',
+    borderColor:
+      'rgba(45, 225, 214, 0.24)',
   },
 
   filterText: {
     color: colors.muted,
     fontSize: 9,
+    lineHeight: 11,
     fontWeight: '700',
   },
 
@@ -754,18 +913,29 @@ const styles = StyleSheet.create({
   },
 
   filterCount: {
-    color: colors.dim,
-    fontSize: 8,
-    fontWeight: '800',
-    marginLeft: 6,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 7,
+    backgroundColor: colors.surface2,
   },
 
   filterCountActive: {
-    color: colors.accent,
+    backgroundColor:
+      'rgba(45, 225, 214, 0.12)',
   },
 
-  pressed: {
-    opacity: 0.62,
+  filterCountText: {
+    color: colors.dim,
+    fontSize: 7,
+    lineHeight: 9,
+    fontWeight: '900',
+  },
+
+  filterCountTextActive: {
+    color: colors.accent,
   },
 
   /* ============================================================
@@ -776,13 +946,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-between',
-    marginTop: 11,
-    marginBottom: 11,
+    marginTop: 10,
+    marginBottom: 8,
   },
 
-  listLabel: {
+  listEyebrow: {
     color: colors.dim,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '900',
     letterSpacing: 1.3,
   },
@@ -790,16 +961,42 @@ const styles = StyleSheet.create({
   listTitle: {
     color: colors.white,
     fontSize: 16,
+    lineHeight: 19,
     fontWeight: '900',
     marginTop: 4,
   },
 
-  filterStatus: {
-    color: colors.accentSoft,
-    fontSize: 7,
+  archiveStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 2,
+  },
+
+  archiveDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: colors.accent,
+    marginRight: 5,
+  },
+
+  archiveStatusText: {
+    color: colors.dim,
+    fontSize: 6.5,
+    lineHeight: 9,
     fontWeight: '900',
     letterSpacing: 0.8,
-    paddingBottom: 3,
+  },
+
+  resetButton: {
+    paddingBottom: 2,
+  },
+
+  resetText: {
+    color: colors.accentSoft,
+    fontSize: 8,
+    lineHeight: 10,
+    fontWeight: '800',
   },
 
   /* ============================================================
@@ -807,16 +1004,21 @@ const styles = StyleSheet.create({
   ============================================================ */
 
   list: {
-    gap: 0,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
 
   item: {
-    paddingVertical: 17,
+    paddingVertical: 18,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
 
-  itemTop: {
+  itemLast: {
+    borderBottomWidth: 0,
+  },
+
+  itemMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -824,21 +1026,22 @@ const styles = StyleSheet.create({
   },
 
   itemMeta: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
 
   itemIndex: {
     color: colors.accent,
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: '900',
     letterSpacing: 0.7,
   },
 
-  itemDivider: {
+  metaDivider: {
     width: 1,
-    height: 11,
+    height: 10,
     backgroundColor: colors.border,
     marginHorizontal: 7,
   },
@@ -846,6 +1049,7 @@ const styles = StyleSheet.create({
   itemDate: {
     color: colors.dim,
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: '700',
   },
 
@@ -869,6 +1073,7 @@ const styles = StyleSheet.create({
   priorityText: {
     color: colors.muted,
     fontSize: 7,
+    lineHeight: 9,
     fontWeight: '900',
     letterSpacing: 0.8,
   },
@@ -882,7 +1087,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 23,
     fontWeight: '900',
-    letterSpacing: -0.3,
+    letterSpacing: -0.35,
     marginTop: 14,
   },
 
@@ -896,18 +1101,18 @@ const styles = StyleSheet.create({
   itemFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
     marginTop: 13,
   },
 
-  stat: {
+  itemStat: {
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  statText: {
+  itemStatText: {
     color: colors.dim,
     fontSize: 8,
+    lineHeight: 10,
     fontWeight: '700',
     marginLeft: 4,
   },
@@ -925,15 +1130,24 @@ const styles = StyleSheet.create({
   ============================================================ */
 
   loading: {
-    minHeight: 180,
+    minHeight: 200,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  loadingTitle: {
+    color: colors.white,
+    fontSize: 12,
+    lineHeight: 15,
+    fontWeight: '800',
+    marginTop: 11,
   },
 
   loadingText: {
     color: colors.dim,
     fontSize: 9,
-    marginTop: 9,
+    lineHeight: 13,
+    marginTop: 4,
   },
 
   /* ============================================================
@@ -944,7 +1158,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 28,
-    paddingTop: 85,
+    paddingTop: 82,
   },
 
   emptyIcon: {
@@ -953,15 +1167,18 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    backgroundColor:
+      'rgba(45, 225, 214, 0.055)',
     borderWidth: 1,
-    borderColor: 'rgba(45, 225, 214, 0.12)',
+    borderColor:
+      'rgba(45, 225, 214, 0.11)',
     marginBottom: 15,
   },
 
   emptyTitle: {
     color: colors.white,
     fontSize: 17,
+    lineHeight: 21,
     fontWeight: '900',
     textAlign: 'center',
   },
@@ -971,8 +1188,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 17,
     textAlign: 'center',
-    marginTop: 6,
     maxWidth: 285,
+    marginTop: 6,
   },
 
   bottomSpace: {
