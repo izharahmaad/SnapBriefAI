@@ -1,5 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import {
   Animated,
@@ -8,16 +10,15 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
 
-import { colors } from '@/theme';
+import { colors, radius } from '@/theme';
 
 export default function SplashScreen() {
-  const markScale = useRef(new Animated.Value(0.88)).current;
+  const markScale = useRef(new Animated.Value(0.86)).current;
   const markOpacity = useRef(new Animated.Value(0)).current;
   const contentOpacity = useRef(new Animated.Value(0)).current;
-  const lineProgress = useRef(new Animated.Value(0)).current;
+  const contentY = useRef(new Animated.Value(10)).current;
+  const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     let mounted = true;
@@ -26,8 +27,8 @@ export default function SplashScreen() {
       Animated.parallel([
         Animated.timing(markOpacity, {
           toValue: 1,
-          duration: 400,
-          easing: Easing.out(Easing.ease),
+          duration: 350,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
 
@@ -39,17 +40,26 @@ export default function SplashScreen() {
         }),
       ]),
 
-      Animated.timing(contentOpacity, {
-        toValue: 1,
-        duration: 350,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
+      Animated.parallel([
+        Animated.timing(contentOpacity, {
+          toValue: 1,
+          duration: 320,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
 
-      Animated.timing(lineProgress, {
+        Animated.timing(contentY, {
+          toValue: 0,
+          duration: 320,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]),
+
+      Animated.timing(progress, {
         toValue: 1,
         duration: 650,
-        easing: Easing.out(Easing.ease),
+        easing: Easing.out(Easing.cubic),
         useNativeDriver: false,
       }),
     ]).start();
@@ -85,15 +95,20 @@ export default function SplashScreen() {
       clearTimeout(timer);
     };
   }, [
-    markScale,
-    markOpacity,
     contentOpacity,
-    lineProgress,
+    contentY,
+    markOpacity,
+    markScale,
+    progress,
   ]);
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
+
+      {/* =========================================================
+          BRAND
+      ========================================================= */}
 
       <View style={styles.center}>
         <Animated.View
@@ -107,16 +122,21 @@ export default function SplashScreen() {
         >
           <Ionicons
             name="document-text-outline"
-            size={30}
+            size={29}
             color={colors.bg}
           />
         </Animated.View>
 
+        {/* =======================================================
+            IDENTITY
+        ======================================================= */}
+
         <Animated.View
           style={[
-            styles.content,
+            styles.identity,
             {
               opacity: contentOpacity,
+              transform: [{ translateY: contentY }],
             },
           ]}
         >
@@ -128,12 +148,16 @@ export default function SplashScreen() {
             Turn noise into clarity.
           </Text>
 
-          <View style={styles.lineTrack}>
+          {/* =====================================================
+              LOADING
+          ===================================================== */}
+
+          <View style={styles.progressTrack}>
             <Animated.View
               style={[
-                styles.lineActive,
+                styles.progressValue,
                 {
-                  width: lineProgress.interpolate({
+                  width: progress.interpolate({
                     inputRange: [0, 1],
                     outputRange: ['0%', '100%'],
                   }),
@@ -144,21 +168,37 @@ export default function SplashScreen() {
         </Animated.View>
       </View>
 
-      <Animated.Text
+      {/* =========================================================
+          FOOTER
+      ========================================================= */}
+
+      <Animated.View
         style={[
-          styles.bottomText,
+          styles.footer,
           {
             opacity: contentOpacity,
           },
         ]}
       >
-        AI NOTES · MADE USEFUL
-      </Animated.Text>
+        <Text style={styles.footerLabel}>
+          SNAPBRIEF AI
+        </Text>
+
+        <View style={styles.footerDot} />
+
+        <Text style={styles.footerText}>
+          AI NOTES, MADE USEFUL
+        </Text>
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  /* ============================================================
+     SCREEN
+  ============================================================ */
+
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -170,37 +210,48 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 28,
   },
+
+  /* ============================================================
+     BRAND MARK
+  ============================================================ */
 
   mark: {
     width: 64,
     height: 64,
-    borderRadius: 20,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
+
     backgroundColor: colors.accent,
+
     shadowColor: colors.accent,
     shadowOffset: {
       width: 0,
-      height: 7,
+      height: 6,
     },
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-    elevation: 7,
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+    elevation: 6,
+
     marginBottom: 18,
   },
 
-  content: {
+  /* ============================================================
+     IDENTITY
+  ============================================================ */
+
+  identity: {
     alignItems: 'center',
   },
 
   wordmark: {
     color: colors.white,
-    fontSize: 27,
-    lineHeight: 32,
+    fontSize: 29,
+    lineHeight: 34,
     fontWeight: '800',
-    letterSpacing: -0.7,
+    letterSpacing: -0.8,
   },
 
   tagline: {
@@ -208,31 +259,64 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     fontWeight: '500',
-    marginTop: 7,
+    marginTop: 6,
   },
 
-  lineTrack: {
-    width: 86,
+  /* ============================================================
+     PROGRESS
+  ============================================================ */
+
+  progressTrack: {
+    width: 84,
     height: 2,
     overflow: 'hidden',
-    borderRadius: 999,
+    borderRadius: radius.pill,
     backgroundColor: colors.border,
     marginTop: 20,
   },
 
-  lineActive: {
+  progressValue: {
     height: '100%',
-    borderRadius: 999,
+    borderRadius: radius.pill,
     backgroundColor: colors.accent,
   },
 
-  bottomText: {
+  /* ============================================================
+     FOOTER
+  ============================================================ */
+
+  footer: {
     position: 'absolute',
-    bottom: 30,
+    left: 0,
+    right: 0,
+    bottom: 29,
+
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  footerLabel: {
+    color: colors.accentSoft,
+    fontSize: 7,
+    lineHeight: 9,
+    fontWeight: '900',
+    letterSpacing: 1.15,
+  },
+
+  footerDot: {
+    width: 3,
+    height: 3,
+    borderRadius: radius.pill,
+    backgroundColor: colors.border,
+    marginHorizontal: 7,
+  },
+
+  footerText: {
     color: colors.dim,
     fontSize: 7,
     lineHeight: 9,
     fontWeight: '800',
-    letterSpacing: 1.2,
+    letterSpacing: 0.9,
   },
 });
