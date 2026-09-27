@@ -1,5 +1,7 @@
 export const examples = [
-  'Client call Friday 11am. Need to review landing page, budget, launch date and payment terms.',
-  'Gym idea: morning classes, monthly plan, app check-in, referral reward, launch next month.',
-  'Team needs a release before Friday. Fix onboarding crash, polish empty states and verify analytics.',
+  'Client call Friday at 11 AM. Review the landing page, confirm the final budget, lock the launch date, and agree on payment terms.',
+  
+  'Plan for the new gym: start with morning classes, offer a monthly membership, add app-based check-ins, and introduce a referral reward before next month’s launch.',
+  
+  'Release needs to ship before Friday. Fix the onboarding crash, clean up the empty states, verify analytics events, and complete a final QA pass.',
 ];
