@@ -1,14 +1,8 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { colors } from '@/theme';
 
 type TabDefinition = {
@@ -28,8 +22,8 @@ const TABS: TabDefinition[] = [
   {
     route: 'synthesis',
     label: 'Synthesis',
-    icon: 'sparkles-outline',
-    activeIcon: 'sparkles',
+    icon: 'layers-outline',
+    activeIcon: 'layers',
   },
   {
     route: 'vault',
@@ -65,32 +59,19 @@ function CustomTabBar({
       ]}
     >
       <View style={styles.shadow}>
-        <BlurView
-          intensity={70}
-          tint="dark"
-          style={styles.bar}
-        >
-          <View
-            pointerEvents="none"
-            style={styles.tint}
-          />
+        <BlurView intensity={70} tint="dark" style={styles.bar}>
+          <View pointerEvents="none" style={styles.tint} />
 
           <View style={styles.content}>
             {TABS.map((tab) => {
               const routeIndex = state.routes.findIndex(
-                (route: { name: string }) =>
-                  route.name === tab.route,
+                (route: { name: string }) => route.name === tab.route
               );
 
-              if (routeIndex === -1) {
-                return null;
-              }
+              if (routeIndex === -1) return null;
 
               const route = state.routes[routeIndex];
-
-              const focused =
-                state.routes[state.index]?.name ===
-                tab.route;
+              const focused = state.routes[state.index]?.name === tab.route;
 
               const handlePress = () => {
                 const event = navigation.emit({
@@ -99,10 +80,7 @@ function CustomTabBar({
                   canPreventDefault: true,
                 });
 
-                if (
-                  !focused &&
-                  !event.defaultPrevented
-                ) {
+                if (!focused && !event.defaultPrevented) {
                   navigation.navigate(route.name);
                 }
               };
@@ -121,9 +99,7 @@ function CustomTabBar({
                   onLongPress={handleLongPress}
                   accessibilityRole="button"
                   accessibilityLabel={`${tab.label} tab`}
-                  accessibilityState={{
-                    selected: focused,
-                  }}
+                  accessibilityState={{ selected: focused }}
                   style={({ pressed }) => [
                     styles.tab,
                     pressed && styles.tabPressed,
@@ -131,17 +107,9 @@ function CustomTabBar({
                 >
                   <View style={styles.iconArea}>
                     <Ionicons
-                      name={
-                        focused
-                          ? tab.activeIcon
-                          : tab.icon
-                      }
+                      name={focused ? tab.activeIcon : tab.icon}
                       size={17}
-                      color={
-                        focused
-                          ? colors.accent
-                          : colors.dim
-                      }
+                      color={focused ? colors.accent : colors.dim}
                     />
                   </View>
 
@@ -157,8 +125,7 @@ function CustomTabBar({
                   <View
                     style={[
                       styles.indicator,
-                      !focused &&
-                        styles.indicatorHidden,
+                      !focused && styles.indicatorHidden,
                     ]}
                   />
                 </Pressable>
@@ -189,37 +156,27 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="home"
-        options={{
-          title: 'Briefs',
-        }}
+        options={{ title: 'Briefs' }}
       />
 
       <Tabs.Screen
         name="synthesis"
-        options={{
-          title: 'Synthesis',
-        }}
+        options={{ title: 'Synthesis' }}
       />
 
       <Tabs.Screen
         name="vault"
-        options={{
-          title: 'Vault',
-        }}
+        options={{ title: 'Vault' }}
       />
 
       <Tabs.Screen
         name="settings"
-        options={{
-          title: 'Settings',
-        }}
+        options={{ title: 'Settings' }}
       />
 
       <Tabs.Screen
         name="history"
-        options={{
-          href: null,
-        }}
+        options={{ href: null }}
       />
     </Tabs>
   );
@@ -237,7 +194,6 @@ const styles = StyleSheet.create({
   shadow: {
     width: '100%',
     maxWidth: 440,
-
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
@@ -245,45 +201,36 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.24,
     shadowRadius: 13,
-
     elevation: 8,
   },
 
   bar: {
     width: '100%',
     height: 56,
-
     overflow: 'hidden',
-
     borderRadius: 999,
-
     borderWidth: 1,
-    borderColor: 'rgba(146, 255, 247, 0.09)',
-
-    backgroundColor: 'rgba(11, 24, 27, 0.78)',
+    borderColor: 'rgba(146,255,247,0.09)',
+    backgroundColor: 'rgba(11,24,27,0.78)',
   },
 
   tint: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(6, 17, 19, 0.10)',
+    backgroundColor: 'rgba(6,17,19,0.10)',
   },
 
   content: {
     flex: 1,
-
     flexDirection: 'row',
     alignItems: 'center',
-
     paddingHorizontal: 4,
   },
 
   tab: {
     flex: 1,
     height: 48,
-
     alignItems: 'center',
     justifyContent: 'center',
-
     borderRadius: 999,
   },
 
@@ -293,20 +240,16 @@ const styles = StyleSheet.create({
 
   iconArea: {
     height: 20,
-
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   label: {
     color: colors.dim,
-
     fontSize: 7,
     lineHeight: 9,
-
     fontWeight: '700',
     letterSpacing: 0.15,
-
     marginTop: 2,
   },
 
@@ -318,11 +261,8 @@ const styles = StyleSheet.create({
   indicator: {
     width: 3,
     height: 3,
-
     borderRadius: 999,
-
     backgroundColor: colors.accent,
-
     marginTop: 3,
   },
 
