@@ -29,14 +29,19 @@ export async function generateBrief(
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      const message =
-        typeof data?.detail === 'string'
-          ? data.detail
-          : data?.detail
-            ? JSON.stringify(data.detail)
-            : 'Unable to generate your brief.';
+      let message = 'Unable to generate your brief.';
+
+      if (typeof data?.detail === 'string') {
+        message = data.detail;
+      } else if (data?.detail) {
+        message = JSON.stringify(data.detail);
+      }
 
       throw new Error(message);
+    }
+
+    if (!data || typeof data !== 'object') {
+      throw new Error('SnapBrief returned an invalid response.');
     }
 
     return data as GenerateResponse;
