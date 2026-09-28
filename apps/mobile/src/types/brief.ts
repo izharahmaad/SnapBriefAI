@@ -17,9 +17,6 @@ export type Brief = {
   created_at: string;
   updated_at?: string;
 
-  /**
-   * Workspace controls
-   */
   is_pinned?: boolean;
   is_favorite?: boolean;
   is_archived?: boolean;
