@@ -15,12 +15,12 @@ export type Brief = {
   due_date?: string | null;
 
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 
   /**
-   * Product-level workspace controls
+   * Workspace controls
    */
-  is_pinned: boolean;
-  is_favorite: boolean;
-  is_archived: boolean;
+  is_pinned?: boolean;
+  is_favorite?: boolean;
+  is_archived?: boolean;
 };
