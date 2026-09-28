@@ -66,10 +66,6 @@ const SAMPLE_BRIEF: Brief = {
   priority: 'high',
   due_date: undefined,
   created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  is_pinned: false,
-  is_favorite: false,
-  is_archived: false,
 };
 
 export default function HomeScreen() {
@@ -77,6 +73,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   const compact = width < 380;
+
   const horizontalPadding = compact ? 16 : 20;
 
   // Taller hero so the artwork has stronger visual presence.
@@ -92,7 +89,10 @@ export default function HomeScreen() {
       return 0;
     }
 
-    return Math.min(text.length / CHARACTER_LIMIT, 1);
+    return Math.min(
+      text.length / CHARACTER_LIMIT,
+      1,
+    );
   }, [text.length]);
 
   async function createBrief() {
@@ -108,18 +108,10 @@ export default function HomeScreen() {
     try {
       const output = await generateBrief(trimmed);
 
-      const now = new Date().toISOString();
-
       const nextBrief: Brief = {
         ...output,
         id: `${Date.now()}`,
-        created_at: now,
-        updated_at: now,
-
-        // Workspace defaults.
-        is_pinned: false,
-        is_favorite: false,
-        is_archived: false,
+        created_at: new Date().toISOString(),
       };
 
       setBrief(nextBrief);
@@ -136,11 +128,9 @@ export default function HomeScreen() {
   }
 
   function loadExample() {
-    if (!examples.length) {
-      return;
-    }
-
-    const index = Math.floor(Math.random() * examples.length);
+    const index = Math.floor(
+      Math.random() * examples.length,
+    );
 
     setText(examples[index] ?? '');
     setBrief(null);
@@ -275,7 +265,8 @@ export default function HomeScreen() {
             <Text
               style={[
                 styles.heroTitle,
-                compact && styles.heroTitleCompact,
+                compact &&
+                  styles.heroTitleCompact,
               ]}
             >
               Turn scattered thoughts
@@ -325,7 +316,8 @@ export default function HomeScreen() {
         style={[
           styles.body,
           {
-            paddingHorizontal: horizontalPadding,
+            paddingHorizontal:
+              horizontalPadding,
           },
         ]}
       >
@@ -385,7 +377,9 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        <GlassCard style={styles.editorCard}>
+        <GlassCard
+          style={styles.editorCard}
+        >
           <View style={styles.editorTop}>
             <View style={styles.inputIdentity}>
               <View style={styles.inputIcon}>
@@ -450,21 +444,28 @@ export default function HomeScreen() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.quickContent}
+              contentContainerStyle={
+                styles.quickContent
+              }
             >
               {QUICK_STARTS.map((item) => {
-                const active = text === item.text;
+                const active =
+                  text === item.text;
 
                 return (
                   <Pressable
                     key={item.label}
                     onPress={() =>
-                      chooseQuickStart(item.text)
+                      chooseQuickStart(
+                        item.text,
+                      )
                     }
                     style={({ pressed }) => [
                       styles.quickChip,
-                      active && styles.quickChipActive,
-                      pressed && styles.quickChipPressed,
+                      active &&
+                        styles.quickChipActive,
+                      pressed &&
+                        styles.quickChipPressed,
                     ]}
                   >
                     <Ionicons
@@ -496,7 +497,9 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          <View style={styles.inputProgressTrack}>
+          <View
+            style={styles.inputProgressTrack}
+          >
             <View
               style={[
                 styles.inputProgressValue,
@@ -514,7 +517,9 @@ export default function HomeScreen() {
 
         <Pressable
           onPress={createBrief}
-          disabled={loading || !text.trim()}
+          disabled={
+            loading || !text.trim()
+          }
           style={({ pressed }) => [
             styles.primaryButton,
             pressed &&
@@ -606,7 +611,11 @@ export default function HomeScreen() {
             <View style={styles.outputStatus}>
               <View style={styles.outputDot} />
 
-              <Text style={styles.outputStatusText}>
+              <Text
+                style={
+                  styles.outputStatusText
+                }
+              >
                 {brief ? 'LIVE' : 'PREVIEW'}
               </Text>
             </View>
@@ -623,7 +632,11 @@ export default function HomeScreen() {
                   color={colors.dim}
                 />
 
-                <Text style={styles.disclaimerText}>
+                <Text
+                  style={
+                    styles.disclaimerText
+                  }
+                >
                   AI-generated output. Review
                   important dates, numbers,
                   names and commitments before
@@ -644,7 +657,9 @@ export default function HomeScreen() {
                   color={colors.accent}
                 />
 
-                <Text style={styles.newBriefText}>
+                <Text
+                  style={styles.newBriefText}
+                >
                   Start another brief
                 </Text>
               </Pressable>
@@ -696,7 +711,8 @@ function Metric({
       <Text
         style={[
           styles.metricValue,
-          active && styles.metricValueActive,
+          active &&
+            styles.metricValueActive,
         ]}
       >
         {value}
@@ -709,7 +725,8 @@ function Metric({
       <View
         style={[
           styles.metricLine,
-          active && styles.metricLineActive,
+          active &&
+            styles.metricLineActive,
         ]}
       />
     </View>
@@ -724,19 +741,31 @@ function PreviewBrief() {
       <View style={styles.previewBody}>
         <View style={styles.previewHeader}>
           <View>
-            <Text style={styles.previewEyebrow}>
+            <Text
+              style={styles.previewEyebrow}
+            >
               SAMPLE OUTPUT
             </Text>
 
-            <Text style={styles.previewLabel}>
+            <Text
+              style={styles.previewLabel}
+            >
               Generated brief
             </Text>
           </View>
 
           <View style={styles.previewPriority}>
-            <View style={styles.previewPriorityDot} />
+            <View
+              style={
+                styles.previewPriorityDot
+              }
+            />
 
-            <Text style={styles.previewPriorityText}>
+            <Text
+              style={
+                styles.previewPriorityText
+              }
+            >
               HIGH
             </Text>
           </View>
@@ -750,9 +779,15 @@ function PreviewBrief() {
           {SAMPLE_BRIEF.summary}
         </Text>
 
-        <View style={styles.previewDivider} />
+        <View
+          style={styles.previewDivider}
+        />
 
-        <Text style={styles.previewSectionLabel}>
+        <Text
+          style={
+            styles.previewSectionLabel
+          }
+        >
           KEY POINTS
         </Text>
 
@@ -762,9 +797,13 @@ function PreviewBrief() {
               key={`${point}-${index}`}
               style={styles.previewRow}
             >
-              <View style={styles.previewBullet} />
+              <View
+                style={styles.previewBullet}
+              />
 
-              <Text style={styles.previewText}>
+              <Text
+                style={styles.previewText}
+              >
                 {point}
               </Text>
             </View>
@@ -787,7 +826,11 @@ function PreviewBrief() {
               key={`${action}-${index}`}
               style={styles.previewAction}
             >
-              <View style={styles.previewActionIcon}>
+              <View
+                style={
+                  styles.previewActionIcon
+                }
+              >
                 <Ionicons
                   name="arrow-forward"
                   size={9}
@@ -795,7 +838,9 @@ function PreviewBrief() {
                 />
               </View>
 
-              <Text style={styles.previewText}>
+              <Text
+                style={styles.previewText}
+              >
                 {action}
               </Text>
             </View>
