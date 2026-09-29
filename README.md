@@ -20,7 +20,7 @@ SnapBrief is built around one simple workflow:
        ↓
     Review
        ↓
-    Act
+      Act
 
 Give SnapBrief something unstructured:
 
