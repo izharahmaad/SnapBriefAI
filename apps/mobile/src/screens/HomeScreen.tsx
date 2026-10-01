@@ -1569,7 +1569,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginLeft: 5,
   },
-
   bottomSpace: {
     height: 20,
   },
