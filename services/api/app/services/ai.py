@@ -59,7 +59,6 @@ def _clean_json(text: str) -> str:
 
     return cleaned.strip()
 
-
 async def generate_brief(
     payload: BriefRequest,
     settings: Settings,
