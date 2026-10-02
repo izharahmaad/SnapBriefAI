@@ -1,6 +1,5 @@
 import { PropsWithChildren } from 'react';
 import {
-  StyleProp,
   StyleSheet,
   View,
   ViewStyle,
@@ -9,7 +8,7 @@ import {
 import { colors, radius } from '@/theme';
 
 type GlassCardProps = PropsWithChildren<{
-  style?: StyleProp<ViewStyle>;
+  style?: ViewStyle;
 }>;
 
 export function GlassCard({
@@ -29,16 +28,16 @@ const styles = StyleSheet.create({
 
     borderWidth: 1,
     borderColor: colors.border,
+
     borderRadius: radius.xl,
 
     shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 4,
     },
-    shadowOpacity: 0.14,
-    shadowRadius: 14,
-
-    elevation: 3,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 2,
   },
 });
