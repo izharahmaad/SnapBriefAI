@@ -6,7 +6,6 @@ from google.genai import types
 from app.core.config import Settings
 from app.schemas.brief import BriefRequest, BriefResponse
 
-
 SYSTEM_PROMPT = """
 You are SnapBrief AI, a concise information-structuring assistant.
 
