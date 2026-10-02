@@ -40,6 +40,7 @@ Rules:
 - Return JSON only.
 """
 
+
 def _clean_json(text: str) -> str:
     """
     Remove accidental Markdown code fences if the model
