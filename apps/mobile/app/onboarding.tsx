@@ -1,8 +1,4 @@
-import React, {
-  useRef,
-  useState,
-} from 'react';
-
+import React, { useRef, useState } from 'react';
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -14,25 +10,12 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-
-import {
-  SafeAreaView,
-} from 'react-native-safe-area-context';
-
-import {
-  Ionicons,
-} from '@expo/vector-icons';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
-import {
-  router,
-} from 'expo-router';
-
-import {
-  colors,
-  radius,
-} from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 
 type Slide = {
   eyebrow: string;
@@ -40,38 +23,28 @@ type Slide = {
   description: string;
 };
 
-const ONBOARDING_KEY =
-  'snapbrief_onboarding_complete';
-
 const SLIDES: Slide[] = [
   {
     eyebrow: 'WELCOME TO SNAPBRIEF',
-    title:
-      'Turn scattered thoughts\ninto clear direction.',
+    title: 'Turn scattered thoughts\ninto clear direction.',
     description:
       'Capture notes, ideas, meetings, or transcripts. SnapBrief turns them into structured briefs you can actually use.',
   },
   {
     eyebrow: 'SMART STRUCTURE',
-    title:
-      'Less organizing.\nMore clarity.',
+    title: 'Less organizing.\nMore clarity.',
     description:
       'SnapBrief finds the important details and turns raw information into summaries, priorities, tags, and next actions.',
   },
   {
     eyebrow: 'READY TO CREATE',
-    title:
-      'Capture it.\nStructure it.\nMove forward.',
+    title: 'Capture it.\nStructure it.\nMove forward.',
     description:
       'Create a clear brief in seconds and keep your important thoughts ready to revisit whenever you need them.',
   },
 ];
 
-function BrandMark({
-  size = 38,
-}: {
-  size?: number;
-}) {
+function BrandMark({ size = 38 }: { size?: number }) {
   return (
     <View
       style={[
@@ -92,24 +65,12 @@ function BrandMark({
   );
 }
 
-function VisualOne({
-  width,
-}: {
-  width: number;
-}) {
-  const cardWidth = Math.min(
-    width - 42,
-    330,
-  );
+function VisualOne({ width }: { width: number }) {
+  const cardWidth = Math.min(width - 42, 330);
 
   return (
     <View style={styles.visual}>
-      <View
-        style={[
-          styles.flowCard,
-          { width: cardWidth },
-        ]}
-      >
+      <View style={[styles.flowCard, { width: cardWidth }]}>
         <View style={styles.cardTop}>
           <View style={styles.iconSmall}>
             <Ionicons
@@ -119,36 +80,15 @@ function VisualOne({
             />
           </View>
 
-          <Text style={styles.cardLabel}>
-            RAW INPUT
-          </Text>
+          <Text style={styles.cardLabel}>RAW INPUT</Text>
         </View>
 
-        <Text style={styles.rawTitle}>
-          Friday client meeting
-        </Text>
+        <Text style={styles.rawTitle}>Friday client meeting</Text>
 
         <View style={styles.rawLines}>
-          <View
-            style={[
-              styles.rawLine,
-              { width: '92%' },
-            ]}
-          />
-
-          <View
-            style={[
-              styles.rawLine,
-              { width: '75%' },
-            ]}
-          />
-
-          <View
-            style={[
-              styles.rawLine,
-              { width: '84%' },
-            ]}
-          />
+          <View style={[styles.rawLine, { width: '92%' }]} />
+          <View style={[styles.rawLine, { width: '75%' }]} />
+          <View style={[styles.rawLine, { width: '84%' }]} />
         </View>
       </View>
 
@@ -166,13 +106,7 @@ function VisualOne({
         <View style={styles.transformLine} />
       </View>
 
-      <View
-        style={[
-          styles.flowCard,
-          styles.resultCard,
-          { width: cardWidth },
-        ]}
-      >
+      <View style={[styles.flowCard, styles.resultCard, { width: cardWidth }]}>
         <View style={styles.cardTop}>
           <View style={styles.iconSmallActive}>
             <Ionicons
@@ -182,14 +116,10 @@ function VisualOne({
             />
           </View>
 
-          <Text style={styles.cardLabelActive}>
-            STRUCTURED BRIEF
-          </Text>
+          <Text style={styles.cardLabelActive}>STRUCTURED BRIEF</Text>
         </View>
 
-        <Text style={styles.resultTitle}>
-          Website redesign
-        </Text>
+        <Text style={styles.resultTitle}>Website redesign</Text>
 
         <View style={styles.resultMeta}>
           <Ionicons
@@ -219,30 +149,15 @@ function VisualOne({
   );
 }
 
-function VisualTwo({
-  width,
-}: {
-  width: number;
-}) {
-  const cardWidth = Math.min(
-    width - 42,
-    335,
-  );
+function VisualTwo({ width }: { width: number }) {
+  const cardWidth = Math.min(width - 42, 335);
 
   return (
     <View style={styles.visual}>
-      <View
-        style={[
-          styles.structureCard,
-          { width: cardWidth },
-        ]}
-      >
+      <View style={[styles.structureCard, { width: cardWidth }]}>
         <View style={styles.structureHeader}>
           <View>
-            <Text style={styles.cardLabelActive}>
-              AI STRUCTURE
-            </Text>
-
+            <Text style={styles.cardLabelActive}>AI STRUCTURE</Text>
             <Text style={styles.structureTitle}>
               One input. Clear output.
             </Text>
@@ -313,13 +228,8 @@ function StructureRow({
       </View>
 
       <View style={styles.rowCopy}>
-        <Text style={styles.rowTitle}>
-          {title}
-        </Text>
-
-        <Text style={styles.rowText}>
-          {text}
-        </Text>
+        <Text style={styles.rowTitle}>{title}</Text>
+        <Text style={styles.rowText}>{text}</Text>
       </View>
 
       <Ionicons
@@ -331,29 +241,15 @@ function StructureRow({
   );
 }
 
-function VisualThree({
-  width,
-}: {
-  width: number;
-}) {
-  const cardWidth = Math.min(
-    width - 42,
-    340,
-  );
+function VisualThree({ width }: { width: number }) {
+  const cardWidth = Math.min(width - 42, 340);
 
   return (
     <View style={styles.visual}>
-      <View
-        style={[
-          styles.readyCard,
-          { width: cardWidth },
-        ]}
-      >
+      <View style={[styles.readyCard, { width: cardWidth }]}>
         <View style={styles.readyHeader}>
           <View>
-            <Text style={styles.cardLabelActive}>
-              YOUR BRIEF
-            </Text>
+            <Text style={styles.cardLabelActive}>YOUR BRIEF</Text>
 
             <Text style={styles.readyTitle}>
               Ready to act
@@ -370,20 +266,9 @@ function VisualThree({
         </View>
 
         <View style={styles.stats}>
-          <Stat
-            value="04"
-            label="POINTS"
-          />
-
-          <Stat
-            value="03"
-            label="ACTIONS"
-          />
-
-          <Stat
-            value="01"
-            label="PRIORITY"
-          />
+          <Stat value="04" label="POINTS" />
+          <Stat value="03" label="ACTIONS" />
+          <Stat value="01" label="PRIORITY" />
         </View>
 
         <View style={styles.actionRow}>
@@ -435,13 +320,8 @@ function Stat({
 }) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue}>
-        {value}
-      </Text>
-
-      <Text style={styles.statLabel}>
-        {label}
-      </Text>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
@@ -465,88 +345,66 @@ function SlideVisual({
 }
 
 export default function OnboardingScreen() {
-  const {
-    width,
-    height,
-  } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
-  const isSmallPhone =
-    height < 700;
+  const isSmallPhone = height < 700;
+  const isLargeScreen = width >= 600;
 
-  const isLargeScreen =
-    width >= 600;
+  const contentWidth = Math.min(width - 32, 520);
 
-  const contentWidth = Math.min(
-    width - 32,
-    520,
-  );
+  const visualHeight = isSmallPhone
+    ? 245
+    : isLargeScreen
+      ? 350
+      : 285;
 
-  const visualHeight =
-    isSmallPhone
-      ? 245
-      : isLargeScreen
-        ? 350
-        : 285;
+  const titleSize = isLargeScreen
+    ? 42
+    : isSmallPhone
+      ? 29
+      : 34;
 
-  const titleSize =
-    isLargeScreen
-      ? 42
-      : isSmallPhone
-        ? 29
-        : 34;
+  const titleLineHeight = isLargeScreen
+    ? 48
+    : isSmallPhone
+      ? 34
+      : 40;
 
-  const titleLineHeight =
-    isLargeScreen
-      ? 48
-      : isSmallPhone
-        ? 34
-        : 40;
+  const descriptionSize = isLargeScreen ? 16 : 14;
 
-  const descriptionSize =
-    isLargeScreen
-      ? 16
-      : 14;
+  const scrollRef = useRef<ScrollView>(null);
 
-  const scrollRef =
-    useRef<ScrollView>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [finishing, setFinishing] = useState(false);
 
-  const [currentIndex, setCurrentIndex] =
-    useState(0);
-
-  const [finishing, setFinishing] =
-    useState(false);
-
-  const finishOnboarding =
-    async () => {
-      if (finishing) {
-        return;
-      }
-
-      setFinishing(true);
-
-      try {
-        await AsyncStorage.setItem(
-          ONBOARDING_KEY,
-          'true',
-        );
-
-        router.replace('/(tabs)');
-      } catch {
-        setFinishing(false);
-      }
-    };
-
-  const goNext = () => {
-    if (
-      currentIndex ===
-      SLIDES.length - 1
-    ) {
-      void finishOnboarding();
+  const finishOnboarding = async () => {
+    if (finishing) {
       return;
     }
 
-    const nextIndex =
-      currentIndex + 1;
+    setFinishing(true);
+
+    try {
+      await AsyncStorage.setItem(
+        'snapbrief_onboarding_complete',
+        'true',
+      );
+
+      requestAnimationFrame(() => {
+        router.replace('/(tabs)');
+      });
+    } catch {
+      setFinishing(false);
+    }
+  };
+
+  const goNext = () => {
+    if (currentIndex === SLIDES.length - 1) {
+      finishOnboarding();
+      return;
+    }
+
+    const nextIndex = currentIndex + 1;
 
     scrollRef.current?.scrollTo({
       x: nextIndex * width,
@@ -558,8 +416,7 @@ export default function OnboardingScreen() {
     event: NativeSyntheticEvent<NativeScrollEvent>,
   ) => {
     const nextIndex = Math.round(
-      event.nativeEvent.contentOffset.x /
-        width,
+      event.nativeEvent.contentOffset.x / width,
     );
 
     if (
@@ -570,11 +427,11 @@ export default function OnboardingScreen() {
     }
   };
 
+  const slide = SLIDES[currentIndex];
+
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-      />
+      <StatusBar barStyle="light-content" />
 
       <SafeAreaView
         style={styles.safeArea}
@@ -586,59 +443,40 @@ export default function OnboardingScreen() {
               styles.topBar,
               {
                 width: contentWidth,
-                height: isSmallPhone
-                  ? 60
-                  : 68,
+                height: isSmallPhone ? 60 : 68,
               },
             ]}
           >
             <View style={styles.brand}>
-              <BrandMark
-                size={
-                  isSmallPhone
-                    ? 36
-                    : 40
-                }
-              />
+              <BrandMark size={isSmallPhone ? 36 : 40} />
 
               <View>
                 <Text
                   style={[
                     styles.brandName,
-                    isLargeScreen &&
-                      styles.brandNameLarge,
+                    isLargeScreen && styles.brandNameLarge,
                   ]}
                 >
                   SnapBrief
                 </Text>
 
-                <Text
-                  style={styles.brandCaption}
-                >
+                <Text style={styles.brandCaption}>
                   AI NOTES, MADE USEFUL
                 </Text>
               </View>
             </View>
 
-            {currentIndex <
-              SLIDES.length - 1 && (
+            {currentIndex < SLIDES.length - 1 && (
               <Pressable
-                onPress={() =>
-                  void finishOnboarding()
-                }
+                onPress={finishOnboarding}
                 disabled={finishing}
                 hitSlop={12}
-                accessibilityRole="button"
-                accessibilityLabel="Skip onboarding"
                 style={({ pressed }) => [
                   styles.skipButton,
-                  pressed &&
-                    styles.skipPressed,
+                  pressed && styles.skipPressed,
                 ]}
               >
-                <Text
-                  style={styles.skipText}
-                >
+                <Text style={styles.skipText}>
                   Skip
                 </Text>
               </Pressable>
@@ -646,9 +484,7 @@ export default function OnboardingScreen() {
           </View>
         </View>
 
-        <View
-          style={styles.contentArea}
-        >
+        <View style={styles.contentArea}>
           <ScrollView
             ref={scrollRef}
             horizontal
@@ -656,99 +492,75 @@ export default function OnboardingScreen() {
             bounces={false}
             showsHorizontalScrollIndicator={false}
             scrollEventThrottle={16}
-            onMomentumScrollEnd={
-              handleScrollEnd
-            }
+            onMomentumScrollEnd={handleScrollEnd}
             decelerationRate="fast"
-            accessible={false}
           >
-            {SLIDES.map(
-              (item, index) => (
+            {SLIDES.map((item, index) => (
+              <View
+                key={item.eyebrow}
+                style={[
+                  styles.slide,
+                  {
+                    width,
+                  },
+                ]}
+              >
                 <View
-                  key={item.eyebrow}
                   style={[
-                    styles.slide,
-                    { width },
+                    styles.visualWrap,
+                    {
+                      height: visualHeight,
+                    },
                   ]}
                 >
-                  <View
-                    style={[
-                      styles.visualWrap,
-                      {
-                        height:
-                          visualHeight,
-                      },
-                    ]}
-                  >
-                    <SlideVisual
-                      index={index}
-                      width={
-                        contentWidth
-                      }
-                    />
-                  </View>
-
-                  <View
-                    style={[
-                      styles.copy,
-                      {
-                        width:
-                          contentWidth,
-                      },
-                    ]}
-                  >
-                    <View
-                      style={
-                        styles.eyebrowRow
-                      }
-                    >
-                      <View
-                        style={
-                          styles.eyebrowDot
-                        }
-                      />
-
-                      <Text
-                        style={
-                          styles.eyebrow
-                        }
-                      >
-                        {item.eyebrow}
-                      </Text>
-                    </View>
-
-                    <Text
-                      style={[
-                        styles.title,
-                        {
-                          fontSize:
-                            titleSize,
-                          lineHeight:
-                            titleLineHeight,
-                        },
-                      ]}
-                    >
-                      {item.title}
-                    </Text>
-
-                    <Text
-                      style={[
-                        styles.description,
-                        {
-                          fontSize:
-                            descriptionSize,
-                          lineHeight:
-                            descriptionSize *
-                            1.55,
-                        },
-                      ]}
-                    >
-                      {item.description}
-                    </Text>
-                  </View>
+                  <SlideVisual
+                    index={index}
+                    width={contentWidth}
+                  />
                 </View>
-              ),
-            )}
+
+                <View
+                  style={[
+                    styles.copy,
+                    {
+                      width: contentWidth,
+                    },
+                  ]}
+                >
+                  <View style={styles.eyebrowRow}>
+                    <View style={styles.eyebrowDot} />
+
+                    <Text style={styles.eyebrow}>
+                      {item.eyebrow}
+                    </Text>
+                  </View>
+
+                  <Text
+                    style={[
+                      styles.title,
+                      {
+                        fontSize: titleSize,
+                        lineHeight: titleLineHeight,
+                      },
+                    ]}
+                  >
+                    {item.title}
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.description,
+                      {
+                        fontSize: descriptionSize,
+                        lineHeight: descriptionSize * 1.55,
+                      },
+                    ]}
+                  >
+                    {item.description}
+                  </Text>
+                </View>
+              </View>
+            ))}
           </ScrollView>
         </View>
 
@@ -757,86 +569,50 @@ export default function OnboardingScreen() {
             styles.bottom,
             {
               width: contentWidth,
-              paddingBottom:
-                isSmallPhone
-                  ? 7
-                  : 12,
+              paddingBottom: isSmallPhone ? 7 : 12,
             },
           ]}
         >
-          <View
-            style={styles.progressRow}
-          >
-            <View
-              style={styles.progressTrack}
-            >
+          <View style={styles.progressRow}>
+            <View style={styles.progressTrack}>
               <View
                 style={[
                   styles.progressActive,
                   {
-                    width: `${
-                      ((currentIndex + 1) /
-                        SLIDES.length) *
-                      100
-                    }%`,
+                    width: `${((currentIndex + 1) / SLIDES.length) * 100}%`,
                   },
                 ]}
               />
             </View>
 
-            <Text
-              style={styles.progressText}
-            >
-              {String(
-                currentIndex + 1,
-              ).padStart(2, '0')}{' '}
-              /{' '}
-              {String(
-                SLIDES.length,
-              ).padStart(2, '0')}
+            <Text style={styles.progressText}>
+              {String(currentIndex + 1).padStart(2, '0')} /{' '}
+              {String(SLIDES.length).padStart(2, '0')}
             </Text>
           </View>
 
           <Pressable
             onPress={goNext}
             disabled={finishing}
-            accessibilityRole="button"
-            accessibilityLabel={
-              currentIndex ===
-              SLIDES.length - 1
-                ? 'Start creating'
-                : 'Continue onboarding'
-            }
             style={({ pressed }) => [
               styles.primaryButton,
               {
-                height: isSmallPhone
-                  ? 52
-                  : 56,
+                height: isSmallPhone ? 52 : 56,
               },
-              pressed &&
-                styles.buttonPressed,
-              finishing &&
-                styles.buttonDisabled,
+              pressed && styles.buttonPressed,
+              finishing && styles.buttonDisabled,
             ]}
           >
-            <Text
-              style={
-                styles.primaryButtonText
-              }
-            >
+            <Text style={styles.primaryButtonText}>
               {finishing
                 ? 'Opening…'
-                : currentIndex ===
-                    SLIDES.length - 1
+                : currentIndex === SLIDES.length - 1
                   ? 'Start creating'
                   : 'Continue'}
             </Text>
 
             {!finishing && (
-              <View
-                style={styles.buttonIcon}
-              >
+              <View style={styles.buttonIcon}>
                 <Ionicons
                   name="arrow-forward"
                   size={17}
@@ -846,12 +622,9 @@ export default function OnboardingScreen() {
             )}
           </Pressable>
 
-          <Text
-            style={styles.footerText}
-          >
-            Your notes are only sent for
-            processing when you choose to
-            generate a brief.
+          <Text style={styles.footerText}>
+            Your notes stay yours. SnapBrief only structures
+            what you choose to provide.
           </Text>
         </View>
       </SafeAreaView>
@@ -959,8 +732,7 @@ const styles = StyleSheet.create({
 
   resultCard: {
     backgroundColor: colors.surface2,
-    borderColor:
-      'rgba(45, 225, 214, 0.18)',
+    borderColor: 'rgba(45, 225, 214, 0.18)',
   },
 
   cardTop: {
@@ -975,8 +747,7 @@ const styles = StyleSheet.create({
     borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:
-      'rgba(45, 225, 214, 0.07)',
+    backgroundColor: 'rgba(45, 225, 214, 0.07)',
     marginRight: 8,
   },
 
@@ -1121,8 +892,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:
-      'rgba(45, 225, 214, 0.055)',
+    backgroundColor: 'rgba(45, 225, 214, 0.055)',
     marginRight: 10,
   },
 
@@ -1149,8 +919,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     backgroundColor: colors.surface2,
     borderWidth: 1,
-    borderColor:
-      'rgba(45, 225, 214, 0.16)',
+    borderColor: 'rgba(45, 225, 214, 0.16)',
   },
 
   readyHeader: {
@@ -1333,11 +1102,7 @@ const styles = StyleSheet.create({
 
   buttonPressed: {
     opacity: 0.82,
-    transform: [
-      {
-        scale: 0.988,
-      },
-    ],
+    transform: [{ scale: 0.988 }],
   },
 
   buttonDisabled: {
@@ -1359,8 +1124,7 @@ const styles = StyleSheet.create({
     borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:
-      'rgba(6, 17, 19, 0.10)',
+    backgroundColor: 'rgba(6, 17, 19, 0.10)',
   },
 
   footerText: {
