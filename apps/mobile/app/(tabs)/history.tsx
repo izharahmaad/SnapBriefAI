@@ -80,6 +80,39 @@ export default function History() {
     );
   };
 
+  const handleOpenBrief = (item: Brief) => {
+    const points = item.key_points?.length
+      ? item.key_points
+          .map((point) => `• ${point}`)
+          .join('\n')
+      : 'No key points recorded.';
+
+    const actions = item.actions?.length
+      ? item.actions
+          .map((action) => `• ${action}`)
+          .join('\n')
+      : 'No actions recorded.';
+
+    Alert.alert(
+      item.title || 'Saved brief',
+      [
+        item.summary || 'No summary available.',
+        '',
+        'KEY POINTS',
+        points,
+        '',
+        'ACTIONS',
+        actions,
+      ].join('\n'),
+      [
+        {
+          text: 'Close',
+          style: 'cancel',
+        },
+      ],
+    );
+  };
+
   return (
     <ScrollView
       style={styles.page}
@@ -94,6 +127,7 @@ export default function History() {
       {/* =========================================================
           HEADER
       ========================================================= */}
+
       <View style={styles.header}>
         <View style={styles.headerCopy}>
           <View style={styles.eyebrowRow}>
@@ -117,6 +151,8 @@ export default function History() {
           <Pressable
             onPress={handleClear}
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Clear history"
             style={({ pressed }) => [
               styles.clearButton,
               pressed && styles.pressed,
@@ -138,6 +174,7 @@ export default function History() {
       {/* =========================================================
           OVERVIEW
       ========================================================= */}
+
       {!loading && items.length > 0 ? (
         <View style={styles.overview}>
           <HistoryMetric
@@ -164,6 +201,7 @@ export default function History() {
       {/* =========================================================
           CONTENT
       ========================================================= */}
+
       {loading ? (
         <View style={styles.emptyState}>
           <View style={styles.emptyIcon}>
@@ -218,6 +256,7 @@ export default function History() {
               key={item.id}
               item={item}
               index={index}
+              onPress={handleOpenBrief}
             />
           ))}
         </View>
@@ -253,9 +292,11 @@ function HistoryMetric({
 function HistoryItem({
   item,
   index,
+  onPress,
 }: {
   item: Brief;
   index: number;
+  onPress: (item: Brief) => void;
 }) {
   const date = new Date(item.created_at);
 
@@ -273,105 +314,129 @@ function HistoryItem({
     item.priority?.toLowerCase() || 'normal';
 
   return (
-    <GlassCard style={styles.item}>
-      <View style={styles.itemHeader}>
-        <View style={styles.itemMeta}>
-          <Text style={styles.index}>
-            {String(index + 1).padStart(2, '0')}
-          </Text>
+    <Pressable
+      onPress={() => onPress(item)}
+      accessibilityRole="button"
+      accessibilityLabel={`Open brief: ${item.title}`}
+      style={({ pressed }) => [
+        styles.itemPressable,
+        pressed && styles.itemPressed,
+      ]}
+    >
+      <GlassCard style={styles.item}>
+        <View style={styles.itemHeader}>
+          <View style={styles.itemMeta}>
+            <Text style={styles.index}>
+              {String(index + 1).padStart(2, '0')}
+            </Text>
 
-          <View style={styles.metaDivider} />
+            <View style={styles.metaDivider} />
 
-          <Text style={styles.date}>
-            {formattedDate}
-          </Text>
+            <Text style={styles.date}>
+              {formattedDate}
+            </Text>
+          </View>
+
+          <View style={styles.priority}>
+            <View
+              style={[
+                styles.priorityDot,
+                priority === 'high' &&
+                  styles.priorityDotHigh,
+              ]}
+            />
+
+            <Text
+              style={[
+                styles.priorityText,
+                priority === 'high' &&
+                  styles.priorityTextHigh,
+              ]}
+            >
+              {priority.toUpperCase()}
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.priority}>
-          <View
-            style={[
-              styles.priorityDot,
-              priority === 'high' &&
-                styles.priorityDotHigh,
-            ]}
-          />
-
+        <View style={styles.titleRow}>
           <Text
-            style={[
-              styles.priorityText,
-              priority === 'high' &&
-                styles.priorityTextHigh,
-            ]}
+            style={styles.itemTitle}
+            numberOfLines={2}
           >
-            {priority.toUpperCase()}
+            {item.title}
           </Text>
-        </View>
-      </View>
 
-      <Text
-        style={styles.itemTitle}
-        numberOfLines={2}
-      >
-        {item.title}
-      </Text>
-
-      <Text
-        style={styles.summary}
-        numberOfLines={3}
-      >
-        {item.summary}
-      </Text>
-
-      <View style={styles.itemFooter}>
-        <View style={styles.footerStat}>
-          <Ionicons
-            name="list-outline"
-            size={12}
-            color={colors.dim}
-          />
-
-          <Text style={styles.footerText}>
-            {item.key_points?.length ?? 0} points
-          </Text>
+          <View style={styles.openIcon}>
+            <Ionicons
+              name="arrow-up-right"
+              size={13}
+              color={colors.accent}
+            />
+          </View>
         </View>
 
-        <View style={styles.footerSeparator} />
+        <Text
+          style={styles.summary}
+          numberOfLines={3}
+        >
+          {item.summary}
+        </Text>
 
-        <View style={styles.footerStat}>
-          <Ionicons
-            name="arrow-forward-outline"
-            size={12}
-            color={colors.dim}
-          />
+        <View style={styles.itemFooter}>
+          <View style={styles.footerStat}>
+            <Ionicons
+              name="list-outline"
+              size={12}
+              color={colors.dim}
+            />
 
-          <Text style={styles.footerText}>
-            {item.actions?.length ?? 0} actions
-          </Text>
+            <Text style={styles.footerText}>
+              {item.key_points?.length ?? 0} points
+            </Text>
+          </View>
+
+          <View style={styles.footerSeparator} />
+
+          <View style={styles.footerStat}>
+            <Ionicons
+              name="arrow-forward-outline"
+              size={12}
+              color={colors.dim}
+            />
+
+            <Text style={styles.footerText}>
+              {item.actions?.length ?? 0} actions
+            </Text>
+          </View>
+
+          {item.tags?.length ? (
+            <>
+              <View style={styles.footerSeparator} />
+
+              <View style={styles.footerStat}>
+                <Ionicons
+                  name="pricetag-outline"
+                  size={12}
+                  color={colors.dim}
+                />
+
+                <Text style={styles.footerText}>
+                  {item.tags.length}
+                </Text>
+              </View>
+            </>
+          ) : null}
         </View>
-
-        {item.tags?.length ? (
-          <>
-            <View style={styles.footerSeparator} />
-
-            <View style={styles.footerStat}>
-              <Ionicons
-                name="pricetag-outline"
-                size={12}
-                color={colors.dim}
-              />
-
-              <Text style={styles.footerText}>
-                {item.tags.length}
-              </Text>
-            </View>
-          </>
-        ) : null}
-      </View>
-    </GlassCard>
+      </GlassCard>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  /* ============================================================
+     SCREEN
+  ============================================================ */
+
   page: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -528,9 +593,19 @@ const styles = StyleSheet.create({
      HISTORY ITEM
   ============================================================ */
 
+  itemPressable: {
+    marginBottom: 10,
+    borderRadius: radius.xl,
+  },
+
+  itemPressed: {
+    opacity: 0.72,
+    transform: [{ scale: 0.992 }],
+  },
+
   item: {
     padding: 16,
-    marginBottom: 10,
+    marginBottom: 0,
     borderRadius: radius.xl,
   },
 
@@ -595,13 +670,32 @@ const styles = StyleSheet.create({
     color: colors.accentSoft,
   },
 
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginTop: 15,
+  },
+
   itemTitle: {
+    flex: 1,
     color: colors.white,
     fontSize: 18,
     lineHeight: 23,
     fontWeight: '900',
     letterSpacing: -0.35,
-    marginTop: 15,
+  },
+
+  openIcon: {
+    width: 25,
+    height: 25,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(45, 225, 214, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(45, 225, 214, 0.10)',
+    marginTop: 1,
   },
 
   summary: {
