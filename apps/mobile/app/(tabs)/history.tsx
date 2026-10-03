@@ -368,7 +368,7 @@ function HistoryItem({
 
           <View style={styles.openIcon}>
             <Ionicons
-              name="arrow-up-right"
+              name="arrow-up-right-box"
               size={13}
               color={colors.accent}
             />
