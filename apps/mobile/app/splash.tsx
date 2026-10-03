@@ -13,8 +13,6 @@ import {
 
 import { colors, radius } from '@/theme';
 
-const ONBOARDING_KEY = 'snapbrief_onboarding_complete';
-
 export default function SplashScreen() {
   const markScale = useRef(new Animated.Value(0.86)).current;
   const markOpacity = useRef(new Animated.Value(0)).current;
@@ -73,7 +71,7 @@ export default function SplashScreen() {
 
       try {
         const completed = await AsyncStorage.getItem(
-          ONBOARDING_KEY,
+          'snapbrief_onboarding_complete',
         );
 
         if (!mounted) {
@@ -223,7 +221,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: radius.lg,
-
     alignItems: 'center',
     justifyContent: 'center',
 
@@ -258,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   tagline: {
-    color: colors.accentSoft,
+    color: colors.muted,
     fontSize: 11,
     lineHeight: 16,
     fontWeight: '500',
@@ -273,10 +270,8 @@ const styles = StyleSheet.create({
     width: 84,
     height: 2,
     overflow: 'hidden',
-
     borderRadius: radius.pill,
     backgroundColor: colors.border,
-
     marginTop: 20,
   },
 
