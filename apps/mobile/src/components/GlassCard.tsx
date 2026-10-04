@@ -18,7 +18,6 @@ export function GlassCard({
 }: GlassCardProps) {
   return (
     <View style={[styles.card, style]}>
-      <View pointerEvents="none" style={styles.highlight} />
       {children}
     </View>
   );
@@ -26,13 +25,10 @@ export function GlassCard({
 
 const styles = StyleSheet.create({
   card: {
-    position: 'relative',
-    overflow: 'hidden',
-
     backgroundColor: colors.surface,
 
     borderWidth: 1,
-    borderColor: 'rgba(146, 255, 247, 0.075)',
+    borderColor: colors.border,
     borderRadius: radius.xl,
 
     shadowColor: '#000000',
@@ -40,20 +36,9 @@ const styles = StyleSheet.create({
       width: 0,
       height: 5,
     },
-    shadowOpacity: 0.16,
+    shadowOpacity: 0.14,
     shadowRadius: 14,
 
     elevation: 3,
-  },
-
-  highlight: {
-    position: 'absolute',
-    top: 0,
-    left: 18,
-    right: 18,
-    height: 1,
-
-    backgroundColor:
-      'rgba(146, 255, 247, 0.10)',
   },
 });
