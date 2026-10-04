@@ -25,6 +25,7 @@ export default function RootLayout() {
             animation: 'none',
           }}
         />
+
         <Stack.Screen name="onboarding" />
 
         <Stack.Screen name="(tabs)" />
