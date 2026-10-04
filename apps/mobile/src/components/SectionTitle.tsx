@@ -14,13 +14,7 @@ export function SectionTitle({
   return (
     <View style={styles.container}>
       <View style={styles.eyebrowRow}>
-        <View style={styles.eyebrowAccent} />
-
-        <Text
-          style={styles.eyebrow}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
+        <Text style={styles.eyebrow}>
           {eyebrow}
         </Text>
 
@@ -30,7 +24,6 @@ export function SectionTitle({
       <Text
         style={styles.title}
         numberOfLines={2}
-        ellipsizeMode="tail"
       >
         {title}
       </Text>
@@ -41,38 +34,29 @@ export function SectionTitle({
 const styles = StyleSheet.create({
   container: {
     flexShrink: 1,
+    gap: 5,
   },
 
   eyebrowRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 12,
-    marginBottom: 5,
-  },
-
-  eyebrowAccent: {
-    width: 3,
-    height: 10,
-    borderRadius: 999,
-    backgroundColor: colors.accent,
-    marginRight: 6,
+    minHeight: 10,
   },
 
   eyebrow: {
-    flexShrink: 0,
-    color: colors.accentSoft,
-    fontSize: 8,
-    lineHeight: 10,
+    color: colors.accent,
+    fontSize: 7,
+    lineHeight: 9,
     fontWeight: '900',
-    letterSpacing: 1.15,
+    letterSpacing: 1.35,
     textTransform: 'uppercase',
   },
 
   eyebrowLine: {
-    flex: 1,
+    width: 18,
     height: 1,
-    marginLeft: 8,
-    backgroundColor: 'rgba(45, 225, 214, 0.16)',
+    marginLeft: 7,
+    backgroundColor: 'rgba(45, 225, 214, 0.28)',
   },
 
   title: {
