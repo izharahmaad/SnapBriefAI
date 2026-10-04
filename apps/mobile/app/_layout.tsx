@@ -26,19 +26,9 @@ export default function RootLayout() {
           }}
         />
 
-        <Stack.Screen
-          name="onboarding"
-          options={{
-            animation: 'fade',
-          }}
-        />
+        <Stack.Screen name="onboarding" />
 
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            animation: 'fade',
-          }}
-        />
+        <Stack.Screen name="(tabs)" />
       </Stack>
     </>
   );
