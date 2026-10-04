@@ -726,9 +726,6 @@ const styles = StyleSheet.create({
     marginLeft: 56,
   },
 
-  /* ============================================================
-     CONNECTION
-  ============================================================ */
 
   endpoint: {
     color: colors.dim,
@@ -770,7 +767,7 @@ const styles = StyleSheet.create({
     color: colors.danger,
   },
 
-  
+
   about: {
     padding: 15,
     borderRadius: radius.xl,
