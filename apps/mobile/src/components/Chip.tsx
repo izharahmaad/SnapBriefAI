@@ -18,13 +18,12 @@ export function Chip({ text }: ChipProps) {
 
   return (
     <View style={styles.chip}>
-      <View style={styles.iconWrap}>
-        <Ionicons
-          name="pricetag-outline"
-          size={10}
-          color={colors.accent}
-        />
-      </View>
+      <Ionicons
+        name="pricetag-outline"
+        size={9}
+        color={colors.accent}
+        style={styles.icon}
+      />
 
       <Text
         style={styles.text}
@@ -43,33 +42,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
 
-    minHeight: 27,
+    minHeight: 26,
 
-    paddingLeft: 7,
-    paddingRight: 10,
+    paddingHorizontal: 9,
 
     borderRadius: radius.pill,
 
     backgroundColor:
-      'rgba(45, 225, 214, 0.045)',
+      'rgba(45, 225, 214, 0.035)',
 
     borderWidth: 1,
     borderColor:
-      'rgba(45, 225, 214, 0.12)',
+      'rgba(45, 225, 214, 0.10)',
   },
 
-  iconWrap: {
-    width: 17,
-    height: 17,
-
-    borderRadius: 999,
-
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    backgroundColor:
-      'rgba(45, 225, 214, 0.075)',
-
+  icon: {
     marginRight: 5,
   },
 
@@ -80,8 +67,8 @@ const styles = StyleSheet.create({
     lineHeight: 11,
 
     fontWeight: '700',
-    letterSpacing: 0.15,
+    letterSpacing: 0.1,
 
-    maxWidth: 150,
+    maxWidth: 135,
   },
 });
