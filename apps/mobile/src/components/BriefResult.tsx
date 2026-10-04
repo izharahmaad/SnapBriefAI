@@ -11,35 +11,35 @@ import { colors, radius, spacing } from '@/theme';
 import { Chip } from './Chip';
 
 export function BriefResult({ brief }: { brief: Brief }) {
-  const priority = (brief.priority || 'normal').toLowerCase();
-
   const priorityConfig = {
     high: {
       icon: 'alert-circle-outline' as const,
       color: colors.accent,
       label: 'High',
+      background: 'rgba(45, 225, 214, 0.08)',
     },
     medium: {
       icon: 'time-outline' as const,
       color: colors.accentSoft,
       label: 'Medium',
+      background: 'rgba(146, 255, 247, 0.07)',
     },
     low: {
       icon: 'arrow-down-circle-outline' as const,
       color: colors.muted,
       label: 'Low',
-    },
-    normal: {
-      icon: 'remove-circle-outline' as const,
-      color: colors.muted,
-      label: 'Normal',
+      background: 'rgba(135, 166, 165, 0.07)',
     },
   };
 
   const priorityStyle =
-    priorityConfig[
-      priority as keyof typeof priorityConfig
-    ] ?? priorityConfig.normal;
+    priorityConfig[brief.priority] ?? priorityConfig.medium;
+
+  const hasKeyPoints = brief.key_points?.length > 0;
+  const hasActions = brief.actions?.length > 0;
+  const hasDueDate = Boolean(brief.due_date);
+  const hasTags = brief.tags?.length > 0;
+  const hasDetails = hasDueDate || hasTags;
 
   return (
     <View style={styles.container}>
@@ -56,15 +56,26 @@ export function BriefResult({ brief }: { brief: Brief }) {
             />
           </View>
 
-          <View>
-            <Text style={styles.eyebrow}>SNAPBRIEF</Text>
+          <View style={styles.identityCopy}>
+            <Text style={styles.eyebrow}>
+              SNAPBRIEF
+            </Text>
+
             <Text style={styles.generated}>
               Generated brief
             </Text>
           </View>
         </View>
 
-        <View style={styles.priority}>
+        <View
+          style={[
+            styles.priorityBadge,
+            {
+              backgroundColor: priorityStyle.background,
+              borderColor: `${priorityStyle.color}22`,
+            },
+          ]}
+        >
           <View
             style={[
               styles.priorityDot,
@@ -103,7 +114,7 @@ export function BriefResult({ brief }: { brief: Brief }) {
       {/* =========================================================
           KEY POINTS
       ========================================================= */}
-      {brief.key_points?.length ? (
+      {hasKeyPoints ? (
         <BriefSection
           number="01"
           title="Key points"
@@ -131,7 +142,7 @@ export function BriefResult({ brief }: { brief: Brief }) {
       {/* =========================================================
           ACTIONS
       ========================================================= */}
-      {brief.actions?.length ? (
+      {hasActions ? (
         <BriefSection
           number="02"
           title="Next actions"
@@ -163,7 +174,7 @@ export function BriefResult({ brief }: { brief: Brief }) {
       {/* =========================================================
           DETAILS
       ========================================================= */}
-      {brief.tags?.length || brief.due_date ? (
+      {hasDetails ? (
         <View style={styles.details}>
           <View style={styles.detailsHeader}>
             <Text style={styles.detailsLabel}>
@@ -173,66 +184,55 @@ export function BriefResult({ brief }: { brief: Brief }) {
             <View style={styles.detailsLine} />
           </View>
 
-          <View style={styles.detailsRows}>
+          {hasDueDate ? (
             <View style={styles.detailRow}>
               <View style={styles.detailIdentity}>
-                <Ionicons
-                  name={priorityStyle.icon}
-                  size={14}
-                  color={priorityStyle.color}
-                />
+                <View style={styles.detailIcon}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={12}
+                    color={colors.muted}
+                  />
+                </View>
 
                 <Text style={styles.detailLabel}>
-                  Priority
+                  Due date
                 </Text>
               </View>
 
               <Text
-                style={[
-                  styles.detailValue,
-                  {
-                    color: priorityStyle.color,
-                  },
-                ]}
+                style={styles.detailValue}
+                numberOfLines={1}
               >
-                {priorityStyle.label}
+                {brief.due_date}
               </Text>
             </View>
+          ) : null}
 
-            {brief.due_date ? (
-              <View style={styles.detailRow}>
-                <View style={styles.detailIdentity}>
-                  <Ionicons
-                    name="calendar-outline"
-                    size={14}
-                    color={colors.muted}
-                  />
-
-                  <Text style={styles.detailLabel}>
-                    Due date
-                  </Text>
-                </View>
-
-                <Text style={styles.detailValue}>
-                  {brief.due_date}
-                </Text>
-              </View>
-            ) : null}
-          </View>
-
-          {brief.tags?.length ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.tags}
+          {hasTags ? (
+            <View
+              style={[
+                styles.tagsRow,
+                hasDueDate && styles.tagsRowSpaced,
+              ]}
             >
-              {brief.tags.map((tag) => (
-                <Chip
-                  key={tag}
-                  text={tag}
-                />
-              ))}
-            </ScrollView>
+              <Text style={styles.tagsLabel}>
+                Tags
+              </Text>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.tags}
+              >
+                {brief.tags.map((tag, index) => (
+                  <Chip
+                    key={`${tag}-${index}`}
+                    text={tag}
+                  />
+                ))}
+              </ScrollView>
+            </View>
           ) : null}
         </View>
       ) : null}
@@ -254,9 +254,11 @@ function BriefSection({
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionNumber}>
-          {number}
-        </Text>
+        <View style={styles.sectionNumberWrap}>
+          <Text style={styles.sectionNumber}>
+            {number}
+          </Text>
+        </View>
 
         <View style={styles.sectionCopy}>
           <Text style={styles.sectionTitle}>
@@ -292,8 +294,14 @@ const styles = StyleSheet.create({
 
   identity: {
     flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  identityCopy: {
+    flex: 1,
+    minWidth: 0,
   },
 
   documentIcon: {
@@ -321,15 +329,19 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  priority: {
+  priorityBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    minHeight: 25,
+    paddingHorizontal: 9,
+    borderRadius: radius.pill,
+    borderWidth: 1,
   },
 
   priorityDot: {
     width: 5,
     height: 5,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     marginRight: 6,
   },
 
@@ -337,7 +349,7 @@ const styles = StyleSheet.create({
     fontSize: 8,
     lineHeight: 10,
     fontWeight: '900',
-    letterSpacing: 0.65,
+    letterSpacing: 0.55,
   },
 
   /* ============================================================
@@ -345,22 +357,22 @@ const styles = StyleSheet.create({
   ============================================================ */
 
   main: {
-    marginTop: 24,
+    marginTop: 22,
   },
 
   title: {
     color: colors.white,
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 26,
+    lineHeight: 32,
     fontWeight: '900',
-    letterSpacing: -0.8,
+    letterSpacing: -0.7,
   },
 
   summary: {
     color: colors.muted,
     fontSize: 13,
-    lineHeight: 21,
-    marginTop: 10,
+    lineHeight: 20,
+    marginTop: 9,
   },
 
   /* ============================================================
@@ -368,22 +380,28 @@ const styles = StyleSheet.create({
   ============================================================ */
 
   section: {
-    marginTop: 28,
+    marginTop: 25,
   },
 
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 14,
+    marginBottom: 12,
+  },
+
+  sectionNumberWrap: {
+    width: 30,
+    height: 24,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
 
   sectionNumber: {
-    width: 30,
     color: colors.accent,
     fontSize: 8,
     lineHeight: 10,
     fontWeight: '900',
-    letterSpacing: 0.5,
+    letterSpacing: 0.55,
   },
 
   sectionCopy: {
@@ -405,7 +423,7 @@ const styles = StyleSheet.create({
   },
 
   itemList: {
-    gap: 12,
+    gap: 10,
   },
 
   item: {
@@ -427,7 +445,7 @@ const styles = StyleSheet.create({
   pointDot: {
     width: 5,
     height: 5,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     backgroundColor: colors.accent,
   },
 
@@ -446,12 +464,16 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.text,
     fontSize: 12,
-    lineHeight: 19,
+    lineHeight: 18,
   },
 
+  /* ============================================================
+     DETAILS
+  ============================================================ */
+
   details: {
-    marginTop: 29,
-    paddingTop: 16,
+    marginTop: 27,
+    paddingTop: 15,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
@@ -459,7 +481,7 @@ const styles = StyleSheet.create({
   detailsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 11,
+    marginBottom: 12,
   },
 
   detailsLabel: {
@@ -477,35 +499,66 @@ const styles = StyleSheet.create({
     marginLeft: 9,
   },
 
-  detailsRows: {
-    gap: 11,
-    marginBottom: 11,
-  },
-
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 24,
   },
 
   detailIdentity: {
     flexDirection: 'row',
     alignItems: 'center',
+    minWidth: 0,
+  },
+
+  detailIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(135, 166, 165, 0.06)',
+    marginRight: 8,
   },
 
   detailLabel: {
     color: colors.dim,
     fontSize: 9,
-    marginLeft: 7,
+    lineHeight: 12,
   },
 
   detailValue: {
+    maxWidth: '52%',
     color: colors.text,
     fontSize: 9,
+    lineHeight: 12,
     fontWeight: '800',
+    textAlign: 'right',
+  },
+
+  tagsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 27,
+  },
+
+  tagsRowSpaced: {
+    marginTop: 10,
+  },
+
+  tagsLabel: {
+    width: 30,
+    color: colors.dim,
+    fontSize: 8,
+    lineHeight: 10,
+    fontWeight: '700',
+    marginRight: 7,
   },
 
   tags: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 7,
     paddingRight: 4,
   },
