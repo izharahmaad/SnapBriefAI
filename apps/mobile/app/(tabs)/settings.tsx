@@ -770,7 +770,7 @@ const styles = StyleSheet.create({
     color: colors.danger,
   },
 
-
+  
   about: {
     padding: 15,
     borderRadius: radius.xl,
