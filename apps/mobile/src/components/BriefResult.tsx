@@ -281,10 +281,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
-  /* ============================================================
-     HEADER
-  ============================================================ */
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -370,10 +366,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 9,
   },
-
-  /* ============================================================
-     SECTIONS
-  ============================================================ */
 
   section: {
     marginTop: 25,
