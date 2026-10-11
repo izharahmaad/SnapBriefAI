@@ -139,9 +139,6 @@ export function BriefResult({ brief }: { brief: Brief }) {
         </BriefSection>
       ) : null}
 
-      {/* =========================================================
-          ACTIONS
-      ========================================================= */}
       {hasActions ? (
         <BriefSection
           number="02"
