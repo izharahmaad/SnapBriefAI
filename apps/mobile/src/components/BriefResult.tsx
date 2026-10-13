@@ -106,9 +106,6 @@ export function BriefResult({ brief }: { brief: Brief }) {
         </Text>
       </View>
 
-      {/* =========================================================
-          KEY POINTS
-      ========================================================= */}
       {hasKeyPoints ? (
         <BriefSection
           number="01"
