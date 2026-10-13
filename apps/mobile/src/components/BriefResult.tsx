@@ -43,9 +43,7 @@ export function BriefResult({ brief }: { brief: Brief }) {
 
   return (
     <View style={styles.container}>
-      {/* =========================================================
-          HEADER
-      ========================================================= */}
+     
       <View style={styles.header}>
         <View style={styles.identity}>
           <View style={styles.documentIcon}>
