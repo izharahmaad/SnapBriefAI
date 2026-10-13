@@ -525,7 +525,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: 7,
   },
-
   tags: {
     flexDirection: 'row',
     alignItems: 'center',
