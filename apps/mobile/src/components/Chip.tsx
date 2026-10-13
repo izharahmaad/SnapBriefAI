@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
     borderColor:
       'rgba(45, 225, 214, 0.10)',
   },
-
   icon: {
     marginRight: 5,
   },
