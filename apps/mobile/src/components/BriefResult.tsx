@@ -160,9 +160,6 @@ export function BriefResult({ brief }: { brief: Brief }) {
         </BriefSection>
       ) : null}
 
-      {/* =========================================================
-          DETAILS
-      ========================================================= */}
       {hasDetails ? (
         <View style={styles.details}>
           <View style={styles.detailsHeader}>
