@@ -583,7 +583,7 @@ The design system keeps reusable components visually consistent across the appli
 ### Start the Mobile App
 
     cd apps/mobile
-    npx expo start
+    npx expo start -c
 
 ### Test the API Independently
 
