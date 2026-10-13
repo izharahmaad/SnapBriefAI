@@ -96,9 +96,6 @@ export function BriefResult({ brief }: { brief: Brief }) {
         </View>
       </View>
 
-      {/* =========================================================
-          MAIN CONTENT
-      ========================================================= */}
       <View style={styles.main}>
         <Text style={styles.title}>
           {brief.title}
