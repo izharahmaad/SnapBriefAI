@@ -67,7 +67,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1.15,
     textTransform: 'uppercase',
   },
-
   eyebrowLine: {
     flex: 1,
     height: 1,
