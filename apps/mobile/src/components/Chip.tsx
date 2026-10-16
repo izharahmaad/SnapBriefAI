@@ -15,7 +15,6 @@ export function Chip({ text }: ChipProps) {
   const label = text.startsWith('#')
     ? text
     : `#${text}`;
-
   return (
     <View style={styles.chip}>
       <Ionicons
